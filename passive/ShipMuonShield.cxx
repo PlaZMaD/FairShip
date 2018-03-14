@@ -149,6 +149,66 @@ void ShipMuonShield::CreateArb8(TString arbName, TGeoMedium *medium,
 						z_translation));
 }
 
+void ShipMuonShield::CreateArb8(TString arbName, TGeoMedium *medium,
+                                Double_t dZ, std::array<Double_t, 16> corners,
+                                Int_t color, TGeoUniformMagField *magField,
+                                TGeoVolume *tShield, Double_t x_translation,
+                                Double_t y_translation,
+                                Double_t z_translation, Int_t part_number) {
+
+  Int_t zParts = int(dZ/m/0.5)+1;
+  Double_t finalCorners[zParts][16];
+  Double_t dxdy[4][2];
+  Double_t dZp = dZ/Double_t(zParts);
+
+  for (int i = 0; i < 4; ++i)
+  {
+    dxdy[i][0] = (corners[8+2*i] - corners[0+2*i])/Double_t(zParts);
+    dxdy[i][1] = (corners[9+2*i] - corners[1+2*i])/Double_t(zParts);
+  }
+
+  std::copy(corners.data() + 0,  corners.data() + 8, finalCorners[0]);
+
+  for (int i = 0; i < zParts; ++i)
+  {
+    for (int k = 0; k < 4; ++k)
+    {
+      finalCorners[i][8+2*k] = finalCorners[i][0+2*k] + dxdy[k][0];
+      finalCorners[i][9+2*k] = finalCorners[i][1+2*k] + dxdy[k][1];
+    }
+    if (i != zParts-1)
+    {
+      std::copy(finalCorners[i] + 8, finalCorners[i] + 16, finalCorners[i+1]);
+    }
+  }
+	
+  for (int i = 0; i < zParts; ++i)
+  {
+    for (int k = 0; k < 4; ++k)
+    {
+      finalCorners[i][8+2*k] = finalCorners[i][0+2*k]  = (finalCorners[i][0+2*k] + finalCorners[i][8+2*k]) / 2.0;
+      finalCorners[i][9+2*k] = finalCorners[i][1+2*k]  = (finalCorners[i][9+2*k] + finalCorners[i][1+2*k]) / 2.0;
+    }
+  }
+
+  std::vector<TGeoVolume*> magF;
+
+  for (int i = 0; i < zParts; ++i)
+  {
+    const char* newName = new char[strlen(arbName) + 4];
+    strcpy(const_cast<char*>(newName), std::to_string(i).c_str());
+    magF.push_back(gGeoManager->MakeArb8(arbName, medium, dZp - 0.00001*m, finalCorners[i]));
+    magF[i]->SetLineColor(color);
+    magF[i]->SetField(magField);
+  }
+
+  for (int i = 0; i < zParts; ++i)
+  {
+    tShield->AddNode(magF[i], 1, new TGeoTranslation(x_translation, y_translation, z_translation + i*2.0*dZp - dZ));
+  }
+}
+
+
 void ShipMuonShield::CreateMagnet(TString magnetName,TGeoMedium* medium,TGeoVolume *tShield,TGeoUniformMagField *fields[4],FieldDirection fieldDirection,
 				  Double_t dX, Double_t dY, Double_t dX2, Double_t dY2, Double_t dZ,
 				  Double_t middleGap,Double_t middleGap2,
@@ -255,32 +315,32 @@ void ShipMuonShield::CreateMagnet(TString magnetName,TGeoMedium* medium,TGeoVolu
     switch (fieldDirection){
 
     case FieldDirection::up: 
-      CreateArb8(magnetName + str1L, medium, dZ, cornersMainL, color[0], fields[0], tShield,  0, 0, Z);
-      CreateArb8(magnetName + str1R, medium, dZ, cornersMainR, color[0], fields[0], tShield,  0, 0, Z);
-      CreateArb8(magnetName + str2, medium, dZ, cornersMainSideL, color[1], fields[1], tShield,  0, 0, Z);
-      CreateArb8(magnetName + str3, medium, dZ, cornersMainSideR, color[1], fields[1], tShield,  0, 0, Z);
-      CreateArb8(magnetName + str4, medium, dZ, cornersCLBA, color[1], fields[1], tShield,  0, 0, Z);
-      CreateArb8(magnetName + str5, medium, dZ, cornersCLTA, color[1], fields[1], tShield,  0, 0, Z);
-      CreateArb8(magnetName + str6, medium, dZ, cornersCRTA, color[1], fields[1], tShield,  0, 0, Z);
-      CreateArb8(magnetName + str7, medium, dZ, cornersCRBA, color[1], fields[1], tShield,  0, 0, Z);
-      CreateArb8(magnetName + str8, medium, dZ, cornersTL, color[3], fields[3], tShield,  0, 0, Z);
-      CreateArb8(magnetName + str9, medium, dZ, cornersTR, color[2], fields[2], tShield,  0, 0, Z);
-      CreateArb8(magnetName + str10, medium, dZ, cornersBL, color[2], fields[2], tShield,  0, 0, Z);
-      CreateArb8(magnetName + str11, medium, dZ, cornersBR, color[3], fields[3], tShield,  0, 0, Z);
+      CreateArb8(magnetName + str1L, medium, dZ, cornersMainL, color[0], fields[0], tShield,  0, 0, Z, 1);
+      CreateArb8(magnetName + str1R, medium, dZ, cornersMainR, color[0], fields[0], tShield,  0, 0, Z, 2);
+      CreateArb8(magnetName + str2, medium, dZ, cornersMainSideL, color[1], fields[1], tShield,  0, 0, Z, 3);
+      CreateArb8(magnetName + str3, medium, dZ, cornersMainSideR, color[1], fields[1], tShield,  0, 0, Z, 4);
+      CreateArb8(magnetName + str4, medium, dZ, cornersCLBA, color[1], fields[1], tShield,  0, 0, Z, 5);
+      CreateArb8(magnetName + str5, medium, dZ, cornersCLTA, color[1], fields[1], tShield,  0, 0, Z, 6);
+      CreateArb8(magnetName + str6, medium, dZ, cornersCRTA, color[1], fields[1], tShield,  0, 0, Z, 7);
+      CreateArb8(magnetName + str7, medium, dZ, cornersCRBA, color[1], fields[1], tShield,  0, 0, Z, 8);
+      CreateArb8(magnetName + str8, medium, dZ, cornersTL, color[3], fields[3], tShield,  0, 0, Z, 9);
+      CreateArb8(magnetName + str9, medium, dZ, cornersTR, color[2], fields[2], tShield,  0, 0, Z, 10);
+      CreateArb8(magnetName + str10, medium, dZ, cornersBL, color[2], fields[2], tShield,  0, 0, Z, 11);
+      CreateArb8(magnetName + str11, medium, dZ, cornersBR, color[3], fields[3], tShield,  0, 0, Z, 12);
       break;
     case FieldDirection::down:
-      CreateArb8(magnetName + str1L, medium, dZ, cornersMainL, color[1], fields[1], tShield,  0, 0, Z);
-      CreateArb8(magnetName + str1R, medium, dZ, cornersMainR, color[1], fields[1], tShield,  0, 0, Z);
-      CreateArb8(magnetName + str2, medium, dZ, cornersMainSideL, color[0], fields[0], tShield,  0, 0, Z);
-      CreateArb8(magnetName + str3, medium, dZ, cornersMainSideR, color[0], fields[0], tShield,  0, 0, Z);
-      CreateArb8(magnetName + str4, medium, dZ, cornersCLBA, color[0], fields[0], tShield,  0, 0, Z);
-      CreateArb8(magnetName + str5, medium, dZ, cornersCLTA, color[0], fields[0], tShield,  0, 0, Z);
-      CreateArb8(magnetName + str6, medium, dZ, cornersCRTA, color[0], fields[0], tShield,  0, 0, Z);
-      CreateArb8(magnetName + str7, medium, dZ, cornersCRBA, color[0], fields[0], tShield,  0, 0, Z);
-      CreateArb8(magnetName + str8, medium, dZ, cornersTL, color[2], fields[2], tShield,  0, 0, Z);
-      CreateArb8(magnetName + str9, medium, dZ, cornersTR, color[3], fields[3], tShield,  0, 0, Z);
-      CreateArb8(magnetName + str10, medium, dZ, cornersBL, color[3], fields[3], tShield,  0, 0, Z);
-      CreateArb8(magnetName + str11, medium, dZ, cornersBR, color[2], fields[2], tShield,  0, 0, Z);
+      CreateArb8(magnetName + str1L, medium, dZ, cornersMainL, color[1], fields[1], tShield,  0, 0, Z, 1);
+      CreateArb8(magnetName + str1R, medium, dZ, cornersMainR, color[1], fields[1], tShield,  0, 0, Z, 2);
+      CreateArb8(magnetName + str2, medium, dZ, cornersMainSideL, color[0], fields[0], tShield,  0, 0, Z, 3);
+      CreateArb8(magnetName + str3, medium, dZ, cornersMainSideR, color[0], fields[0], tShield,  0, 0, Z, 4);
+      CreateArb8(magnetName + str4, medium, dZ, cornersCLBA, color[0], fields[0], tShield,  0, 0, Z, 5);
+      CreateArb8(magnetName + str5, medium, dZ, cornersCLTA, color[0], fields[0], tShield,  0, 0, Z, 6);
+      CreateArb8(magnetName + str6, medium, dZ, cornersCRTA, color[0], fields[0], tShield,  0, 0, Z, 7);
+      CreateArb8(magnetName + str7, medium, dZ, cornersCRBA, color[0], fields[0], tShield,  0, 0, Z, 8);
+      CreateArb8(magnetName + str8, medium, dZ, cornersTL, color[2], fields[2], tShield,  0, 0, Z, 9);
+      CreateArb8(magnetName + str9, medium, dZ, cornersTR, color[3], fields[3], tShield,  0, 0, Z, 10);
+      CreateArb8(magnetName + str10, medium, dZ, cornersBL, color[3], fields[3], tShield,  0, 0, Z, 11);
+      CreateArb8(magnetName + str11, medium, dZ, cornersBR, color[2], fields[2], tShield,  0, 0, Z, 12);
       break;
     }
   }
