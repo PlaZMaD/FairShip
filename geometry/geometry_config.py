@@ -105,12 +105,13 @@ with ConfigRegistry.register_config("basic") as c:
      if tankDesign > 5: 
       c.Veto.outerSupport = 5.*u.mm
       c.Veto.outerSupportMed = "steel"
+      c.Veto.lidThickness = 16.*u.mm
      else:
       c.Veto.outerSupport = 8.*u.mm
       c.Veto.outerSupportMed = "Aluminum"
+      c.Veto.lidThickness = 80.*u.mm
      c.Veto.sensitiveThickness = 0.3*u.m
      c.Veto.sensitiveMed = "Scintillator"
-     c.Veto.lidThickness = 80.*u.mm
      c.Veto.decayMed = "vacuums"
      c.Veto.rib = 3.*u.cm
      c.Veto.ribMed = "steel"
@@ -266,6 +267,7 @@ with ConfigRegistry.register_config("basic") as c:
     c.ecal  =  AttrDict(z = c.TimeDet.z + c.TimeDet.DZ  + 5*u.cm + presShowerDeltaZ)  #
     c.ecal.File = EcalGeoFile
     hcalThickness = 232*u.cm
+    if  c.HcalOption == 2: hcalThickness = 110*u.cm  # to have same interaction length as before
     if not c.HcalOption < 0:
      c.hcal =  AttrDict(z=c.ecal.z + hcalThickness/2. + 45.*u.cm  )
      c.hcal.hcalSpace = hcalThickness + 5.5*u.cm
@@ -660,17 +662,18 @@ with ConfigRegistry.register_config("basic") as c:
 
     c.NuTauTarget.Ydist = 0.2*u.cm
     
-    c.NuTauTarget.EmTh = 0.0045 * u.cm
+    c.NuTauTarget.SingleEmFilm = True
+    c.NuTauTarget.EmTh = 0.0070 * u.cm
     c.NuTauTarget.EmX = 12.5 * u.cm
     c.NuTauTarget.EmY = 9.9 * u.cm
-    c.NuTauTarget.PBTh = 0.0205 * u.cm
+    c.NuTauTarget.PBTh = 0.0175 * u.cm
     c.NuTauTarget.LeadTh = 0.1 * u.cm
     c.NuTauTarget.EPlW = 2* c.NuTauTarget.EmTh + c.NuTauTarget.PBTh
     c.NuTauTarget.AllPW = c.NuTauTarget.LeadTh + c.NuTauTarget.EPlW
     c.NuTauTarget.BrX = 12.9 *u.cm
     c.NuTauTarget.BrY = 10.5 *u.cm
     c.NuTauTarget.xdim = c.NuTauTarget.col*c.NuTauTarget.BrX
-    c.NuTauTarget.ydim = c.NuTauTarget.row*(c.NuTauTarget.BrY+c.NuTauTarget.Ydist)    
+    c.NuTauTarget.ydim = c.NuTauTarget.row*c.NuTauTarget.BrY+(c.NuTauTarget.row-1)*c.NuTauTarget.Ydist    
 
     c.NuTauTarget.BrPackZ = 0.1 * u.cm
     c.NuTauTarget.BrPackX = c.NuTauTarget.BrX - c.NuTauTarget.EmX
