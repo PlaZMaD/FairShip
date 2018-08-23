@@ -769,10 +769,10 @@ void ShipMuonShield::ConstructGeometry()
 
     
       for (Int_t nM = 2; nM <= (nMagnets - 1); nM++) {
-        
+
                 TGeoUniformMagField **fields_sum = (nM<5.)?fields_in:fields_out;
 
-	CreateMagnet(magnetName[nM], iron, tShield, fields_sum[nM], fieldDirection[nM],
+	CreateMagnet(magnetName[nM], iron, tShield, fields_sum, fieldDirection[nM],
 		     dXIn[nM], dYIn[nM], dXOut[nM], dYOut[nM], dZf[nM],
 		     midGapIn[nM], midGapOut[nM], HmainSideMagIn[nM],
 		     HmainSideMagOut[nM], gapIn[nM], gapOut[nM], Z[nM], nM==8);
