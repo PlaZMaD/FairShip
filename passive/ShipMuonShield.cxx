@@ -15,7 +15,8 @@
 #include "FairRuntimeDb.h"              // for FairRuntimeDb
 #include "TVectorT.h"
 #include "TFile.h"
-#include <iostream>                     // for operator<<, basic_ostream, etc
+#include <iostream>    
+                // for operator<<, basic_ostream, etc
 
 Double_t cm = 1;
 Double_t m = 100 * cm;
@@ -764,10 +765,12 @@ void ShipMuonShield::ConstructGeometry()
       TGeoUniformMagField *RetField_out     = new TGeoUniformMagField(0.,-ironField_in,0.);
       TGeoUniformMagField *fields_in[4] = {magFieldIron_in,RetField,ConRField,ConLField};
       TGeoUniformMagField *fields_out[4] = {magFieldIron,RetField_out,ConRField,ConLField};
-      TGeoUniformMagField *fields_sum[4] = {fields_in, fields_in, fields_in, fields_out, fields_out, fields_out, fields_out};
+      // std::vector<TGeoUniformMagField*> fields_sum = {fields_in, fields_in, fields_in, fields_out, fields_out, fields_out, fields_out};
 
     
       for (Int_t nM = 2; nM <= (nMagnets - 1); nM++) {
+        
+                TGeoUniformMagField **fields_sum = (nM<5.)?fields_in:fields_out;
 
 	CreateMagnet(magnetName[nM], iron, tShield, fields_sum[nM], fieldDirection[nM],
 		     dXIn[nM], dYIn[nM], dXOut[nM], dYOut[nM], dZf[nM],
