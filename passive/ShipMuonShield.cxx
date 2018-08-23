@@ -764,7 +764,7 @@ void ShipMuonShield::ConstructGeometry()
       TGeoUniformMagField *RetField_out     = new TGeoUniformMagField(0.,-ironField_in,0.);
       TGeoUniformMagField *fields_in[4] = {magFieldIron_in,RetField,ConRField,ConLField};
       TGeoUniformMagField *fields_out[4] = {magFieldIron,RetField_out,ConRField,ConLField};
-      TGeoUniformMagField **fields_sum[4] = {fields_in, fields_in, fields_in, fields_out, fields_out, fields_out, fields_out};
+      TGeoUniformMagField *fields_sum[4] = {fields_in, fields_in, fields_in, fields_out, fields_out, fields_out, fields_out};
 
     
       for (Int_t nM = 2; nM <= (nMagnets - 1); nM++) {
