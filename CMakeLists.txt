@@ -271,6 +271,7 @@ add_subdirectory (splitcal)
 add_subdirectory (hcal)
 add_subdirectory (veto)
 add_subdirectory (TimeDet)
+add_subdirectory (fluxDet)
 add_subdirectory (strawtubes)
 add_subdirectory (muon)
 add_subdirectory (shipgen)
@@ -279,6 +280,7 @@ add_subdirectory (genfit)
 add_subdirectory (preshower)
 add_subdirectory (pid)
 add_subdirectory (muonShieldOptimization)
+add_subdirectory (online)
 
 FIND_PATH(TEvePath NAMES TEveEventManager.h PATHS
   ${SIMPATH}/tools/root/include
