@@ -473,8 +473,8 @@ Int_t ShipMuonShield::Initialize(std::vector<TString> &magnetName,
      dZ[4] = dZ5 - zgap / 2;
      Z[4] = Z[3] + dZ[3] + dZ[4] + zgap;
 
-     dXIn[5] = 0.03 * m;
-     dXOut[5] = 0.32 * m;
+     dXIn[5] = 0.03 * m ;
+     dXOut[5] = 0.32 * - 0.05* m;
      dYIn[5] = 0.54 * m;
      dYOut[5] = 0.24 * m;
      gapIn[5] = 0.08 * m;
@@ -482,8 +482,8 @@ Int_t ShipMuonShield::Initialize(std::vector<TString> &magnetName,
      dZ[5] = dZ6 - zgap / 2;
      Z[5] = Z[4] + dZ[4] + dZ[5] + zgap;
 
-     dXIn[6] = 0.22 * m;
-     dXOut[6] = 0.32 * m;
+     dXIn[6] = 0.22 * m - 0.05* m;
+     dXOut[6] = 0.32 * m - 0.05* m;
      dYIn[6] = 2.09 * m;
      dYOut[6] = 0.35 * m;
      gapIn[6] = 0.08 * m;
@@ -491,8 +491,8 @@ Int_t ShipMuonShield::Initialize(std::vector<TString> &magnetName,
      dZ[6] = dZ7 - zgap / 2;
      Z[6] = Z[5] + dZ[5] + dZ[6] + zgap;
 
-     dXIn[7] = 0.33 * m;
-     dXOut[7] = 0.77 * m;
+     dXIn[7] = 0.33 * m - 0.05* m;
+     dXOut[7] = 0.77 * m - 0.05* m;
      dYIn[7] = 0.85 * m;
      dYOut[7] = 2.41 * m;
      gapIn[7] = 0.09 * m;
