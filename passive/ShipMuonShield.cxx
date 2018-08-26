@@ -63,7 +63,7 @@ ShipMuonShield::ShipMuonShield(const char* name, const Int_t Design, const char*
   : FairModule(name ,Title)
 {
  fDesign = Design;
- fField  = field;
+ fField  = 1.5;//field;
  fGeofile = "";
  if (fDesign==1){
      fMuonShieldLength = L1;   
@@ -760,7 +760,7 @@ void ShipMuonShield::ConstructGeometry()
 
       }
 
-      Double_t ironField_in = 1.7*tesla;
+      Double_t ironField_in = 1.8*tesla;
       TGeoUniformMagField *magFieldIron_in = new TGeoUniformMagField(0.,ironField_in,0.);
       TGeoUniformMagField *RetField_out     = new TGeoUniformMagField(0.,-ironField_in,0.);
       TGeoUniformMagField *fields_in[4] = {magFieldIron_in,RetField,ConRField,ConLField};
@@ -770,7 +770,8 @@ void ShipMuonShield::ConstructGeometry()
     
       for (Int_t nM = 2; nM <= (nMagnets - 1); nM++) {
 
-                TGeoUniformMagField **fields_sum = (nM<5.)?fields_in:fields_out;
+               // TGeoUniformMagField **fields_sum = (nM<5.)?fields_in:fields_out;
+		TGeoUniformMagField **fields_sum = fields_in;
 
 	CreateMagnet(magnetName[nM], iron, tShield, fields_sum, fieldDirection[nM],
 		     dXIn[nM], dYIn[nM], dXOut[nM], dYOut[nM], dZf[nM],
