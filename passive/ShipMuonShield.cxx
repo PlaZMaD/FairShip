@@ -656,6 +656,10 @@ void ShipMuonShield::ConstructGeometry()
     TGeoMedium *iron  =gGeoManager->GetMedium("iron");
     InitMedium("Concrete");
     TGeoMedium *concrete  =gGeoManager->GetMedium("Concrete");
+    //InitMedium("Air");
+    //TGeoMedium *concrete  =gGeoManager->GetMedium("Concrete");
+    InitMedium("vacuums");
+    TGeoMedium *vacuums =gGeoManager->GetMedium("vacuums");
     
     if (fDesign >= 5 && fDesign <= 9) {
       Double_t ironField = fField*tesla;
@@ -760,7 +764,7 @@ void ShipMuonShield::ConstructGeometry()
       }
 
       for (Int_t nM = 2; nM <= (nMagnets - 1); nM++) {
-	CreateMagnet(magnetName[nM], iron, tShield, fields, fieldDirection[nM],
+	CreateMagnet(magnetName[nM], vacuums, tShield, fields, fieldDirection[nM],
 		     dXIn[nM], dYIn[nM], dXOut[nM], dYOut[nM], dZf[nM],
 		     midGapIn[nM], midGapOut[nM], HmainSideMagIn[nM],
 		     HmainSideMagOut[nM], gapIn[nM], gapOut[nM], Z[nM], nM==8);
