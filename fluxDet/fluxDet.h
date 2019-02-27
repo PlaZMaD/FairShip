@@ -14,6 +14,7 @@ class fluxDet : public FairDetector
  public:
  	fluxDet(const char* name, const char* Title, Bool_t Active, Double_t X, Double_t Y, Double_t Z, Double_t dX, Double_t dY, Double_t dZ);
  	fluxDet();
+	void Initialize();
  	fluxDet(const char* name,Bool_t Active);
  	virtual ~fluxDet();
 
