@@ -1,5 +1,8 @@
-#!/usr/bin/env python 
-import ROOT,os,sys,getopt,time
+#!/usr/bin/env python2
+import os
+import sys
+import getopt
+import ROOT
 import shipunit as u
 import shipRoot_conf
 import rootUtils as ut
@@ -68,7 +71,7 @@ nuRadiography = False # misuse GenieGenerator for neutrino radiography and geome
 Opt_high = None # switch for cosmic generator
 try:
         opts, args = getopt.getopt(sys.argv[1:], "D:FHPu:n:i:f:c:hqv:s:l:A:Y:i:m:co:t:g",[\
-                                   "PG","pID=","Pythia6","Pythia8","Genie","MuDIS","Ntuple","Nuage","MuonBack","FollowMuon","FastMuon",\
+                                   "PG","pID=","Muflux","Pythia6","Pythia8","Genie","MuDIS","Ntuple","Nuage","MuonBack","FollowMuon","FastMuon",\
                                    "Cosmics=","nEvents=", "display", "seed=", "firstEvent=", "phiRandom", "mass=", "couplings=", "coupling=", "epsilon=",\
                                    "output=","tankDesign=","muShieldDesign=","NuRadio","test",\
                                    "DarkPhoton","RpvSusy","SusyBench=","sameSeed=","charm=","CharmdetSetup=","nuTauTargetDesign=","caloDesign=","strawDesign=","Estart=","Eend=",\
@@ -104,7 +107,10 @@ for o, a in opts:
             simEngine = "Pythia8"
         if o in ("--PG",):
             simEngine = "PG"
-        if o in ("--pID",):	    
+        if o in ("--Muflux",):
+            simEngine = "FixedTarget"
+            HNL = False
+        if o in ("--pID",):
             if a: pID = int(a)
         if o in ("--Estart",):
             Estart = 10.
@@ -195,7 +201,7 @@ for o, a in opts:
         if o in ("-e", "--epsilon",):
            theDPepsilon = float(a)
         if o in ("-t", "--test"):
-            inputFile = "../FairShip/files/Cascade-parp16-MSTP82-1-MSEL4-76Mpot_1_5000.root"
+            inputFile = "$FAIRSHIP/files/Cascade-parp16-MSTP82-1-MSEL4-76Mpot_1_5000.root"
             nEvents = 50
         if o in ("--dry-run",):
             dryrun = True
@@ -337,6 +343,14 @@ if simEngine == "Pythia8":
 # P8gen.SetMom(500.*u.GeV)
 # P8gen.SetId(-211)
  primGen.AddGenerator(P8gen)
+if simEngine == "FixedTarget":
+ P8gen = ROOT.FixedTargetGenerator()
+ P8gen.SetTarget("volTarget_1",0.,0.)
+ P8gen.SetMom(400.*u.GeV)
+ P8gen.SetEnergyCut(0.)
+ P8gen.SetHeartBeat(100000)
+ P8gen.SetG4only()
+ primGen.AddGenerator(P8gen)
 if simEngine == "Pythia6":
 # set muon interaction close to decay volume
  primGen.SetTarget(ship_geo.target.z0+ship_geo.muShield.length, 0.) 
@@ -456,7 +470,7 @@ if simEngine == "MuonBack":
  MuonBackgen = ROOT.MuonBackGenerator()
  # MuonBackgen.FollowAllParticles() # will follow all particles after hadron absorber, not only muons
  MuonBackgen.Init(inputFile,firstEvent,phiRandom)
- MuonBackgen.SetSmearBeam(5 * u.cm) # radius of ring, thickness 8mm
+ if charm == 0: MuonBackgen.SetSmearBeam(5 * u.cm) # radius of ring, thickness 8mm
  if sameSeed: MuonBackgen.SetSameSeed(sameSeed)
  primGen.AddGenerator(MuonBackgen)
  nEvents = min(nEvents,MuonBackgen.GetNevents())

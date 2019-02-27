@@ -100,6 +100,7 @@ if not geoFile:
  geoFile = tmp.replace('_rec','')
 
 fgeo = ROOT.TFile.Open(geoFile)
+geoMat =  ROOT.genfit.TGeoMaterialInterface()  # if only called in ShipDigiReco -> crash, reason unknown
 
 from ShipGeoConfig import ConfigRegistry
 from rootpyPickler import Unpickler
@@ -120,19 +121,21 @@ if withHists:
 import shipDet_conf
 run = ROOT.FairRunSim()
 run.SetName("TGeant4")  # Transport engine
-run.SetOutputFile("dummy")  # Output file
+run.SetOutputFile(ROOT.TMemFile('output', 'recreate'))  # Output file
 run.SetUserConfig("g4Config_basic.C") # geant4 transport not used, only needed for creating VMC field
 rtdb = run.GetRuntimeDb()
 # -----Create geometry----------------------------------------------
 modules = shipDet_conf.configure(run,ShipGeo)
-run.Init()
+# run.Init()
+fgeo.FAIRGeom
 import geomGeant4
 
 if hasattr(ShipGeo.Bfield,"fieldMap"):
-  fieldMaker = geomGeant4.addVMCFields(ShipGeo, '', True)
+  fieldMaker = geomGeant4.addVMCFields(ShipGeo, '', True,withVirtualMC = False)
 
 # make global variables
 builtin.debug    = debug
+builtin.fieldMaker = fieldMaker
 builtin.pidProton = pidProton
 builtin.withT0 = withT0
 builtin.realPR = realPR
@@ -149,7 +152,6 @@ builtin.iEvent  = iEvent
 
 # import reco tasks
 import shipDigiReco
-geoMat =  ROOT.genfit.TGeoMaterialInterface()  # if only called in ShipDigiReco -> crash, reason unknown
 
 SHiP = shipDigiReco.ShipDigiReco(outFile,fgeo)
 nEvents   = min(SHiP.sTree.GetEntries(),nEvents)
