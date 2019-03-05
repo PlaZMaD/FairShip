@@ -328,7 +328,7 @@ with ConfigRegistry.register_config("basic") as c:
         c.muShield.dZ8 = 2.35*u.m + zGap
         c.muShield.dXgap = 0.*u.m
     elif muShieldDesign == 9:
-        c.muShield.Field = 1.7  # Tesla
+        c.muShield.Field = 1.6  # Tesla
         c.muShield.dZ1 = 0.35 * u.m + zGap
         c.muShield.dZ2 = 2.26 * u.m + zGap
         c.muShield.dZ3 = 2.08 * u.m + zGap
