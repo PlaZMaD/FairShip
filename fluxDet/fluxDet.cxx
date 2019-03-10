@@ -69,7 +69,7 @@ fluxDet::fluxDet(const char* name,Bool_t Active)
 	: FairDetector(name, Active, kfluxDet),
 	  fTrackID(-1),
       fVolumeID(-1),
-      fPos(TLorentzVector(0., 0., -3350, 0.)),
+      fPos(TLorentzVector(0., 0., -3400, 0.)),
       fMom(TLorentzVector (0., 0., 0., 0.)),
       fzPos(-3350.),
       fxSize(800.),
