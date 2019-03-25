@@ -13,7 +13,6 @@
 #include "Pythia8Plugins/EvtGen.h"
 #include "EvtGenBase/EvtSimpleRandomEngine.hh"
 #include "EvtGenBase/EvtRandom.hh"
-#include "TDatabasePDG.h"
 #include "TMCProcess.h"
 
 const Double_t cm = 10.; // pythia units are mm
@@ -31,6 +30,7 @@ FixedTargetGenerator::FixedTargetGenerator()
   fMom        = 400;  // proton
   fLogger = FairLogger::GetLogger();
   targetName = ""; 
+  fcharmtarget = false;
   xOff=0; yOff=0;
   tauOnly = false;
   JpsiMainly = false;
@@ -41,6 +41,7 @@ FixedTargetGenerator::FixedTargetGenerator()
   withEvtGen = kFALSE;
   chicc=1.7e-3;     //prob to produce primary ccbar pair/pot
   chibb=1.6e-7;     //prob to produce primary bbbar pair/pot
+  nrpotspill = 5.E13; // nr of protons / spill
   setByHand = kFALSE;
   Debug = kFALSE;
   Option = "Primary";
@@ -55,21 +56,6 @@ Bool_t FixedTargetGenerator::InitForCharmOrBeauty(TString fInName, Int_t nev, Do
   fin   = TFile::Open(fInName);
   nTree = (TNtuple*)fin->FindObjectAny("pythia6"); // old format, simple ntuple
   nEvents = nTree->GetEntries();
-// check if we deal with charm or beauty:
-  if (!setByHand and n_M>5){ 
-    chicc = chibb;
-    fLogger->Info(MESSAGE_ORIGIN,"automatic detection of beauty, configured for beauty");
-    fLogger->Info(MESSAGE_ORIGIN,"bb cross section / mbias %f",chicc);
-  }else{
-    fLogger->Info(MESSAGE_ORIGIN,"cc cross section / mbias %f",chicc);
-  }
-// convert pot to weight corresponding to one spill of 5e13 pot
- // get histogram with number of pot to normalise
- // pot are counted double, i.e. for each signal, i.e. pot/2.
-  Int_t nrcpot=((TH1F*)fin->Get("2"))->GetBinContent(1)/2.; // number of primary interactions
-  wspill = nrpotspill*chicc/nrcpot*nEvents/nev;
-  fLogger->Info(MESSAGE_ORIGIN,"Input file: %s   with %i entries, corresponding to nr-pot=%f",fInName.Data(),nEvents,nrcpot/chicc);
-  fLogger->Info(MESSAGE_ORIGIN,"weight %f corresponding to %f p.o.t. per spill for %f events to process",wspill,nrpotspill,nev);
   nTree->SetBranchAddress("id",&n_id);
   nTree->SetBranchAddress("px",&n_px);
   nTree->SetBranchAddress("py",&n_py);
@@ -84,6 +70,23 @@ Bool_t FixedTargetGenerator::InitForCharmOrBeauty(TString fInName, Int_t nev, Do
   if (nTree->GetBranch("k")){
    fLogger->Info(MESSAGE_ORIGIN,"+++has branch+++");
    nTree->SetBranchAddress("k",&ck);}
+// check if we deal with charm or beauty:
+  nTree->GetEvent(0);
+  if (!setByHand and n_M>5){ 
+    chicc = chibb;
+    fLogger->Info(MESSAGE_ORIGIN,"automatic detection of beauty, configured for beauty");
+    fLogger->Info(MESSAGE_ORIGIN,"bb cross section / mbias %f",chicc);
+  }else{
+    fLogger->Info(MESSAGE_ORIGIN,"cc cross section / mbias %f",chicc);
+  }
+// convert pot to weight corresponding to one spill of 5e13 pot
+ // get histogram with number of pot to normalise
+ // pot are counted double, i.e. for each signal, i.e. pot/2.
+  Int_t nrcpot=((TH1F*)fin->Get("2"))->GetBinContent(1)/2.; // number of primary interactions
+  wspill = nrpotspill*chicc/nrcpot*nEvents/nev;
+  fLogger->Info(MESSAGE_ORIGIN,"Input file: %s   with %i entries, corresponding to nr-pot=%f",fInName.Data(),nEvents,nrcpot/chicc);
+  fLogger->Info(MESSAGE_ORIGIN,"weight %f corresponding to %f p.o.t. per spill for %f events to process",wspill,nrpotspill,nev);
+
   pot=0.;
   //Determine fDs on this file for primaries
   nDsprim=0;
@@ -202,6 +205,7 @@ Bool_t FixedTargetGenerator::Init()
   }
   if (targetName!=""){
    fMaterialInvestigator = new GenieGenerator();
+   if (!fcharmtarget){   
    TGeoNavigator* nav = gGeoManager->GetCurrentNavigator();
    nav->cd(targetName);
    TGeoNode* target = nav->GetCurrentNode(); 
@@ -228,45 +232,36 @@ Bool_t FixedTargetGenerator::Init()
    end[0]=xOff;
    end[1]=yOff;
    end[2]=endZ;
+   }
+   else{  //charm geometry uses a different target 
+   TGeoVolume* top = gGeoManager->GetTopVolume();
+   TGeoNode* target = top->FindNode(targetName);
+   if (!target){
+       fLogger->Error(MESSAGE_ORIGIN,"target not found, %s, program will crash",targetName.Data());
+   }
+   Double_t z_middle = target->GetMatrix()->GetTranslation()[2];
+   TGeoBBox* sha = (TGeoBBox*)target->GetVolume()->GetShape();
+   startZ =  z_middle - sha->GetDZ();
+   endZ   =  z_middle + sha->GetDZ();
+   start[0]=xOff;
+   start[1]=yOff;
+   start[2]=startZ;
+   end[0]=xOff;
+   end[1]=yOff;
+   end[2]=endZ;
+   }
 //find maximum interaction length
    bparam = fMaterialInvestigator->MeanMaterialBudget(start, end, mparam);
    maxCrossSection =  mparam[9];
   }
-  // book hists for Genie neutrino momentum distribution
-  // add also leptons, and photon
-  TDatabasePDG* PDG = TDatabasePDG::Instance();
-  for(Int_t idnu=11; idnu<19; idnu+=1){
-  // nu or anti-nu
-   if (idnu==18){idnu=22;}  
-   for (Int_t idadd=-1; idadd<3; idadd+=2){
-    Int_t idhnu=1000+idnu;
-    Int_t idw=idnu;
-    if (idadd==-1){
-     idhnu+=1000;
-     idw=-idnu;
-    }
-    if (idnu==22){idadd=3;idw=idnu;}
-    TString name=PDG->GetParticle(idw)->GetName();
-    TString title = name;title+=" momentum (GeV)";
-    TString key = "";key+=idhnu;
-    TSeqCollection* fileList=gROOT->GetListOfFiles();
-    ((TFile*)fileList->At(0))->cd();
-    TH1D* Hidhnu = new TH1D(key,title,400,0.,400.);
-    title = name;title+="  log10-p vs log10-pt";
-    key = "";key+=idhnu+100;
-    TH2D* Hidhnu100 = new TH2D(key,title,100,-0.3,1.7,100,-2.,0.5);
-    title = name;title+="  log10-p vs log10-pt";
-    key = "";key+=idhnu+200;
-    TH2D* Hidhnu200 = new TH2D(key,title,25,-0.3,1.7,100,-2.,0.5);
-   }
-  }
+
   return kTRUE;
 }
 // -------------------------------------------------------------------------
 
 
 // -----   Destructor   ----------------------------------------------------
-FixedTargetGenerator::~FixedTargetGenerator() 
+FixedTargetGenerator::~FixedTargetGenerator()
 {
 }
 // -------------------------------------------------------------------------
@@ -365,7 +360,7 @@ Bool_t FixedTargetGenerator::ReadEvent(FairPrimaryGenerator* cpg)
      Double_t z  = fPythia->event[ii].zProd()+zinter;
      Double_t x  = fPythia->event[ii].xProd()+xOff;
      Double_t y  = fPythia->event[ii].yProd()+yOff;
-     Double_t tof = fPythia->event[ii].tProd();
+     Double_t tof = fPythia->event[ii].tProd() / (10*c_light) ; // to go from mm to s
      Double_t px = fPythia->event[ii].px();  
      Double_t py = fPythia->event[ii].py();  
      Int_t im = fPythia->event[ii].mother1()-1;

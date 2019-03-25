@@ -1,14 +1,23 @@
-#!/usr/bin/env python 
-import ROOT,os,sys,getopt,time
+#!/usr/bin/env python2
+import os
+import sys
+import getopt
+import ROOT
 import shipunit as u
 import shipRoot_conf
 import rootUtils as ut
 from ShipGeoConfig import ConfigRegistry
+
 debug = 0  # 1 print weights and field
            # 2 make overlap check
+dryrun = False # True: just setup Pythia and exit
+
+CharmdetSetup = 0 # 1 charm cross section setup, 0 muon flux setup
+CharmTarget = 3 #six different configurations used in July 2018 exposure for charm
 # Default HNL parameters
 theMass = 1.0*u.GeV
 theCouplings = [0.447e-9, 7.15e-9, 1.88e-9] # ctau=53.3km  TP default for HNL
+theProductionCouplings = theDecayCouplings = None
 
 # Default dark photon parameters
 theDPmass = 0.2*u.GeV
@@ -18,7 +27,7 @@ mcEngine     = "TGeant4"
 simEngine    = "Pythia8"  # "Genie" # Ntuple
 nEvents      = 100
 firstEvent   = 0
-inclusive    = "c"    # True = all processes if "c" only ccbar -> HNL, if "b" only bbar -> HNL, and for darkphotons: if meson = production through meson decays, pbrem = proton bremstrahlung, to do: QCD prod.
+inclusive    = "c"    # True = all processes if "c" only ccbar -> HNL, if "b" only bbar -> HNL, if "bc" only Bc+/Bc- -> HNL, and for darkphotons: if meson = production through meson decays, pbrem = proton bremstrahlung, qcd = ffbar -> DP.
 deepCopy     = False  # False = copy only stable particles to stack, except for HNL events
 MCTracksWithHitsOnly   = False  # copy particles which produced a hit and their history
 MCTracksWithEnergyCutOnly = True # copy particles above a certain kin energy cut
@@ -31,20 +40,26 @@ RPVSUSY      = False
 RPVSUSYbench = 2
 
 eventDisplay = False
-inputFile    = "/eos/experiment/ship/data/Charm/Cascade-parp16-MSTP82-1-MSEL4-76Mpot_1.root"
+inputFile    = "/eos/experiment/ship/data/Charm/Cascade-parp16-MSTP82-1-MSEL4-978Bpot.root"
 
 defaultInputFile = True
 outputDir    = "."
 sameSeed     = False # can be set to an integer for the muonBackground simulation with specific seed for each muon 
-theSeed      = int(10000 * time.time() % 10000000)
+theSeed      = 0 # see TRrandom::SetSeed documentation
 
-dy           = 10.
-dv           = 5 # 4=TP elliptical tank design, 5 = optimized conical rectangular design, 6=5 without segment-1
-ds           = 7 # 5=TP muon shield, 6=magnetized hadron, 7=short magnet design 
-nud          = 1 # 0=TP, 1=new magnet option for short muon shield, 2= no magnet surrounding neutrino detector
+globalDesigns = {'2016':{'dy':10.,'dv':5,'ds':7,'nud':1,'caloDesign':0,'strawDesign':4},\
+                 '2018':{'dy':10.,'dv':6,'ds':9,'nud':3,'caloDesign':3,'strawDesign':10}}
+default = '2018'
+
+dy           = globalDesigns[default]['dy'] # max height of vacuum tank
+dv           = globalDesigns[default]['dv'] # 4=TP elliptical tank design, 5 = optimized conical rectangular design, 6=5 without segment-1
+ds           = globalDesigns[default]['ds'] # 5=TP muon shield, 6=magnetized hadron, 7=short magnet design, 9=optimised with T4 as constraint, 8=requires config file
+nud          = globalDesigns[default]['nud'] # 0=TP, 1=new magnet option for short muon shield, 2= no magnet surrounding neutrino detector
+caloDesign   = globalDesigns[default]['caloDesign'] # 0=ECAL/HCAL TP  1=ECAL/HCAL TP + preshower 2=splitCal  3=ECAL/ passive HCAL 
+strawDesign  = globalDesigns[default]['strawDesign'] # simplistic tracker design,  4=sophisticated straw tube design, horizontal wires (default), 10=2cm straw diameter for 2018 layout
+
 charm        = 0 # !=0 create charm detector instead of SHiP
-caloDesign   = 0 # 0=ECAL/HCAL TP  1=ECAL/HCAL TP + preshower 2=splitCal
-strawDesign  = 4 # simplistic tracker design,  4=sophisticated straw tube design, horizontal wires (default), 10=2cm straw diameter for 2018 layout
+pID          = 22 # default for the particle gun
 geofile = None
 
 inactivateMuonProcesses = False   # provisionally for making studies of various muon background sources
@@ -57,24 +72,30 @@ nuRadiography = False # misuse GenieGenerator for neutrino radiography and geome
 Opt_high = None # switch for cosmic generator
 try:
         opts, args = getopt.getopt(sys.argv[1:], "D:FHPu:n:i:f:c:hqv:s:l:A:Y:i:m:co:t:g",[\
-                                   "PG","Pythia6","Pythia8","Genie","MuDIS","Ntuple","Nuage","MuonBack","FollowMuon","FastMuon",\
+                                   "PG","pID=","Muflux","Pythia6","Pythia8","Genie","MuDIS","Ntuple","Nuage","MuonBack","FollowMuon","FastMuon",\
                                    "Cosmics=","nEvents=", "display", "seed=", "firstEvent=", "phiRandom", "mass=", "couplings=", "coupling=", "epsilon=",\
                                    "output=","tankDesign=","muShieldDesign=","NuRadio","test",\
-                                   "DarkPhoton","RpvSusy","SusyBench=","sameSeed=","charm=","nuTauTargetDesign=","caloDesign=","strawDesign="])
+                                   "DarkPhoton","RpvSusy","SusyBench=","sameSeed=","charm=","CharmdetSetup=","CharmTarget=","nuTauTargetDesign=","caloDesign=","strawDesign=","Estart=",\
+                                   "Eend=","production-couplings=","decay-couplings=","dry-run"])
 
 except getopt.GetoptError:
         # print help information and exit:
-        print ' enter --Pythia8 to generate events with Pythia8 (-A b: signal from b, -A c: signal from c (default)  or -A inclusive)'
+        print ' enter --Pythia8 to generate events with Pythia8 (-A b: signal from b, -A c: signal from c (default), -A bc: signal from Bc, or -A inclusive)'
         print ' or    --Genie for reading and processing neutrino interactions '
         print ' or    --Pythia6 for muon nucleon scattering'  
         print ' or    --PG for particle gun'  
+	print '       --pID= id of particle used by the gun (default=22)'
+	print '       --Estart= start of energy range of particle gun for muflux detector (default=10 GeV)'
+	print '       --Eend= end of energy range of particle gun for muflux detector (default=10 GeV)'	
         print '       --MuonBack to generate events from muon background file, --Cosmics=0 for cosmic generator data'  
         print '       --RpvSusy to generate events based on RPV neutralino (default HNL)'
         print '       --DarkPhoton to generate events with dark photons (default HNL)'
-        print ' for darkphoton generation, use -A meson or -A pbrem'
+        print ' for darkphoton generation, use -A meson or -A pbrem or -A qcd'
         print '       --SusyBench to specify which of the preset benchmarks to generate (default 2)'
         print '       --mass or -m to set HNL or New Particle mass'
         print '       --couplings \'U2e,U2mu,U2tau\' or -c \'U2e,U2mu,U2tau\' to set list of HNL couplings'
+        print '       --production-couplings \'U2e,U2mu,U2tau\' to set the couplings for HNL production only'
+        print '       --decay-couplings \'U2e,U2mu,U2tau\' to set the couplings for HNL decay only'
         print '       --epsilon value or -e value to set mixing parameter epsilon' 
         print '                   Note that for RPVSUSY the third entry of the couplings is the stop mass'
         sys.exit(2)
@@ -87,12 +108,24 @@ for o, a in opts:
             simEngine = "Pythia8"
         if o in ("--PG",):
             simEngine = "PG"
+        if o in ("--Muflux",):
+            simEngine = "FixedTarget"
+            HNL = False
+        if o in ("--pID",):
+            if a: pID = int(a)
+        if o in ("--Estart",):
+            Estart = 10.
+            if a!=str(0): Estart = float(a)
+        if o in ("--Eend",):
+            Eend = 10.
+            if a!=str(0): Eend = float(a)   
         if o in ("-A",):
             inclusive = a
+            if a=='b': inputFile = "/eos/experiment/ship/data/Beauty/Cascade-run0-19-parp16-MSTP82-1-MSEL5-5338Bpot.root"
             if a.lower() == 'charmonly':
                charmonly = True
                HNL = False 
-            if a not in ['b','c','meson','pbrem']: inclusive = True
+            if a not in ['b','c','bc','meson','pbrem','qcd']: inclusive = True
         if o in ("--Genie",):
             simEngine = "Genie"
         if o in ("--NuRadio",):
@@ -145,6 +178,10 @@ for o, a in opts:
             strawDesign = int(a)
         if o in ("--charm",):
             charm = int(a)
+        if o in ("--CharmdetSetup",):
+            CharmdetSetup = int(a)
+        if o in ("--CharmTarget",):
+            CharmTarget = int(a)
         if o in ("-F",):
             deepCopy = True
         if o in ("--RpvSusy",):
@@ -160,11 +197,17 @@ for o, a in opts:
            else: theMass = float(a)
         if o in ("-c", "--couplings", "--coupling",):
            theCouplings = [float(c) for c in a.split(",")]
+        if o in ("-cp", "--production-couplings"):
+            theProductionCouplings = [float(c) for c in a.split(",")]
+        if o in ("-cd", "--decay-couplings"):
+            theDecayCouplings = [float(c) for c in a.split(",")]
         if o in ("-e", "--epsilon",):
            theDPepsilon = float(a)
         if o in ("-t", "--test"):
-            inputFile = "../FairShip/files/Cascade-parp16-MSTP82-1-MSEL4-76Mpot_1_5000.root"
+            inputFile = "$FAIRSHIP/files/Cascade-parp16-MSTP82-1-MSEL4-76Mpot_1_5000.root"
             nEvents = 50
+        if o in ("--dry-run",):
+            dryrun = True
 
 #sanity check
 if (HNL and RPVSUSY) or (HNL and DarkPhoton) or (DarkPhoton and RPVSUSY): 
@@ -187,14 +230,20 @@ if (simEngine == "Ntuple" or simEngine == "MuonBack") and defaultInputFile :
   print " for example -f /eos/experiment/ship/data/Mbias/pythia8_Geant4-withCharm_onlyMuons_4magTarget.root"
   sys.exit()
 ROOT.gRandom.SetSeed(theSeed)  # this should be propagated via ROOT to Pythia8 and Geant4VMC
-shipRoot_conf.configure(DarkPhoton)      # load basic libraries, prepare atexit for python
+shipRoot_conf.configure(0)     # load basic libraries, prepare atexit for python
 # - muShieldDesign = 2  # 1=passive 5=active (default) 7=short design+magnetized hadron absorber
 # - targetOpt      = 5  # 0=solid   >0 sliced, 5: 5 pieces of tungsten, 4 H20 slits, 17: Mo + W +H2O (default)
 #   nuTauTargetDesign = 0 # 0 = TP, 1 = NEW with magnet, 2 = NEW without magnet, 3 = 2018 design
 if charm == 0: ship_geo = ConfigRegistry.loadpy("$FAIRSHIP/geometry/geometry_config.py", Yheight = dy, tankDesign = dv, \
                                                 muShieldDesign = ds, nuTauTargetDesign=nud, CaloDesign=caloDesign, strawDesign=strawDesign, muShieldGeo=geofile)
-else: ship_geo = ConfigRegistry.loadpy("$FAIRSHIP/geometry/charm-geometry_config.py")
-
+else: 
+ ship_geo = ConfigRegistry.loadpy("$FAIRSHIP/geometry/charm-geometry_config.py", Setup = CharmdetSetup, cTarget = CharmTarget)
+ if CharmdetSetup == 0: print "Setup for muon flux measurement has been set"
+ else: 
+  print "Setup for charm cross section measurement has been set"
+  if (((CharmTarget > 6) or (CharmTarget < 0)) and (CharmTarget != 16)): #check if proper option for emulsion target has been set
+   print "ERROR: unavailable option for CharmTarget. Currently implemented options: 1,2,3,4,5,6,16"
+   1/0
 # switch off magnetic field to measure muon flux
 #ship_geo.muShield.Field = 0.
 #ship_geo.EmuMagnet.B = 0.
@@ -202,7 +251,8 @@ else: ship_geo = ConfigRegistry.loadpy("$FAIRSHIP/geometry/charm-geometry_config
 
 
 # Output file name, add dy to be able to setup geometry with ambiguities.
-tag = simEngine+"-"+mcEngine
+if simEngine == "PG": tag = simEngine + "_"+str(pID)+"-"+mcEngine
+else: tag = simEngine+"-"+mcEngine
 if charmonly: tag = simEngine+"CharmOnly-"+mcEngine
 if eventDisplay: tag = tag+'_D'
 if dv > 4 : tag = 'conical.'+tag
@@ -224,7 +274,6 @@ parFile="%s/ship.params.%s.root" % (outputDir, tag)
 timer = ROOT.TStopwatch()
 timer.Start()
 # ------------------------------------------------------------------------
-
 # -----Create simulation run----------------------------------------
 run = ROOT.FairRunSim()
 run.SetName(mcEngine)  # Transport engine
@@ -247,37 +296,49 @@ if simEngine == "Pythia8":
   P8gen = ROOT.HNLPythia8Generator()
   import pythia8_conf
   if HNL:
-   print 'Generating HNL events of mass %.3f GeV\n'%theMass
-   print 'and with couplings=',theCouplings
-   pythia8_conf.configure(P8gen,theMass,theCouplings,inclusive,deepCopy)
+   print 'Generating HNL events of mass %.3f GeV'%theMass
+   if theProductionCouplings is None and theDecayCouplings is None:
+    print 'and with couplings=',theCouplings
+    theProductionCouplings = theDecayCouplings = theCouplings
+   elif theProductionCouplings is not None and theDecayCouplings is not None:
+    print 'and with couplings',theProductionCouplings,'at production'
+    print 'and',theDecayCouplings,'at decay'
+   else:
+    raise ValueError('Either both production and decay couplings must be specified, or neither.')
+   pythia8_conf.configure(P8gen,theMass,theProductionCouplings,theDecayCouplings,inclusive,deepCopy)
   if RPVSUSY:
-   print 'Generating RPVSUSY events of mass %.3f GeV\n'%theMass
-   print 'and with couplings=[%.3f,%.3f]\n'%(theCouplings[0],theCouplings[1])
-   print 'and with stop mass=\%.3f GeV\n',theCouplings[2]
+   print 'Generating RPVSUSY events of mass %.3f GeV'%theMass
+   print 'and with couplings=[%.3f,%.3f]'%(theCouplings[0],theCouplings[1])
+   print 'and with stop mass=%.3f GeV\n'%theCouplings[2]
    pythia8_conf.configurerpvsusy(P8gen,theMass,[theCouplings[0],theCouplings[1]],
-                                theCouplings[2],RPVSUSYbench,'c',deepCopy)
-  P8gen.SetSmearBeam(1*u.cm) # finite beam size
+                                theCouplings[2],RPVSUSYbench,inclusive,deepCopy)
   P8gen.SetParameters("ProcessLevel:all = off")
-  if ds==7: # short muon shield
-   P8gen.SetLmin(44*u.m)
-   P8gen.SetLmax(107*u.m)
   if inputFile: 
    ut.checkFileExists(inputFile)
 # read from external file
    P8gen.UseExternalFile(inputFile, firstEvent)
  if DarkPhoton:
   P8gen = ROOT.DPPythia8Generator()
-  P8gen.SetDPId(9900015)
+  if inclusive=='qcd':
+	  P8gen.SetDPId(4900023)
+  else:
+	  P8gen.SetDPId(9900015)
   import pythia8darkphoton_conf
-  pythia8darkphoton_conf.configure(P8gen,theDPmass,theDPepsilon,inclusive,deepCopy)
+  passDPconf = pythia8darkphoton_conf.configure(P8gen,theDPmass,theDPepsilon,inclusive,deepCopy)
+  if (passDPconf!=1): sys.exit()
+ if HNL or RPVSUSY or DarkPhoton: 
   P8gen.SetSmearBeam(1*u.cm) # finite beam size
-  if ds==7: # short muon shield
-   P8gen.SetLmin(44*u.m)
-   P8gen.SetLmax(107*u.m)
+  P8gen.SetLmin((ship_geo.Chamber1.z - ship_geo.chambers.Tub1length) - ship_geo.target.z0 )
+  P8gen.SetLmax(ship_geo.TrackStation1.z - ship_geo.target.z0 )
  if charmonly:
+  primGen.SetTarget(0., 0.) #vertex is setted in pythia8Generator
   ut.checkFileExists(inputFile)
-  primGen.SetBeam(0.,0., ship_geo.Box.TX-2., ship_geo.Box.TY-2.) #Uniform distribution in x/y on the target (1 cm of margin at both sides)    
-  primGen.SmearVertexXY(True)
+  if ship_geo.Box.gausbeam:
+   primGen.SetBeam(0.,0., 0.5, 0.5) #more central beam, for hits in downstream detectors    
+   primGen.SmearGausVertexXY(True) #sigma = x
+  else:
+   primGen.SetBeam(0.,0., ship_geo.Box.TX-1., ship_geo.Box.TY-1.) #Uniform distribution in x/y on the target (0.5 cm of margin at both sides)
+   primGen.SmearVertexXY(True)
   P8gen = ROOT.Pythia8Generator()
   P8gen.UseExternalFile(inputFile, firstEvent)
   if ship_geo.MufluxSpectrometer.muflux == False :
@@ -288,6 +349,14 @@ if simEngine == "Pythia8":
 # pion on proton 500GeV
 # P8gen.SetMom(500.*u.GeV)
 # P8gen.SetId(-211)
+ primGen.AddGenerator(P8gen)
+if simEngine == "FixedTarget":
+ P8gen = ROOT.FixedTargetGenerator()
+ P8gen.SetTarget("volTarget_1",0.,0.)
+ P8gen.SetMom(400.*u.GeV)
+ P8gen.SetEnergyCut(0.)
+ P8gen.SetHeartBeat(100000)
+ P8gen.SetG4only()
  primGen.AddGenerator(P8gen)
 if simEngine == "Pythia6":
 # set muon interaction close to decay volume
@@ -300,13 +369,16 @@ if simEngine == "Pythia6":
  primGen.AddGenerator(P6gen)
 # -----Particle Gun-----------------------
 if simEngine == "PG": 
-  myPgun = ROOT.FairBoxGenerator(22,1)
-  myPgun.SetPRange(10,10.2)
+  myPgun = ROOT.FairBoxGenerator(pID,1)
+  myPgun.SetPRange(Estart,Eend)
   myPgun.SetPhiRange(0, 360) # // Azimuth angle range [degree]
-  myPgun.SetThetaRange(0,0) # // Polar angle in lab system range [degree]
   myPgun.SetXYZ(0.*u.cm, 0.*u.cm, 0.*u.cm) 
+  if charm!=0:
+     myPgun.SetThetaRange(0,6) # // Pdefault for muon flux
+     primGen.SetTarget(ship_geo.target.z0,0.)
+  else:  
+     myPgun.SetThetaRange(0,0) # // Polar angle in lab system range [degree]
   primGen.AddGenerator(myPgun)
-  run.SetGenerator(primGen)
 # -----muon DIS Background------------------------
 if simEngine == "muonDIS":
  ut.checkFileExists(inputFile)
@@ -322,6 +394,7 @@ if simEngine == "muonDIS":
  DISgen.Init(inputFile,firstEvent) 
  primGen.AddGenerator(DISgen)
  nEvents = min(nEvents,DISgen.GetNevents())
+ inactivateMuonProcesses = True # avoid unwanted hadronic events of "incoming" muon flying backward
  print 'Generate ',nEvents,' with DIS input', ' first event',firstEvent
 # -----neutrino interactions from nuage------------------------
 if simEngine == "Nuage":
@@ -394,11 +467,25 @@ if simEngine == "Ntuple":
 #
 if simEngine == "MuonBack":
 # reading muon tracks from previous Pythia8/Geant4 simulation with charm replaced by cascade production 
- ut.checkFileExists(inputFile)
- primGen.SetTarget(ship_geo.target.z0+50*u.m,0.)
+ fileType = ut.checkFileExists(inputFile)
+ if fileType == 'tree':
+ # 2018 background production 
+  primGen.SetTarget(ship_geo.target.z0+70.1225*u.m,0.)
+ else:
+  primGen.SetTarget(ship_geo.target.z0+50*u.m,0.)
+ #
  MuonBackgen = ROOT.MuonBackGenerator()
+ # MuonBackgen.FollowAllParticles() # will follow all particles after hadron absorber, not only muons
  MuonBackgen.Init(inputFile,firstEvent,phiRandom)
- MuonBackgen.SetSmearBeam(5 * u.cm) # radius of ring, thickness 8mm
+ if charm == 0: MuonBackgen.SetSmearBeam(5 * u.cm) # radius of ring, thickness 8mm
+ else: 
+    if inputFile[0:4] == "/eos": test = os.environ["EOSSHIP"]+inputFile
+    else: test = inputFile
+    testf = ROOT.TFile.Open(test)
+    if not testf.FileHeader.GetTitle().find('diMu100.0')<0:
+        MuonBackgen.SetDownScaleDiMuon()   # avoid interference with boosted channels
+        print "MuonBackgenerator: set downscale for dimuon on"
+    testf.Close()
  if sameSeed: MuonBackgen.SetSameSeed(sameSeed)
  primGen.AddGenerator(MuonBackgen)
  nEvents = min(nEvents,MuonBackgen.GetNevents())
@@ -408,7 +495,7 @@ if simEngine == "MuonBack":
     fastMuon = True
     modules['Veto'].SetFollowMuon()
  if fastMuon :    modules['Veto'].SetFastMuon()
- #   missing for the above use case, without making muon shield sensitve
+
  # optional, boost gamma2muon conversion
  # ROOT.kShipMuonsCrossSectionFactor = 100. 
 #
@@ -432,6 +519,8 @@ if eventDisplay: run.SetStoreTraj(ROOT.kTRUE)
 else:            run.SetStoreTraj(ROOT.kFALSE)
 # -----Initialize simulation run------------------------------------
 run.Init()
+if dryrun: # Early stop after setting up Pythia 8
+ sys.exit(0)
 gMC = ROOT.TVirtualMC.GetMC()
 fStack = gMC.GetStack()
 if MCTracksWithHitsOnly:
@@ -464,7 +553,10 @@ import geomGeant4
 # Define extra VMC B fields not already set by the geometry definitions, e.g. a global field,
 # any field maps, or defining if any volumes feel only the local or local+global field.
 # For now, just keep the fields already defined by the C++ code, i.e comment out the fieldMaker
-#fieldMaker = geomGeant4.addVMCFields('field/ExampleBFieldSetup.txt', False)
+if charm == 0:   # charm and muflux testbeam not yet updated for using the new bfield interface
+ if hasattr(ship_geo.Bfield,"fieldMap"):
+  fieldMaker = geomGeant4.addVMCFields(ship_geo, '', True)
+
 # Print VMC fields and associated geometry objects
 if debug > 0:
  geomGeant4.printVMCFields()
@@ -480,6 +572,7 @@ if inactivateMuonProcesses :
  mygMC.ProcessGeantCommand("/process/inactivate muPairProd")
  mygMC.ProcessGeantCommand("/process/inactivate muBrems")
  mygMC.ProcessGeantCommand("/process/inactivate muIoni")
+ mygMC.ProcessGeantCommand("/process/inactivate muonNuclear")
  mygMC.ProcessGeantCommand("/particle/select mu+")
  mygMC.ProcessGeantCommand("/particle/process/dump")
  gProcessTable = ROOT.G4ProcessTable.GetProcessTable()
@@ -530,7 +623,13 @@ print "Real time ",rtime, " s, CPU time ",ctime,"s"
 # remove empty events
 if simEngine == "MuonBack":
  tmpFile = outFile+"tmp"
- fin   = ROOT.gROOT.GetListOfFiles()[0]
+ xxx = outFile.split('/')
+ check = xxx[len(xxx)-1]
+ fin = False
+ for ff in ROOT.gROOT.GetListOfFiles():
+    nm = ff.GetName().split('/')
+    if nm[len(nm)-1] == check: fin = ff
+ if not fin: fin   = ROOT.TFile.Open(outFile)
  t     = fin.cbmsim
  fout  = ROOT.TFile(tmpFile,'recreate')
  sTree = t.CloneTree(0)
@@ -563,3 +662,5 @@ def checkOverlapsWithGeant4():
  mygMC.ProcessGeantCommand("/geometry/test/recursion_start 0")
  mygMC.ProcessGeantCommand("/geometry/test/recursion_depth 2")
  mygMC.ProcessGeantCommand("/geometry/test/run")
+
+

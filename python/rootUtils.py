@@ -63,6 +63,7 @@ def bookProf(h,key=None,title='',nbinsx=100,xmin=0,xmax=1,ymin=None,ymax=None,op
 def writeHists(h,fname,plusCanvas=False):
   f = TFile(fname,'RECREATE')
   for akey in h:
+    if not hasattr(h[akey],'Class'): continue
     cln = h[akey].Class().GetName()
     if not cln.find('TH')<0 or not cln.find('TP')<0:   h[akey].Write()
     if plusCanvas and not cln.find('TC')<0:   h[akey].Write()
@@ -182,3 +183,26 @@ def checkFileExists(x):
     if not test: 
        print "input file",f," does not exist. Missing authentication?"
        os._exit(1)
+    if test.FindObjectAny('cbmsim'): 
+     return 'tree'
+    else:
+     return 'ntuple'
+def findMaximumAndMinimum(histo):
+ amin,amax = 1E30, -130
+ nmin,nmax = 0, 0
+ for n in range(1,histo.GetNbinsX()+1):
+  c =  histo.GetBinContent(n)
+  if c>amax:
+    amax = c
+    nmax = n
+  if c<amin:
+    amin = c
+    nmin = n
+ return amin,amax,nmin,nmax
+def makeIntegralDistrib(h,key):
+ name = 'I-'+key
+ h[name]=h[key].Clone(name)
+ h[name].SetTitle('Integral > '+h[key].GetTitle())
+ for n in range(1,h[key].GetNbinsX()+1):
+   if n==1: h[name].SetBinContent(1,h[key].GetSumOfWeights())
+   else: h[name].SetBinContent(n,h[name].GetBinContent(n-1)-h[key].GetBinContent(n-1))

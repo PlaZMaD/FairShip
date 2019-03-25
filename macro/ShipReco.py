@@ -12,7 +12,7 @@ dy  = None
 saveDisk  = False # remove input file
 pidProton = False # if true, take truth, if False fake with pion mass
 realPR = ''
-realPROptions=["Prev", "FH", "AR", "Baseline"]
+realPROptions=["FH", "AR", "TemplateMatching"]
 withT0 = False
 
 import resource
@@ -44,6 +44,10 @@ except getopt.GetoptError:
         print ' noStrawSmearing: no smearing of distance to wire, default on'
         print ' outputfile will have same name with _rec added'  
         print ' --realPR= defines track pattern recognition. Possible options: ',realPROptions, "if no option given, fake PR is used."
+        print ' Options description:'
+        print '      FH                        : Hough transform.'
+        print '      AR                        : Artificial retina.'
+        print '      TemplateMatching          : Tracks are searched for based on the template: track seed + hits within a window around the seed.'
         sys.exit()
 for o, a in opts:
         if o in ("noVertexing",):
@@ -98,30 +102,16 @@ else:
 if not geoFile:
  tmp = inputFile.replace('ship.','geofile_full.')
  geoFile = tmp.replace('_rec','')
-# try to figure out which ecal geo to load
+
 fgeo = ROOT.TFile.Open(geoFile)
-sGeo = fgeo.FAIRGeom
+geoMat =  ROOT.genfit.TGeoMaterialInterface()  # if only called in ShipDigiReco -> crash, reason unknown
 
 from ShipGeoConfig import ConfigRegistry
 from rootpyPickler import Unpickler
-
-if not fgeo.FindKey('ShipGeo'):
- # old geofile, missing Shipgeo dictionary
- if sGeo.GetVolume('EcalModule3') :  ecalGeoFile = "ecal_ellipse6x12m2.geo"
- else: ecalGeoFile = "ecal_ellipse5x10m2.geo" 
- print 'found ecal geo for ',ecalGeoFile
- if dy: 
-  ShipGeo = ConfigRegistry.loadpy("$FAIRSHIP/geometry/geometry_config.py", Yheight = dy, EcalGeoFile = ecalGeoFile)
- else:
-  ShipGeo = ConfigRegistry.loadpy("$FAIRSHIP/geometry/geometry_config.py", EcalGeoFile = ecalGeoFile) 
-else: 
- # new geofile, load Shipgeo dictionary
-  upkl    = Unpickler(fgeo)
-  ShipGeo = upkl.load('ShipGeo')
-  ecalGeoFile = ShipGeo.ecal.File
-
-ps = 0
-if sGeo.GetVolume('PreshowerDetector'):ps = 1
+#load Shipgeo dictionary
+upkl    = Unpickler(fgeo)
+ShipGeo = upkl.load('ShipGeo')
+ecalGeoFile = ShipGeo.ecal.File
 
 h={}
 log={}
@@ -132,13 +122,24 @@ if withHists:
  ut.bookHist(h,'nmeas','nr measuerements',100,0.,50.)
  ut.bookHist(h,'chi2','Chi2/DOF',100,0.,20.)
 
-# -----Create geometry----------------------------------------------
 import shipDet_conf
 run = ROOT.FairRunSim()
+run.SetName("TGeant4")  # Transport engine
+run.SetOutputFile(ROOT.TMemFile('output', 'recreate'))  # Output file
+run.SetUserConfig("g4Config_basic.C") # geant4 transport not used, only needed for creating VMC field
+rtdb = run.GetRuntimeDb()
+# -----Create geometry----------------------------------------------
 modules = shipDet_conf.configure(run,ShipGeo)
+# run.Init()
+fgeo.FAIRGeom
+import geomGeant4
+
+if hasattr(ShipGeo.Bfield,"fieldMap"):
+  fieldMaker = geomGeant4.addVMCFields(ShipGeo, '', True,withVirtualMC = False)
 
 # make global variables
 builtin.debug    = debug
+builtin.fieldMaker = fieldMaker
 builtin.pidProton = pidProton
 builtin.withT0 = withT0
 builtin.realPR = realPR
@@ -155,6 +156,7 @@ builtin.iEvent  = iEvent
 
 # import reco tasks
 import shipDigiReco
+
 SHiP = shipDigiReco.ShipDigiReco(outFile,fgeo)
 nEvents   = min(SHiP.sTree.GetEntries(),nEvents)
 # main loop

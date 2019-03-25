@@ -35,6 +35,7 @@ public:
     //Set options for detector contruction (active/passive, which design)
     void SetDetectorDesign(Int_t Design);
     void MakeNuTargetPassive(Bool_t a);
+    void MergeTopBot(Bool_t SingleEmFilm);
 
     void ConstructGeometry();
 
@@ -46,6 +47,7 @@ public:
     void SetCellParam(Double_t CellW);
     void SetNumberBricks(Double_t col, Double_t row, Double_t wall);
     void SetTTzdimension(Double_t TTZ);
+    void SetNumberTargets(Int_t target);
 
     //Functions to get parameters relative to the magnet in which the detector is placed
     void SetMagnetConfiguration(Int_t config);//1=TP, 0=new
@@ -62,7 +64,9 @@ public:
     void SetPillarDimension(Double_t X, Double_t Y, Double_t Z);
 
   
-    void DecodeBrickID(Int_t detID, Int_t &NWall, Int_t &NRow, Int_t &NColumn, Int_t &NPlate, Bool_t &EmCES, Bool_t &EmBrick);
+    void DecodeBrickID(Int_t detID, Int_t &NWall, Int_t &NRow, Int_t &NColumn, Int_t &NPlate, Bool_t &EmCES, Bool_t &EmBrick, Bool_t &EmTop);
+
+    void SetHpTParam(Int_t n, Double_t dd, Double_t DZ); //other detector's parameters (needed for positioning)
 
     /**      Initialization of the detector is done here    */
     virtual void Initialize();
@@ -142,6 +146,7 @@ private:
 protected:
 
     Bool_t fPassive; //0 = with Emulsion, 1 = only lead + rohacell
+    Bool_t fsingleemulsionfilm; //0 = both top and bottom layers active, separated by plastic base; 1 = only one active layer
     Int_t fDesign; //0=TP, 1=NewMagnet (Davide), 2=No Magnet Config
     
     //Position of the Center of the Detector
@@ -160,6 +165,7 @@ protected:
     Int_t fNCol;
     Int_t fNRow;
     Int_t fNWall;
+    Int_t fNTarget;
 
     Double_t XDimension; //dimension of the target box (= 2 x 2 x 1) m^3
     Double_t YDimension;
@@ -202,7 +208,12 @@ protected:
      Double_t fPillarX;
      Double_t fPillarY;
      Double_t fPillarZ;  
-    
+
+    //other detector's parameters (needed for positioning)
+     Double_t fHpTDistance;    
+     Double_t fHpTDZ;
+     Int_t fnHpT;
+
     Int_t InitMedium(const char* name);
     
 };

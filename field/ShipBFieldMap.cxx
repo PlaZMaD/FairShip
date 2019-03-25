@@ -350,7 +350,7 @@ void ShipBFieldMap::readTextFile() {
 	
 	// The remaining lines contain Bx,By,Bz data values 
 	// in ascending z,y,x co-ord order
-	fieldMap_->clear();
+	fieldMap_->reserve(N_);
 
 	Float_t Bx(0.0), By(0.0), Bz(0.0);
 
@@ -398,21 +398,27 @@ void ShipBFieldMap::setLimits() {
     yRange_ = yMax_ - yMin_;
     zRange_ = zMax_ - zMin_;
 
+    // Find the number of bins using the limits and bin sizes. The number of bins
+    // includes both the minimum and maximum values. To ensure correct rounding
+    // up to the nearest integer we need to add 1.5 not 1.0.
     if (dx_ > 0.0) {
-	Nx_ = static_cast<Int_t>(((xMax_ - xMin_)/dx_) + 1.0);
+	Nx_ = static_cast<Int_t>(((xMax_ - xMin_)/dx_) + 1.5);
     }
     if (dy_ > 0.0) {
-	Ny_ = static_cast<Int_t>(((yMax_ - yMin_)/dy_) + 1.0);
+	Ny_ = static_cast<Int_t>(((yMax_ - yMin_)/dy_) + 1.5);
     }
     if (dz_ > 0.0) {
-	Nz_ = static_cast<Int_t>(((zMax_ - zMin_)/dz_) + 1.0);
+	Nz_ = static_cast<Int_t>(((zMax_ - zMin_)/dz_) + 1.5);
     }
 
     N_ = Nx_*Ny_*Nz_;
 
-    std::cout<<"x values: "<<xMin_<<", "<<xMax_<<", dx = "<<dx_<<std::endl;
-    std::cout<<"y values: "<<yMin_<<", "<<yMax_<<", dy = "<<dy_<<std::endl;
-    std::cout<<"z values: "<<zMin_<<", "<<zMax_<<", dz = "<<dz_<<std::endl;
+    std::cout<<"x limits: "<<xMin_<<", "<<xMax_<<", dx = "<<dx_<<std::endl;
+    std::cout<<"y limits: "<<yMin_<<", "<<yMax_<<", dy = "<<dy_<<std::endl;
+    std::cout<<"z limits: "<<zMin_<<", "<<zMax_<<", dz = "<<dz_<<std::endl;
+
+    std::cout<<"Offsets: x = "<<xOffset_<<", y = "<<yOffset_<<", z = "<<zOffset_<<std::endl;
+    std::cout<<"Angles : phi = "<<phi_<<", theta = "<<theta_<<", psi = "<<psi_<<std::endl;
 
     std::cout<<"Total number of bins = "<<N_
 	     <<"; Nx = "<<Nx_<<", Ny = "<<Ny_<<", Nz = "<<Nz_<<std::endl;
@@ -469,7 +475,7 @@ Int_t ShipBFieldMap::getMapBin(Int_t iX, Int_t iY, Int_t iZ)
     if (index < 0) {
 	index = 0;
     } else if (index >= N_) {
-	index = N_;
+	index = N_-1;
     }
 
     return index;

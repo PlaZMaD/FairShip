@@ -8,6 +8,26 @@ ROOT.gROOT.ProcessLine('#include "Geant4/G4FieldManager.hh"')
 ROOT.gROOT.ProcessLine('#include "Geant4/G4UIterminal.hh"')
 ROOT.gROOT.ProcessLine('#include "Geant4/G4RunManager.hh"')
 ROOT.gROOT.ProcessLine('#include "TG4GeometryServices.h"')
+ROOT.gROOT.ProcessLine('#include "TG4GeometryManager.h"')
+
+def check4OrphanVolumes(fGeo):
+# fill list with volumes from nodes and compare with list of volumes
+ top = fGeo.GetTopVolume()
+ listOfVolumes = [top.GetName()]
+ findNode(top,listOfVolumes)
+ orphan = []
+ gIndex = {}
+ for v in fGeo.GetListOfVolumes():
+   name = v.GetName()
+   if not name in listOfVolumes:
+     orphan.append(name)
+   if not name in gIndex: gIndex[name]=[]
+   gIndex[name].append(v.GetNumber())
+ print "list of orphan volumes:",orphan
+ vSame = {}
+ for x in gIndex:
+   if len(gIndex[x])>1: vSame[x]=len(gIndex[x])
+ print "list of volumes with same name",vSame
 
 def setMagnetField(flag=None):
     print 'setMagnetField() called. Out of date, does not set field for tau neutrino detector!'
@@ -111,14 +131,40 @@ def printWeightsandFields(onlyWithField = True,exclude=[]):
    print 'total magnet mass',nM/1000.,'t'
    return
 
-def addVMCFields(controlFile = 'field/BFieldSetup.txt', verbose = False):
+def addVMCFields(shipGeo, controlFile = '', verbose = False, withVirtualMC = True):
     '''
     Define VMC B fields, e.g. global field, field maps, local or local+global fields
     '''
-    print 'Calling addVMCFields using input control file {0}'.format(controlFile)
+    print 'Calling addVMCFields'
     
     fieldMaker = ROOT.ShipFieldMaker(verbose)
-    fieldMaker.makeFields(controlFile)
+
+    # Read the input control file. If this is empty then the only fields that are 
+    # defined (so far) are those within the C++ geometry classes
+    if controlFile is not '':
+      fieldMaker.readInputFile(controlFile)
+
+    # Set the main spectrometer field map as a global field
+    if hasattr(shipGeo, 'Bfield'):
+      fieldMaker.defineFieldMap('MainSpecMap', 'files/MainSpectrometerField.root',
+                                ROOT.TVector3(0.0, 0.0, shipGeo.Bfield.z))      
+      withConstField = False
+      if hasattr(shipGeo.EmuMagnet,'WithConstField'): withConstField = shipGeo.EmuMagnet.WithConstField
+      if not withConstField:
+       fieldMaker.defineFieldMap('NuMap','files/nuTauDetField.root', ROOT.TVector3(0.0,0.0,shipGeo.EmuMagnet.zC))       
+    # Combine the two fields to obtain the global field
+       fieldMaker.defineComposite('TotalField', 'MainSpecMap', 'NuMap')
+       fieldMaker.defineGlobalField('TotalField')
+      else:
+       fieldMaker.defineGlobalField('MainSpecMap')
+    if withVirtualMC:
+    # Force the VMC to update/reset the fields defined by the fieldMaker object.
+    # Get the ROOT/Geant4 geometry manager
+     geom = ROOT.TG4GeometryManager.Instance()
+    # Let the geometry know about the fieldMaker object
+     geom.SetUserPostDetConstruction(fieldMaker)
+    # Update the fields via the overriden ShipFieldMaker::Contruct() function
+     geom.ConstructSDandField()
 
     # Return the fieldMaker object, otherwise it will "go out of scope" and its
     # content will be deleted
@@ -137,10 +183,14 @@ def printVMCFields():
     for v in vols:
 
         field =  v.GetField()
-        #print 'Vol is {0}, field is {1}'.format(v.GetName(), field)
+        if field:
+         print 'Vol is {0}, field is {1}'.format(v.GetName(), field)
+        else: 
+         print 'Vol is {0}'.format(v.GetName())
 
         if field:
-            # Get the field value in the local volume centre
+            # Get the field value assuming the global co-ordinate origin.
+            # This needs to be modified to use the local volume centre
             centre = array('d',[0.0, 0.0, 0.0])
             B = array('d',[0.0, 0.0, 0.0])
             field.Field(centre, B)
