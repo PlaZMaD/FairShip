@@ -455,6 +455,7 @@ void NuTauMudet::ConstructGeometry()
       Double_t y_tr = 300. * cm;
       Double_t leftZPosition = - 3400 * cm;
       Double_t rightZPosition = leftZPosition + 2. * microGap + cubeThickness + mLength;
+      Double_t zMid = (leftZPosition+rightZPosition)/2.
 
 
       TGeoBBox *upStreamBox = new TGeoBBox("upStreamBox", x_tr/2., y_tr/2., cubeThickness/2.); 
@@ -466,10 +467,10 @@ void NuTauMudet::ConstructGeometry()
 
       top->AddNode(upStreamBox, 1, new TGeoTranslation(0,0,leftZPosition));
    	  top->AddNode(downStreamBox, 1, new TGeoTranslation(0,0,rightZPosition));
-	  top->AddNode(topBox, 1, new TGeoTranslation(0,0,fzPos));
+	  top->AddNode(topBox, 1, new TGeoTranslation(0,y_tr/2.,zMid));
       // top->AddNode(botBox, 1, new TGeoTranslation(0,0,fzPos));
-      top->AddNode(sideBox_l, 1, new TGeoTranslation(0,0,fzPos));
-      top->AddNode(sideBox_r, 1, new TGeoTranslation(0,0,fzPos));
+      top->AddNode(sideBox_l, 1, new TGeoTranslation(x_tr/2.,0,zMid));
+      top->AddNode(sideBox_r, 1, new TGeoTranslation(-x_tr/2.,0,zMid));
 
 
       ////////////////
