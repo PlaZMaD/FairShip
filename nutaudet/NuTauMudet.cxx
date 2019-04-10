@@ -450,10 +450,10 @@ void NuTauMudet::ConstructGeometry()
       ////////////////
       Double_t microGap = 0.01 * mm;
       Double_t cubeThickness = 100.* cm;
-      Double_t mLength = 300. * cm;
-      Double_t x_tr = 300. * cm;
-      Double_t y_tr = 300. * cm;
-      Double_t leftZPosition = - 3400 * cm;
+      Double_t mLength = 700. * cm;
+      Double_t x_tr = 450. * cm;
+      Double_t y_tr = 450. * cm;
+      Double_t leftZPosition = - 3450 * cm;
       Double_t rightZPosition = leftZPosition + 2. * microGap + cubeThickness + mLength;
       Double_t zMid = (leftZPosition+rightZPosition)/2.;
 
