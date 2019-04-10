@@ -471,12 +471,12 @@ void NuTauMudet::ConstructGeometry()
       TGeoVolume *sideBox_rVol = new TGeoVolume("sideBox_rVol",sideBox_r, Iron);
       TGeoVolume *sideBox_lVol = new TGeoVolume("sideBox_lVol",sideBox_l, Iron);
 
-      top->AddNode(upStreamBoxVol, 1, new TGeoTranslation(0,0,leftZPosition));
-      top->AddNode(downStreamBoxVol, 1, new TGeoTranslation(0,0,rightZPosition));
-      top->AddNode(topBoxVol, 1, new TGeoTranslation(0,y_tr/2.,zMid));
+      tTauNuDet->AddNode(upStreamBoxVol, 1, new TGeoTranslation(0,0,leftZPosition));
+      tTauNuDet->AddNode(downStreamBoxVol, 1, new TGeoTranslation(0,0,rightZPosition));
+      tTauNuDet->AddNode(topBoxVol, 1, new TGeoTranslation(0,y_tr/2.,zMid));
       // top->AddNode(botBox, 1, new TGeoTranslation(0,0,fzPos));
-      top->AddNode(sideBox_lVol, 1, new TGeoTranslation(x_tr/2.,0,zMid));
-      top->AddNode(sideBox_rVol, 1, new TGeoTranslation(-x_tr/2.,0,zMid));
+      tTauNuDet->AddNode(sideBox_lVol, 1, new TGeoTranslation(x_tr/2.,0,zMid));
+      tTauNuDet->AddNode(sideBox_rVol, 1, new TGeoTranslation(-x_tr/2.,0,zMid));
 
 
       ////////////////
