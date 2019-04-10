@@ -450,7 +450,7 @@ void NuTauMudet::ConstructGeometry()
       ////////////////
       Double_t microGap = 0.01 * mm;
       Double_t cubeThickness = 100.* cm;
-      Double_t mLength = 700. * cm;
+      Double_t mLength = 900. * cm;
       Double_t x_tr = 450. * cm;
       Double_t y_tr = 450. * cm;
       Double_t leftZPosition = - 3450 * cm;
@@ -475,8 +475,8 @@ void NuTauMudet::ConstructGeometry()
       tTauNuDet->AddNode(downStreamBoxVol, 1, new TGeoTranslation(0,0,rightZPosition));
       tTauNuDet->AddNode(topBoxVol, 1, new TGeoTranslation(0,y_tr/2.,zMid));
       // top->AddNode(botBox, 1, new TGeoTranslation(0,0,fzPos));
-      tTauNuDet->AddNode(sideBox_lVol, 1, new TGeoTranslation(x_tr/2.,0,zMid));
-      tTauNuDet->AddNode(sideBox_rVol, 1, new TGeoTranslation(-x_tr/2.,0,zMid));
+      tTauNuDet->AddNode(sideBox_lVol, 1, new TGeoTranslation((x_tr - cubeThickness)/2.,0,zMid));
+      tTauNuDet->AddNode(sideBox_rVol, 1, new TGeoTranslation(-(x_tr - cubeThickness)/2.,0,zMid));
 
 
       ////////////////
