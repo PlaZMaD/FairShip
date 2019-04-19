@@ -1,3 +1,5 @@
+
+
 #include "MufluxReco.h"
 #include <TROOT.h>
 #include <TChain.h>
@@ -481,7 +483,7 @@ StringVecIntMap MufluxReco::countMeasurements(TrackInfo* trInfo){
     MufluxSpectrometerHit* hit = new MufluxSpectrometerHit(detID,0);
     auto info = hit->StationInfo();
     delete hit;
-    Int_t s=info[0]; Int_t v=info[1]; Int_t p=info[2]; Int_t l=info[3]; Int_t channelNr=info[5]; 
+    Int_t s=info[0]; Int_t v=info[4]; Int_t p=info[2]; Int_t l=info[3]; Int_t channelNr=info[5]; 
     if (trInfo->wL(n) <0.1 && trInfo->wR(n) <0.1){ continue;}
     if (v != 0){ 
        mStatistics["uv"].push_back(detID);
@@ -568,12 +570,18 @@ void MufluxReco::trackKinematics(Float_t chi2UL, Int_t nMax){
      if (MCdata){
        std::map<TString,int> detectors = { {"u",0}, {"v",0}, {"x2",0}, {"x3",0}, {"x1",0},{"x4",0}};
        std::map<TString, int>::iterator it;
+       bool failed = false;
        for ( it = detectors.begin(); it != detectors.end(); it++ ){
         for ( int m=0; m<hitsPerStation[it->first.Data()].size();m+=1){
-         if (TRandom().Uniform() < effFudgeFac[it->first.Data()]){detectors[it->first.Data()]+=1;}
-        if (detectors[it->first.Data()]<2){continue;}
+         float rnr = gRandom->Uniform();
+         float eff = effFudgeFac[it->first.Data()];
+         if (rnr < eff){detectors[it->first.Data()]+=1;}
         }
+        if (detectors[it->first.Data()]<2){
+           failed = true;
+           break;}
        }
+       if (failed){continue;}
      }
      if (hitsPerStation["x1"].size()<2){ continue;}
      if (hitsPerStation["x2"].size()<2){ continue;}
@@ -703,6 +711,16 @@ void MufluxReco::sortHits(TClonesArray* hits, nestedList* l, Bool_t flag){
     std::cout<< "sortHits: unphysical detector ID "<<hit->GetDetectorID()<<std::endl;
     hit->Dump();
    }else{
+     if (MCdata){
+      float rnr = gRandom->Uniform();
+      TString station;
+      if (info[4]==0){station = 'x';station += info[0];}
+      if (info[4]==1){station = 'u';}
+      if (info[4]==2){station = 'v';}
+      float eff = effFudgeFac[station.Data()];
+      std::cout << "debug "<< station.Data()<<" "<<eff<<" "<<rnr<<std::endl;
+      if (rnr > eff){continue;}
+     }
     spectrHitsSorted[info[4]][info[0]][info[2]*2+info[3]].push_back(hit);
   }
  }
