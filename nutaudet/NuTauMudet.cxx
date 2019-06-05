@@ -449,11 +449,11 @@ void NuTauMudet::ConstructGeometry()
       TGeoBBox *SmalldetBox = new TGeoBBox("SmalldetBox", fXtot/2, (fYtot-fdeltay)/2, fZtot/2); //solving overlapping with pillars->dividing box to an union of two different boxes
       ////////////////
       Double_t microGap = 0.01 * mm;
-      Double_t cubeThickness = 50.* cm;
+      Double_t cubeThickness = 80.* cm;
       Double_t mLength = 950. * cm;
       Double_t x_tr = 450. * cm;
       Double_t y_tr = 700. * cm;
-      Double_t leftZPosition = - 3450 * cm;
+      Double_t leftZPosition = - 3420 * cm;
       Double_t rightZPosition = leftZPosition + 2. * microGap + cubeThickness + mLength;
       Double_t zMid = (leftZPosition+rightZPosition)/2.;
 
