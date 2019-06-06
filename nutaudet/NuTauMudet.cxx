@@ -449,7 +449,7 @@ void NuTauMudet::ConstructGeometry()
       TGeoBBox *SmalldetBox = new TGeoBBox("SmalldetBox", fXtot/2, (fYtot-fdeltay)/2, fZtot/2); //solving overlapping with pillars->dividing box to an union of two different boxes
       ////////////////
       Double_t microGap = 0.01 * mm;
-      Double_t cubeThickness = 80.* cm;
+      Double_t cubeThickness = 78.* cm;
       Double_t mLength = 950. * cm;
       Double_t x_tr = 450. * cm;
       Double_t y_tr = 700. * cm;
@@ -472,7 +472,7 @@ void NuTauMudet::ConstructGeometry()
       TGeoVolume *sideBox_lVol = new TGeoVolume("sideBox_lVol",sideBox_l, Iron);
 
       tTauNuDet->AddNode(upStreamBoxVol, 1, new TGeoTranslation(0,0,leftZPosition));
-      tTauNuDet->AddNode(downStreamBoxVol, 1, new TGeoTranslation(0,0,rightZPosition));
+      //tTauNuDet->AddNode(downStreamBoxVol, 1, new TGeoTranslation(0,0,rightZPosition));
       tTauNuDet->AddNode(topBoxVol, 1, new TGeoTranslation(0,y_tr/2.,zMid));
       // top->AddNode(botBox, 1, new TGeoTranslation(0,0,fzPos));
       tTauNuDet->AddNode(sideBox_lVol, 1, new TGeoTranslation((x_tr - cubeThickness)/2.,0,zMid));
