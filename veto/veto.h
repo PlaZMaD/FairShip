@@ -5,12 +5,26 @@
 #include "TVector3.h"
 #include "TLorentzVector.h"
 #include "TGeoVolume.h"
-
+#include "TMCProcess.h"
+#include "TFile.h"
+#include "TTree.h"
+#include "TBranch.h"
 #include <map>
+#include <fstream>
 
 class vetoPoint;
 class FairVolume;
 class TClonesArray;
+
+// struct __attribute__((packed)) mystruct {
+// 	double Energy;
+// 	double x;
+// 	double y;
+// 	double z;
+//         int processesID[200]={-1};
+// //	TMCProcess Process;
+// };
+
 
 class veto: public FairDetector
 {
@@ -69,7 +83,6 @@ class veto: public FairDetector
                              TVector3 pos, TVector3 mom,
                              Double_t time, Double_t length,
                              Double_t eLoss,Int_t pdgcode,TVector3 Lpos, TVector3 Lmom);
-
     /** The following methods can be implemented if you need to make
      *  any optional action in your detector during the transport.
     */
@@ -96,6 +109,25 @@ class veto: public FairDetector
 
   private:
 
+   TFile* myfile;
+   TTree* mytree;
+   TTree* trackparams;
+//    std::ofstream output;
+   
+   double my_energy;
+   double my_x;
+   double my_y;
+   double my_z;
+   int my_processesID[200]={-1};
+   TArrayI Process;
+   
+   Double_t xmean;
+   Double_t ymean;
+   Double_t zmean;
+   Double_t cur_energy;
+   
+   //TBranch mybranch;
+//    mystruct mystr;
     /** Track information to be stored until the track leaves the
     active volume.
     */

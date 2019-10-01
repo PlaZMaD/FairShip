@@ -47,7 +47,7 @@ class vetoPoint : public FairMCPoint
     vetoPoint operator=(const vetoPoint& point);
 
     ClassDef(vetoPoint,3)
-
+	
 };
 
 #endif

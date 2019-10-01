@@ -34,8 +34,11 @@
 
 
 #include <iostream>
+#include <fstream>
+
 using std::cout;
 using std::endl;
+using std::ofstream;
 
 Double_t cm  = 1;       // cm
 Double_t m   = 100*cm;  //  m
@@ -55,6 +58,36 @@ veto::veto()
   fUseSupport=1;
   fPlasticVeto=0;
   fLiquidVeto=1;
+  cout<<endl;
+  cout<<endl;
+  cout<<endl;
+  cout<<endl;
+  cout<<endl;
+  cout<<endl;
+  cout<<"Created Myfile"<<endl;
+  cout<<endl;
+  cout<<endl;
+  cout<<endl;
+  cout<<endl;
+  cout<<endl;
+  cout<<endl;
+//   output.open("veto_output.txt");
+  myfile = new TFile("myfile.root", "RECREATE");
+  mytree = new TTree("mytree", "");
+//   mytree->Branch("mytree", &mystr, "Energy/D:x:y:z:processID/I");
+  mytree->Branch("x", &my_x);
+  mytree->Branch("y", &my_y);
+  mytree->Branch("z", &my_z);
+  mytree->Branch("energy", &my_energy);
+  mytree->Branch("processID", &Process);
+  mytree->Branch("cur_energy", &cur_energy);
+
+  
+  trackparams = new TTree("trackparams", "");
+  trackparams->Branch("TrackID", &fTrackID);
+  trackparams->Branch("xmean", &xmean);
+  trackparams->Branch("ymean", &ymean);
+  trackparams->Branch("zmean", &zmean);
 }
 
 veto::veto(const char* name, Bool_t active)
@@ -95,6 +128,35 @@ veto::veto(const char* name, Bool_t active)
   fUseSupport=1;
   fPlasticVeto=0;
   fLiquidVeto=1;
+  cout<<endl;
+  cout<<endl;
+  cout<<endl;
+  cout<<endl;
+  cout<<endl;
+  cout<<endl;
+  cout<<"Created Myfile"<<endl;
+  cout<<endl;
+  cout<<endl;
+  cout<<endl;
+  cout<<endl;
+  cout<<endl;
+  cout<<endl;
+//   output.open("veto_output.txt");
+  myfile = new TFile("myfile.root", "RECREATE");
+  mytree = new TTree("mytree", "");
+  mytree->Branch("x",&my_x);
+  mytree->Branch("y",&my_y);
+  mytree->Branch("z",&my_z);
+  mytree->Branch("energy",&my_energy);
+  mytree->Branch("processID",&Process);
+  mytree->Branch("cur_energy", &cur_energy);
+
+  
+  trackparams = new TTree("trackparams", "");
+  trackparams->Branch("TrackID", &fTrackID);
+  trackparams->Branch("xmean", &xmean);
+  trackparams->Branch("ymean", &ymean);
+  trackparams->Branch("zmean", &zmean);
 }
 
 veto::~veto()
@@ -103,6 +165,23 @@ veto::~veto()
     fvetoPointCollection->Delete();
     delete fvetoPointCollection;
   }
+  cout<<endl;
+  cout<<endl;
+  cout<<endl;
+  cout<<endl;
+  cout<<endl;
+  cout<<endl;
+  cout<<"deleted Myfile"<<endl;
+  cout<<endl;
+  cout<<endl;
+  cout<<endl;
+  cout<<endl;
+  cout<<endl;
+  cout<<endl;
+  myfile->Write();
+  delete mytree;
+  delete trackparams;
+  delete myfile;
 }
 
 void veto::Initialize()
@@ -1073,6 +1152,7 @@ void veto::SetTublengths(Float_t l1, Float_t l2, Float_t l3, Float_t l4, Float_t
 
 Bool_t  veto::ProcessHits(FairVolume* vol)
 {
+
   /** This method is called from the MC stepping */
   //Set parameters at entrance of volume. Reset ELoss.
   if ( gMC->IsTrackEntering() ) {
@@ -1108,9 +1188,31 @@ Bool_t  veto::ProcessHits(FairVolume* vol)
     gMC->TrackPosition(Pos);
     TLorentzVector Mom;
     gMC->TrackMomentum(Mom);
-    Double_t xmean = (fPos.X()+Pos.X())/2. ;
-    Double_t ymean = (fPos.Y()+Pos.Y())/2. ;
-    Double_t zmean = (fPos.Z()+Pos.Z())/2. ;
+     xmean = (fPos.X()+Pos.X())/2. ;
+     ymean = (fPos.Y()+Pos.Y())/2. ;
+     zmean = (fPos.Z()+Pos.Z())/2. ;
+     cur_energy = p->Energy();
+     trackparams->Fill();
+  //  TMCProcess proc = gMC->ProdProcess();
+    TArrayI processesID;
+    gMC->StepProcesses(processesID);
+	my_energy = gMC->Edep();
+	my_x = Pos.X();
+	my_y = Pos.Y();
+	my_z = Pos.Z();
+        Process = processesID;
+//          /*output*/<<Pos.X()<<" "<<Pos.Y()<<" "<<Pos.Z()<<" "<<gMC->Edep()<<" ";
+        if (processesID.fN > 200) cout<<"too much processes!!!"<<endl;
+        /* for (int i=0; i<processesID.fN; i++)
+         {
+             output<<processesID[i]<<" ";
+//              mystr.processesID[i] = processesID[i];
+              cout<<processesID[i]<<" ";
+         }  */       
+//          cout<<endl;
+	mytree->Fill();
+        
+//         output<<endl;
 //    cout << veto_uniqueId << " :(" << xmean << ", " << ymean << ", " << zmean << "): " << gMC->CurrentVolName() << endl;
     AddHit(fTrackID, veto_uniqueId, TVector3(xmean, ymean,  zmean),
            TVector3(fMom.Px(), fMom.Py(), fMom.Pz()), fTime, fLength,
