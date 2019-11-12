@@ -146,8 +146,9 @@ Bool_t MuonBackGenerator::ReadEvent(FairPrimaryGenerator* cpg)
         if (gRandom->Uniform(0.,1.)>0.99){
           std::vector<int> list = it->second;
           for ( Int_t i=0;i < list.size(); i++){
-             vetoPoint *v = (vetoPoint*)vetoPoints->At(list.at(i)); 
-             Int_t muIndex = v->GetTrackID();
+             //vetoPoint *v = (vetoPoint*)vetoPoints->At(list.at(i));
+             ShipMCTrack *v = (ShipMCTrack*) MCTrack->At(list.at(i));
+             Int_t muIndex = i;//v->GetTrackID();
              muList.insert( { muIndex,i });
           }
         }
