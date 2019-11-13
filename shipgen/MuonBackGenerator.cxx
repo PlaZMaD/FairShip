@@ -127,7 +127,7 @@ Bool_t MuonBackGenerator::ReadEvent(FairPrimaryGenerator* cpg)
          Int_t abspid = TMath::Abs(v->GetPdgCode()); 
          if (abspid==13 or (not followMuons and abspid!=12 and abspid!=14) ){
           found = true;
-          Int_t muIndex = v->GetTrackID();
+          Int_t muIndex = i;//v->GetTrackID();
           if (!fdownScaleDiMuon) {muList.insert( { muIndex,i }); }
           else if (abspid==13 ){
              if ( checkDiMuon(muIndex) ){
