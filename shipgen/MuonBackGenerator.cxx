@@ -123,8 +123,8 @@ Bool_t MuonBackGenerator::ReadEvent(FairPrimaryGenerator* cpg)
    if (id==-1){ // use tree as input file
      Bool_t found = false;
      for (int i = 0; i < vetoPoints->GetEntries(); i++) {
-         vetoPoint *v = (vetoPoint*)vetoPoints->At(i); 
-         Int_t abspid = TMath::Abs(v->PdgCode()); 
+         ShipMCTrack *v = (ShipMCTrack*) MCTrack->At(i);
+         Int_t abspid = TMath::Abs(v->GetPdgCode()); 
          if (abspid==13 or (not followMuons and abspid!=12 and abspid!=14) ){
           found = true;
           Int_t muIndex = v->GetTrackID();
