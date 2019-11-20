@@ -51,6 +51,7 @@ protected:
   Bool_t followMuons;
   Int_t fSameSeed;
   Double_t fsmearBeam ;
+  std::set goodEventsList;
   ClassDef(MuonBackGenerator,6);
 };
 

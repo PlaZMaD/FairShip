@@ -26,7 +26,7 @@ Bool_t MuonBackGenerator::Init(const char* fileName) {
   return Init(fileName, 0, false);
 }
 // -----   Default constructor   -------------------------------------------
-Bool_t MuonBackGenerator::Init(const char* fileName, const int firstEvent, const Bool_t fl = false ) {
+Bool_t MuonBackGenerator::Init(const char* fileName, const char* eventConfigFileName,const int firstEvent, const Bool_t fl = false ) {
   fLogger = FairLogger::GetLogger();
   fLogger->Info(MESSAGE_ORIGIN,"Opening input file %s",fileName);
   if (0 == strncmp("/eos",fileName,4) ) {
@@ -39,6 +39,18 @@ Bool_t MuonBackGenerator::Init(const char* fileName, const int firstEvent, const
   if (fInputFile->IsZombie()) {
     fLogger->Fatal(MESSAGE_ORIGIN, "Error opening the Signal file:",fInputFile);
   }
+  // std::set<int> goodEventsList;
+  fstream eventConfig(eventConfigFileName, ios::in);
+  if (!eventConfig){
+    fLogger->Fatal(MESSAGE_ORIGIN, "Error opening the event config file:",eventConfig);
+  }
+  else{
+    int goodEventNumber;
+    eventConfig >> goodEventNumber;
+    goodEventsList.insert(goodEventNumber);
+  }
+  // eventConfig.open(eventConfigFileName, ios::in);
+  
   fn = firstEvent;
   fPhiRandomize = fl;
   fSameSeed = 0;
@@ -165,6 +177,7 @@ Bool_t MuonBackGenerator::ReadEvent(FairPrimaryGenerator* cpg)
     Int_t theSeed = fn + fSameSeed * fNevents;
     fLogger->Debug(MESSAGE_ORIGIN, TString::Format("Seed: %d", theSeed));
     gRandom->SetSeed(theSeed);
+    std::cout<<"Set seed for event: " << theSeed<<std::endl;
   }
   if (fPhiRandomize){phi = gRandom->Uniform(0.,2.) * TMath::Pi();}
   if (fsmearBeam > 0) {

@@ -478,7 +478,7 @@ if simEngine == "MuonBack":
  #
  MuonBackgen = ROOT.MuonBackGenerator()
  # MuonBackgen.FollowAllParticles() # will follow all particles after hadron absorber, not only muons
- MuonBackgen.Init(inputFile,firstEvent,phiRandom)
+ MuonBackgen.Init(inputFile,"eventsList.txt",firstEvent,phiRandom)
  if charm == 0: MuonBackgen.SetSmearBeam(5 * u.cm) # radius of ring, thickness 8mm
  elif DownScaleDiMuon: 
     if inputFile[0:4] == "/eos": test = os.environ["EOSSHIP"]+inputFile
