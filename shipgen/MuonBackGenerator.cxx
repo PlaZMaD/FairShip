@@ -47,8 +47,9 @@ Bool_t MuonBackGenerator::Init(const char* fileName, const char* eventConfigFile
   }
   else{
     int goodEventNumber;
-    eventConfig >> goodEventNumber;
+    for (eventConfig >> goodEventNumber; !eventConfig.eof(); eventConfig >> goodEventNumber){    
     goodEventsList.insert(goodEventNumber);
+    }
   }
   // eventConfig.open(eventConfigFileName, ios::in);
   
@@ -121,7 +122,11 @@ Bool_t MuonBackGenerator::ReadEvent(FairPrimaryGenerator* cpg)
   Double_t dx = 0, dy = 0;
   std::unordered_map<int, int> muList;
   std::unordered_map<int, std::vector<int>> moList;
+  std::set<int>::iterator endSet = goodEventsList.end();
   while (fn<fNevents) {
+   if (goodEventsList.find(fn)==endSet){
+    continue;
+   }
    fTree->GetEntry(fn);
    muList.clear(); 
    moList.clear(); 
@@ -178,7 +183,7 @@ Bool_t MuonBackGenerator::ReadEvent(FairPrimaryGenerator* cpg)
     Int_t theSeed = fn + fSameSeed * fNevents;
     fLogger->Debug(MESSAGE_ORIGIN, TString::Format("Seed: %d", theSeed));
     gRandom->SetSeed(theSeed);
-    std::cout<<"Set seed for event: " << theSeed<<std::endl;
+    // std::cout<<"Set seed for event: " << theSeed<<std::endl;
   }
   if (fPhiRandomize){phi = gRandom->Uniform(0.,2.) * TMath::Pi();}
   if (fsmearBeam > 0) {
