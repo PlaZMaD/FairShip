@@ -13,6 +13,7 @@
 #include "TMCProcess.h"
 #include <algorithm>
 #include <unordered_map>
+#include <iostream>
 
 // read events from Pythia8/Geant4 base simulation (only target + hadron absorber
 
@@ -23,7 +24,7 @@ MuonBackGenerator::MuonBackGenerator() {
 // -------------------------------------------------------------------------
 // -----   Default constructor   -------------------------------------------
 Bool_t MuonBackGenerator::Init(const char* fileName) {
-  return Init(fileName, 0, false);
+  return Init(fileName, "goodEvents.txt", 0, false);
 }
 // -----   Default constructor   -------------------------------------------
 Bool_t MuonBackGenerator::Init(const char* fileName, const char* eventConfigFileName,const int firstEvent, const Bool_t fl = false ) {
@@ -40,9 +41,9 @@ Bool_t MuonBackGenerator::Init(const char* fileName, const char* eventConfigFile
     fLogger->Fatal(MESSAGE_ORIGIN, "Error opening the Signal file:",fInputFile);
   }
   // std::set<int> goodEventsList;
-  fstream eventConfig(eventConfigFileName, ios::in);
+  std::fstream eventConfig(eventConfigFileName, std::fstream::in);
   if (!eventConfig){
-    fLogger->Fatal(MESSAGE_ORIGIN, "Error opening the event config file:",eventConfig);
+    fLogger->Fatal(MESSAGE_ORIGIN, "Error opening the event config file:", fInputFile);
   }
   else{
     int goodEventNumber;

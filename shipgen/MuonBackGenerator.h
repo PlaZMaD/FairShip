@@ -21,7 +21,7 @@ class MuonBackGenerator : public FairGenerator
   
   /** public method ReadEvent **/
   Bool_t ReadEvent(FairPrimaryGenerator*);  
-  virtual Bool_t Init(const char*, int, const Bool_t fl); //!
+  virtual Bool_t Init(const char*, const char*, int, const Bool_t fl); //!
   virtual Bool_t Init(const char*); //!
   Int_t GetNevents();//!
   void CloseFile();//!
@@ -51,7 +51,7 @@ protected:
   Bool_t followMuons;
   Int_t fSameSeed;
   Double_t fsmearBeam ;
-  std::set goodEventsList;
+  std::set<int> goodEventsList;
   ClassDef(MuonBackGenerator,6);
 };
 
