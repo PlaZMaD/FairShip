@@ -768,7 +768,7 @@ void ShipMuonShield::ConstructGeometry()
       TGeoUniformMagField *ConRField_my    = new TGeoUniformMagField(-ironField*fieldScale[nM],0.,0.);
       TGeoUniformMagField *ConLField_my    = new TGeoUniformMagField(ironField*fieldScale[nM],0.,0.);
       TGeoUniformMagField *fields_my[4] = {magFieldIron_my,RetField_my,ConRField_my,ConLField_my};
-      std::cout<<"Creating magnet "<< magnetName[nM]<<"	z = "<<dZf[nM]<<std::endl;
+      std::cout<<"Creating magnet "<< magnetName[nM]<<"	z = "<<dZf[nM]<<" fieldScale "<<fieldScale[nM]<<std::endl;
 	CreateMagnet(magnetName[nM], iron, tShield, fields_my, fieldDirection[nM],
 		     dXIn[nM], dYIn[nM], dXOut[nM], dYOut[nM], dZf[nM],
 		     midGapIn[nM], midGapOut[nM], HmainSideMagIn[nM],
