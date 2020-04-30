@@ -204,7 +204,7 @@ void ShipMuonShield::CreateArb8(TString arbName, TGeoMedium *medium,
   {
     const char* newName = new char[strlen(arbName) + 4];
     strcpy(const_cast<char*>(newName), std::to_string(i).c_str());
-    magF.push_back(gGeoManager->MakeArb8(arbName, medium, dZp - 0.00001*m, finalCorners[i]));
+    magF.push_back(gGeoManager->MakeArb8(newName, medium, dZp - 0.00001*m, finalCorners[i]));
     magF[i]->SetLineColor(color);
     magF[i]->SetField(magField);
   }
