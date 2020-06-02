@@ -26,9 +26,11 @@ Double_t tesla = 10 * kilogauss;
 ShipMuonShield::~ShipMuonShield() {}
 ShipMuonShield::ShipMuonShield() : FairModule("ShipMuonShield", "") {}
 
-ShipMuonShield::ShipMuonShield(TString geofile)
+ShipMuonShield::ShipMuonShield(TString geofile, const Int_t withCoMagnet, const Bool_t StepGeo)
   : FairModule("MuonShield", "ShipMuonShield")
 {
+  fStepGeo = StepGeo;
+  fWithCoMagnet = withCoMagnet;
   fGeofile = geofile;
   auto f = TFile::Open(geofile, "read");
   TVectorT<Double_t> params;
@@ -199,7 +201,7 @@ void ShipMuonShield::CreateArb8(TString arbName, TGeoMedium *medium,
   }
 
   std::vector<TGeoVolume*> magF;
-
+  
   for (int i = 0; i < zParts; ++i)
   {
     // const char* newName = new char[strlen(arbName) + 4];
@@ -355,7 +357,7 @@ void ShipMuonShield::CreateMagnet(TString magnetName,TGeoMedium* medium,TGeoVolu
     TString str9 = "_MagTopRight";
     TString str10 = "_MagBotLeft";
     TString str11 = "_MagBotRight";
-
+    
     switch (fieldDirection){
 
     case FieldDirection::up: 
