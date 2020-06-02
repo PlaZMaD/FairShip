@@ -40,8 +40,8 @@ Bool_t MuonBackGenerator::Init(const char* fileName, const int firstEvent, const
     fLogger->Fatal(MESSAGE_ORIGIN, "Error opening the Signal file:",fInputFile);
   }
   fn = firstEvent;
-  fPhiRandomize = fl;
-  fSameSeed = 0;
+  fPhiRandomize = 0;
+  fSameSeed = 1;
   fsmearBeam = 0; // default no beam smearing, use SetSmearBeam(sb) if different, sb [cm]
   fdownScaleDiMuon = kFALSE; // only needed for muflux simulation
   fTree = (TTree *)fInputFile->Get("pythia8-Geant4");
@@ -162,7 +162,7 @@ Bool_t MuonBackGenerator::ReadEvent(FairPrimaryGenerator* cpg)
      return kFALSE;
   } 
   if (fSameSeed) {
-    Int_t theSeed = fn + fSameSeed * fNevents;
+    Int_t theSeed = 11;
     fLogger->Debug(MESSAGE_ORIGIN, TString::Format("Seed: %d", theSeed));
     gRandom->SetSeed(theSeed);
   }
