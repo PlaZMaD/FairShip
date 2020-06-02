@@ -202,9 +202,10 @@ void ShipMuonShield::CreateArb8(TString arbName, TGeoMedium *medium,
 
   for (int i = 0; i < zParts; ++i)
   {
-    const char* newName = new char[strlen(arbName) + 4];
-    strcpy(const_cast<char*>(newName), std::to_string(i).c_str());
-    magF.push_back(gGeoManager->MakeArb8(arbName, medium, dZp - 0.00001*m, finalCorners[i]));
+    // const char* newName = new char[strlen(arbName) + 4];
+    // strcpy(const_cast<char*>(newName), std::to_string(i).c_str());
+    TString newName = arbName + TString("_") + TString(i);
+    magF.push_back(gGeoManager->MakeArb8(newName, medium, dZp - 0.00001*m, finalCorners[i]));
     magF[i]->SetLineColor(color);
     magF[i]->SetField(magField);
   }
@@ -848,7 +849,7 @@ void ShipMuonShield::ConstructGeometry()
            Fatal( "ShipMuonShield", "Exception out of range for --coMuonShield occurred \n");
         }
       }
-      for (Int_t nM = 2; nM <= (nMagnets - 1); nM++) {
+      for (Int_t nM = 2; nM <= (nMagnets - 1); nM++) {/
   Double_t ironField_s = fField * fieldScale[nM] * tesla;
   TGeoUniformMagField *magFieldIron_s = new TGeoUniformMagField(0.,ironField_s,0.);
   TGeoUniformMagField *RetField_s     = new TGeoUniformMagField(0.,-ironField_s,0.);
