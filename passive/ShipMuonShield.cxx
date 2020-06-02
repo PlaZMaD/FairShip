@@ -851,7 +851,7 @@ void ShipMuonShield::ConstructGeometry()
            Fatal( "ShipMuonShield", "Exception out of range for --coMuonShield occurred \n");
         }
       }
-      for (Int_t nM = 2; nM <= (nMagnets - 1); nM++) {/
+      for (Int_t nM = 2; nM <= (nMagnets - 1); nM++) {
   Double_t ironField_s = fField * fieldScale[nM] * tesla;
   TGeoUniformMagField *magFieldIron_s = new TGeoUniformMagField(0.,ironField_s,0.);
   TGeoUniformMagField *RetField_s     = new TGeoUniformMagField(0.,-ironField_s,0.);
