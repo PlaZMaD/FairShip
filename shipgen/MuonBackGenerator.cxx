@@ -162,7 +162,7 @@ Bool_t MuonBackGenerator::ReadEvent(FairPrimaryGenerator* cpg)
      return kFALSE;
   } 
   if (fSameSeed) {
-    Int_t theSeed = 11;
+    Int_t theSeed = fn;
     fLogger->Debug(MESSAGE_ORIGIN, TString::Format("Seed: %d", theSeed));
     gRandom->SetSeed(theSeed);
   }
