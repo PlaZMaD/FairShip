@@ -190,6 +190,49 @@ void ShipFieldMaker::readInputFile(const std::string& inputFile)
     getData.close();
 
 }
+void ShipFieldMaker::generateFieldMap(){
+        std::ofstream myfile;
+        myfile.open ("example.csv");
+        float step = 2.5;
+        float xRange = 179;
+        float yRange = 317;
+        float zRange = 1515.5;
+        //Double_t B[3] = {0.0, 0.0, 0.0};
+        Double_t position[3] = {0.0, 0.0, 0.0};
+        for (int i =0 ; i < 73; i++){
+                for (int k=0;  k<128;k++){
+                        for (int m=0; m<1214; m++){
+                                Double_t B[3] = {0.0, 0.0, 0.0};
+                                Double_t x = step*i;
+                                Double_t y = step * k;
+                                Double_t z = m * step - 1515.5 - 4996.0;
+                                position[0] = x;
+                                position[1] = y;
+                                position[2] = z;
+
+                                Bool_t inside(kFALSE);
+                                TGeoNode* theNode = gGeoManager->FindNode(position[0], position[1], position[2]);
+                                if (theNode) {
+                                        TGeoVolume* theVol = theNode->GetVolume();
+                                        if (theVol) {
+                                                TVirtualMagField* theField = dynamic_cast<TVirtualMagField*>(theVol->GetField());
+                                                if (theField) {
+                                                        if (theVol->GetShape()->Safety(position) > 0.5){
+                                                                theField->Field(position, B);
+                                                                inside = kTRUE;
+                                                        }else{inside=kTRUE;}
+                                                }
+                                        }
+                                }
+                                if (inside == kFALSE && globalField_) {
+                                        globalField_->Field(position, B);
+                                }
+                                myfile<<x<<"    "<<y<<" "<<z<<" "<<B[0]/Tesla_<<"       "<<B[1]/Tesla_<<"       "<<B[2]/Tesla_<<std::endl;
+                        }
+                }
+        }
+        myfile.close();
+}
 
 void ShipFieldMaker::defineUniform(const stringVect& inputLine)
 {

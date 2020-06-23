@@ -48,6 +48,7 @@ class ShipFieldMaker : public TG4VUserPostDetConstruction
 
     //! Typedef of a vector of strings
     typedef std::vector<std::string> stringVect;
+    void ShipFieldMaker::generateFieldMap();
 
     //! Structure to hold volume name, field name and field scaling factor
     struct fieldInfo {
