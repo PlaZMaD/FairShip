@@ -20,7 +20,7 @@
 MuonBackGenerator::MuonBackGenerator() {
  followMuons = true;
 }
-MuonBackGenerator::MuonBackGenerator( float Px,  float Py,  float Pz){
+MuonBackGenerator::MuonBackGenerator( float mPx,  float mPy,  float mPz){
    followMuons = true;
    Px = mPx; Py = mPy; Pz = mPz;
 }

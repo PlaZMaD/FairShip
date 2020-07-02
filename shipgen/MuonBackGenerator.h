@@ -15,7 +15,7 @@ class MuonBackGenerator : public FairGenerator
   
   /** default constructor **/
   MuonBackGenerator();
-  MuonBackGenerator( float Px,  float Py,  float Pz);
+  MuonBackGenerator( float mPx,  float mPy,  float mPz);
   /** destructor **/
   virtual ~MuonBackGenerator();
   
