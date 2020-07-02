@@ -20,6 +20,10 @@
 MuonBackGenerator::MuonBackGenerator() {
  followMuons = true;
 }
+MuonBackGenerator::MuonBackGenerator( float Px,  float Py,  float Pz){
+   followMuons = true;
+   Px = mPx; Py = mPy; Pz = mPz;
+}
 // -------------------------------------------------------------------------
 // -----   Default constructor   -------------------------------------------
 Bool_t MuonBackGenerator::Init(const char* fileName) {
@@ -212,7 +216,7 @@ Bool_t MuonBackGenerator::ReadEvent(FairPrimaryGenerator* cpg)
           break;
         }
        }
-       cpg->AddTrack(track->GetPdgCode(),px,py,pz,vx,vy,vz,track->GetMotherId(),wanttracking,e,tof,track->GetWeight(),(TMCProcess)track->GetProcID());
+       cpg->AddTrack(track->GetPdgCode(),Px,Py,Pz,vx,vy,vz,track->GetMotherId(),wanttracking,e,tof,track->GetWeight(),(TMCProcess)track->GetProcID());
      }
   }else{
     vx += dx/100.;
@@ -222,8 +226,8 @@ Bool_t MuonBackGenerator::ReadEvent(FairPrimaryGenerator* cpg)
      px = pt*TMath::Cos(phi);
      py = pt*TMath::Sin(phi);
     }
-    cpg->AddTrack(int(pythiaid),px,py,pz,vx*100.,vy*100.,vz*100.,-1.,false,e,pythiaid,parentid);
-    cpg->AddTrack(int(id),px,py,pz,vx*100.,vy*100.,vz*100.,-1.,true,e,tof,w);
+    cpg->AddTrack(int(pythiaid),Px,Py,Pz,vx*100.,vy*100.,vz*100.,-1.,false,e,pythiaid,parentid);
+    cpg->AddTrack(int(id),Px,Py,Pz,vx*100.,vy*100.,vz*100.,-1.,true,e,tof,w);
   }
   return kTRUE;
 }

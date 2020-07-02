@@ -15,7 +15,7 @@ class MuonBackGenerator : public FairGenerator
   
   /** default constructor **/
   MuonBackGenerator();
-  
+  MuonBackGenerator( float Px,  float Py,  float Pz);
   /** destructor **/
   virtual ~MuonBackGenerator();
   
@@ -34,6 +34,9 @@ class MuonBackGenerator : public FairGenerator
   };
   Bool_t checkDiMuon(Int_t muIndex);
   void SetDownScaleDiMuon(){ fdownScaleDiMuon = kTRUE; };
+   float Px;
+   float Py;
+   float Pz;
 
 private:
 protected:
