@@ -216,7 +216,11 @@ Bool_t MuonBackGenerator::ReadEvent(FairPrimaryGenerator* cpg)
           break;
         }
        }
-       cpg->AddTrack(track->GetPdgCode(),Px,Py,Pz,vx,vy,vz,track->GetMotherId(),wanttracking,e,tof,track->GetWeight(),(TMCProcess)track->GetProcID());
+       if (abspid==13){
+          cpg->AddTrack(track->GetPdgCode(),Px,Py,Pz,vx,vy,vz,track->GetMotherId(),wanttracking,e,tof,track->GetWeight(),(TMCProcess)track->GetProcID());
+        }else{
+          cpg->AddTrack(track->GetPdgCode(),px,py,pz,vx,vy,vz,track->GetMotherId(),wanttracking,e,tof,track->GetWeight(),(TMCProcess)track->GetProcID());
+        }
      }
   }else{
     vx += dx/100.;
