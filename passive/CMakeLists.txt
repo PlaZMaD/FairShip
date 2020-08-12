@@ -25,6 +25,7 @@ ShipChamber.cxx
 ShipTargetStation.cxx
 MufluxTargetStation.cxx
 ShipMuonShield.cxx
+MiniShield.cxx
 ShipPassiveContFact.cxx
 ShipTAUMagneticSpectrometer.cxx
 ShipGoliath.cxx
