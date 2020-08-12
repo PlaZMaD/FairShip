@@ -13,8 +13,6 @@
 #include <vector>
 #include <array>
 
-enum class FieldDirection : bool { up, down };
-
 class MiniShield : public FairModule
 {
   public:
