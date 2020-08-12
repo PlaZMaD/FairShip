@@ -83,4 +83,4 @@ class MiniShield : public FairModule
 
 };
 
-#endif //MuonSield_H
+#endif //MiniSield_H

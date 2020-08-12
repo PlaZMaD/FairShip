@@ -93,7 +93,7 @@ def configure(run,ship_geo):
   
 # -----Create geometry----------------------------------------------
  cave= ROOT.ShipCave("CAVE")
- ship_geo.tankDesign < 5: cave.SetGeometryFileName("cave.geo")
+ # cave.SetGeometryFileName("cave.geo")
  detectorList.append(cave)
  MiniShield = ROOT.MiniShield("MiniShield") 
  detectorList.append(MuonShield)
