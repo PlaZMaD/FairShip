@@ -2,7 +2,7 @@
 #define MiniShield_H
 
 #include "FairModule.h"                 // for FairModule
-#include "FairLogger.h"
+// #include "FairLogger.h"
 
 #include "Rtypes.h"                     // for MiniShield::Class, Bool_t, etc
 
@@ -28,10 +28,10 @@ class MiniShield : public FairModule
    void ConstructGeometry();
    ClassDef(MiniShield,4)
 
-  void SetSupports(Bool_t supports) { 
-    fSupport = supports;
-    FairLogger::GetLogger()->Warning(MESSAGE_ORIGIN, "Setting supports to %s. This will not have any effect if called after the geometry has been constructed.", fSupport ? "true" : "false");
-  }
+  // void SetSupports(Bool_t supports) { 
+  //   fSupport = supports;
+  //   FairLogger::GetLogger()->Warning(MESSAGE_ORIGIN, "Setting supports to %s. This will not have any effect if called after the geometry has been constructed.", fSupport ? "true" : "false");
+  // }
     
  protected:
   
