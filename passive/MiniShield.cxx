@@ -64,8 +64,6 @@ MiniShield::MiniShield(const char* name, const Int_t Design, const char* Title,
  fDesign = Design;
  fField  = field;
  fGeofile = "";
- fStepGeo = StepGeo;
- fWithCoMagnet = withCoMagnet;
  if (fDesign==1){
      fMiniShieldLength = L1;   
     }
