@@ -74,7 +74,7 @@ class MiniShield : public FairModule
   void CreateMagnet(TString magnetName, TGeoMedium *medium, TGeoVolume *tShield,
 		    TGeoUniformMagField *field,
 		    Double_t dX, Double_t dY,
-		    Double_t dZ);
+		    Double_t dZ, Double_t Z);
 
 
 };
