@@ -95,8 +95,18 @@ def configure(run,ship_geo):
  cave= ROOT.ShipCave("CAVE")
  # cave.SetGeometryFileName("cave.geo")
  detectorList.append(cave)
- MiniShield = ROOT.MiniShield("MiniShield") 
- detectorList.append(MuonShield)
+ # MiniShield = ROOT.MiniShield("MiniShield") 
+ MiniShield = ROOT.MiniShield(
+            "MiniShield", 0, "MiniMuonShield",
+            0, 0, 0,
+            0, 0,
+            0, 0,
+            0, 0,
+            0, 0,
+            0, 0,
+            0,
+            0, 0)
+ detectorList.append(MiniShield)
  fluxDet = ROOT.fluxDet("fluxDet", ROOT.kTRUE)
  detectorList.append(fluxDet)
 
