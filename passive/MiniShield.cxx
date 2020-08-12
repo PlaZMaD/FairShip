@@ -45,14 +45,14 @@ MiniShield::MiniShield(TString geofile)
   dZ6 = params[5];
   dZ7 = params[6];
   dZ8 = params[7];
-  fMuonShieldLength = 2 * (dZ1 + dZ2 + dZ3 + dZ4 + dZ5 + dZ6 + dZ7 + dZ8) + LE;
+  fMiniShieldLength = 2 * (dZ1 + dZ2 + dZ3 + dZ4 + dZ5 + dZ6 + dZ7 + dZ8) + LE;
 
   fFloor = floor;
   fSupport = true;
 
-  Double_t Z = -25 * m - fMuonShieldLength / 2.;
+  Double_t Z = -25 * m - fMiniShieldLength / 2.;
 
-  zEndOfAbsorb = Z + dZ0 - fMuonShieldLength / 2.;
+  zEndOfAbsorb = Z + dZ0 - fMiniShieldLength / 2.;
   zEndOfAbsorb -= dZ0;
 }
 
@@ -67,7 +67,7 @@ MiniShield::MiniShield(const char* name, const Int_t Design, const char* Title,
  fStepGeo = StepGeo;
  fWithCoMagnet = withCoMagnet;
  if (fDesign==1){
-     fMuonShieldLength = L1;   
+     fMiniShieldLength = L1;   
     }
  if (fDesign==2 || fDesign==3 || fDesign==4 ){
      Fatal("MiniShield","Design %i not anymore supported",fDesign);
@@ -83,7 +83,7 @@ MiniShield::MiniShield(const char* name, const Int_t Design, const char* Title,
      dZ7 = L7;
      dZ8 = L8;
      dXgap= gap;
-     fMuonShieldLength = 2*(dZ1+dZ2+dZ3+dZ4+dZ5+dZ6+dZ7+dZ8) + LE ; //leave some space for nu-tau detector   
+     fMiniShieldLength = 2*(dZ1+dZ2+dZ3+dZ4+dZ5+dZ6+dZ7+dZ8) + LE ; //leave some space for nu-tau detector   
     }
     
  if (fDesign>=7){
@@ -95,14 +95,14 @@ MiniShield::MiniShield(const char* name, const Int_t Design, const char* Title,
      dZ6 = L6;
      dZ7 = L7;
      dZ8 = L8;
-     fMuonShieldLength =
+     fMiniShieldLength =
 	 2 * (dZ1 + dZ2 + dZ3 + dZ4 + dZ5 + dZ6 + dZ7 + dZ8) + LE;
    }
     
  fFloor = (fDesign >= 7) ? floor : 0;
 
- zEndOfAbsorb = Z + dZ0 - fMuonShieldLength/2.;   
- if(fDesign>=6){zEndOfAbsorb = Z - fMuonShieldLength/2.;}
+ zEndOfAbsorb = Z + dZ0 - fMiniShieldLength/2.;   
+ if(fDesign>=6){zEndOfAbsorb = Z - fMiniShieldLength/2.;}
  fSupport = true;
 }
 
