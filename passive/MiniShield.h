@@ -34,7 +34,11 @@ class MiniShield : public FairModule
   // }
     
  protected:
-  
+  Double_t cm = 1;
+  Double_t m = 100 * cm;
+  Double_t mm = 0.1 * cm;
+  Double_t kilogauss = 1.;
+  Double_t tesla = 10 * kilogauss;
   Int_t  fDesign;       // design of muon shield, 1=passive, active = ...
   TString fGeofile;
   Double_t  fMiniShieldLength,fY,fField;

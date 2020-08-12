@@ -17,11 +17,7 @@
 #include "TFile.h"
 #include <iostream>                     // for operator<<, basic_ostream, etc
 
-Double_t cm = 1;
-Double_t m = 100 * cm;
-Double_t mm = 0.1 * cm;
-Double_t kilogauss = 1.;
-Double_t tesla = 10 * kilogauss;
+
 
 MiniShield::~MiniShield() {}
 MiniShield::MiniShield() : FairModule("MiniShield", "") {}
@@ -217,7 +213,7 @@ void MiniShield::CreateMagnet(TString magnetName,TGeoMedium* medium,TGeoVolume *
           Double_t Z
           )
   {
-    TGeoVolume* mainMagnet = gGeoManager->MakeBox(magnetName, TGeoMedium, dX, dY, dZ);
+    TGeoVolume* mainMagnet = gGeoManager->MakeBox(magnetName, medium, dX, dY, dZ);
     mainMagnet->SetField(field);
     tShield->AddNode(mainMagnet, 1, new TGeoTranslation(0,0,Z));
     
