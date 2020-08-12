@@ -62,7 +62,6 @@ class MiniShield : public FairModule
 		  Double_t z_translation);
 
   Int_t Initialize(std::vector<TString> &magnetName,
-		  std::vector<FieldDirection> &fieldDirection,
 		  std::vector<Double_t> &dXIn, std::vector<Double_t> &dYIn,
 		  std::vector<Double_t> &dXOut, std::vector<Double_t> &dYOut,
 		  std::vector<Double_t> &dZ, std::vector<Double_t> &midGapIn,
@@ -73,12 +72,9 @@ class MiniShield : public FairModule
 		  std::vector<Double_t> &Z);
 
   void CreateMagnet(TString magnetName, TGeoMedium *medium, TGeoVolume *tShield,
-		    TGeoUniformMagField *fields[4],
-		    FieldDirection fieldDirection, Double_t dX, Double_t dY,
-		    Double_t dX2, Double_t dY2, Double_t dZ, Double_t middleGap,
-		    Double_t middleGap2, Double_t HmainSideMag,
-		    Double_t HmainSideMag2, Double_t gap, Double_t gap2,
-		    Double_t Z, Bool_t NotMagnet, Bool_t stepGeo);
+		    TGeoUniformMagField *field,
+		    Double_t dX, Double_t dY,
+		    Double_t dZ);
 
 
 };
