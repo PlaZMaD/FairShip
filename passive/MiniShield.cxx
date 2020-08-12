@@ -217,8 +217,8 @@ void MiniShield::CreateMagnet(TString magnetName,TGeoMedium* medium,TGeoVolume *
           Double_t Z
           )
   {
-    TGeoBBox* mainMagnet = new TGeoBBox("miniShield", dX, dY, dZ);
-    mainMagnet->SetField(field)
+    TGeoVolume* mainMagnet = gGeoManager->MakeBox(magnetName, TGeoMedium, dX, dY, dZ);
+    mainMagnet->SetField(field);
     tShield->AddNode(mainMagnet, 1, new TGeoTranslation(0,0,Z));
     
   }
@@ -237,7 +237,7 @@ Int_t MiniShield::Initialize(std::vector<TString> &magnetName,
     TVectorT<Double_t> params;
     params.Read("params");
 
-  return nMagnets;
+  return 0;
 }
 void MiniShield::ConstructGeometry()
 {
