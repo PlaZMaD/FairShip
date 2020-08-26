@@ -31,7 +31,7 @@ MiniShield::MiniShield(TString geofile)
   params.Read("params");
   Double_t LE = 10. * m, floor = 5. * m;
   fDesign = 8;
-  fField = 1.7;
+  fField = 2.0;
   dZ0 = 1 * m;
   dZ1 = 0.4 * m;
   dZ2 = 2.31 * m;
@@ -247,9 +247,9 @@ void MiniShield::ConstructGeometry()
     TGeoMedium *concrete  =gGeoManager->GetMedium("Concrete");
 
     Double_t ironField = fField*tesla;
-    TGeoUniformMagField *mainField = new TGeoUniformMagField(0.,ironField,0.);
+    TGeoUniformMagField *mainField = new TGeoUniformMagField(0., 2.0*tesla, 0.);
    
-	  CreateMagnet("MiniShield",iron,tShield,mainField, 100., 100., 100., 0.);
+	  CreateMagnet("MiniShield",iron,tShield,mainField, 500./2., 500./2., 500., -6250.);
 
     top->AddNode(tShield, 1);
 }
