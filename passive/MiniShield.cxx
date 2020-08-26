@@ -249,7 +249,7 @@ void MiniShield::ConstructGeometry()
     Double_t ironField = fField*tesla;
     TGeoUniformMagField *mainField = new TGeoUniformMagField(0., 2.0*tesla, 0.);
    
-	  CreateMagnet("MiniShield",iron,tShield,mainField, 500./2., 500./2., 500., -6250.);
+	  CreateMagnet("MiniShield",iron,tShield,mainField, 500./2., 500./2., 500./2.0, -6250.);
 
     top->AddNode(tShield, 1);
 }
