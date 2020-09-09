@@ -190,22 +190,21 @@ void ShipFieldMaker::readInputFile(const std::string& inputFile)
     getData.close();
 
 }
-void ShipFieldMaker::generateFieldMap(){
+void ShipFieldMaker::generateFieldMap(TString fileName, const float step, const float xRange, const float yRange, const float zRange, const float zShift){
         std::ofstream myfile;
-        myfile.open ("example.csv");
-        float step = 2.5;
-        float xRange = 179;
-        float yRange = 317;
-        float zRange = 1515.5;
-        //Double_t B[3] = {0.0, 0.0, 0.0};
+        myfile.open (fileName);
+        int xSteps = ceil(xRange/step) + 1;   //field map have X size from 0 up to xMax
+        int ySteps = ceil(yRange/step) + 1;   //from 0 up to yMax
+        int zSteps = ceil(zRange*2./step) + 1;//from -zMax up to zMax
         Double_t position[3] = {0.0, 0.0, 0.0};
-        for (int i =0 ; i < 73; i++){
-                for (int k=0;  k<128;k++){
-                        for (int m=0; m<1214; m++){
+        myfile<<xSteps<<"    "<<ySteps<<"    "<<zSteps<<"    "<<step<<"    "<<xRange<<"    "<<yRange<<"    "<<zRange<<std::endl;
+        for (int i =0 ; i < xSteps; i++){
+                for (int k=0;  k<ySteps;k++){
+                        for (int m=0; m<zSteps; m++){
                                 Double_t B[3] = {0.0, 0.0, 0.0};
                                 Double_t x = step*i;
                                 Double_t y = step * k;
-                                Double_t z = m * step - 1515.5 - 4996.0;
+                                Double_t z = m * step - zRange + zShift;
                                 position[0] = x;
                                 position[1] = y;
                                 position[2] = z;
@@ -227,7 +226,7 @@ void ShipFieldMaker::generateFieldMap(){
                                 if (inside == kFALSE && globalField_) {
                                         globalField_->Field(position, B);
                                 }
-                                myfile<<x<<"    "<<y<<" "<<z<<" "<<B[0]/Tesla_<<"       "<<B[1]/Tesla_<<"       "<<B[2]/Tesla_<<std::endl;
+                                myfile<<x<<"    "<<y<<"    "<<z<<"    "<<B[0]/Tesla_<<"    "<<B[1]/Tesla_<<"    "<<B[2]/Tesla_<<std::endl;
                         }
                 }
         }

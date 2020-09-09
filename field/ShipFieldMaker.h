@@ -27,6 +27,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <math.h>
 
 class TGeoMatrix;
 class TGeoNode;
@@ -48,7 +49,7 @@ class ShipFieldMaker : public TG4VUserPostDetConstruction
 
     //! Typedef of a vector of strings
     typedef std::vector<std::string> stringVect;
-    void generateFieldMap();
+    void generateFieldMap(TString fileName, const float step=2.5, const float xRange=179, const float yRange=317, const float zRange=1515.5, const float zShift=-4996);
 
     //! Structure to hold volume name, field name and field scaling factor
     struct fieldInfo {
