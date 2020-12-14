@@ -34,6 +34,7 @@ class fluxDet : public FairDetector
     virtual void   PostTrack() {;}
     virtual void   PreTrack() {;}
     virtual void   BeginEvent() {;}
+    virtual void   Initialize();
 
  protected:
  	// createBox(TString voxName, TGeoMedium *medium, Double_t X, Double_t Y,  Double_t dZ);
