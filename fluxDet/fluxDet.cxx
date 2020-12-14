@@ -40,7 +40,7 @@ fluxDet::fluxDet(const char* name, const char* Title, Bool_t Active, Double_t X,
       fDetector(0),
       ffluxDetPointCollection(new TClonesArray("fluxDetPoint"))
 {
-	FairDetector::Initialize();
+	// FairDetector::Initialize();
 	// fPos = TLorentzVector (X, Y, Z, 0.);
 
 }
@@ -60,7 +60,7 @@ fluxDet::fluxDet()
       fDetector(0),
       ffluxDetPointCollection(new TClonesArray("fluxDetPoint"))
 {
-	FairDetector::Initialize();
+	// FairDetector::Initialize();
 	// fPos = TLorentzVector (X, Y, Z, 0.);
 
 }
@@ -80,11 +80,13 @@ fluxDet::fluxDet(const char* name,Bool_t Active)
       fDetector(0),
       ffluxDetPointCollection(new TClonesArray("fluxDetPoint"))
 {
-	FairDetector::Initialize();
-
+  // FairDetector::Initialize();
 
 }
-
+void fluxDet::Initialize()
+{
+  FairDetector::Initialize();
+}
 fluxDet::~fluxDet()
 {
   if (ffluxDetPointCollection) {
