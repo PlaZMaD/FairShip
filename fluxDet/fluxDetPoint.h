@@ -28,7 +28,7 @@ class fluxDetPoint : public FairMCPoint
      *@param eLoss    Energy deposit [GeV]
      **/
     fluxDetPoint(Int_t trackID, Int_t detID, TVector3 pos, TVector3 mom,
-                      Int_t pdgCode);
+                     Double_t tof, Double_t length, Double_t eLoss, Int_t pdgCode, TVector3 Lpos, TVector3 Lmom);
 
     /** Destructor **/
     virtual ~fluxDetPoint();
@@ -37,9 +37,17 @@ class fluxDetPoint : public FairMCPoint
     virtual void Print() const;
     Int_t PdgCode() const {return fPdgCode;}
 
+
+
+    Int_t PdgCode() const {return fPdgCode;}
+    TVector3 LastPoint() const {return fLpos;}
+    TVector3 LastMom() const {return fLmom;}
+
+
   private:
     /** Copy constructor **/
     Int_t fPdgCode;
+    TVector3 fLpos,fLmom;
     fluxDetPoint(const fluxDetPoint& point);
     fluxDetPoint operator=(const fluxDetPoint& point);
 
