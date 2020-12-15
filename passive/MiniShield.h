@@ -25,7 +25,8 @@ class MiniShield : public FairModule
                                const Int_t withCoMagnet=0, const Bool_t StepGeo=false,
                                const Bool_t WithConstAbsorberField=true, const Bool_t WithConstShieldField=true);
 
-   MiniShield(TString geofile);
+   MiniShield(TString geofile, const Int_t withCoMagnet=0, const Bool_t StepGeo=false,
+   const Bool_t WithConstAbsorberField=true, const Bool_t WithConstShieldField=true);
    MiniShield();
    virtual ~MiniShield();
    void ConstructGeometry();

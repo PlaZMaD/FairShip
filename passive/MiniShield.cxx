@@ -21,16 +21,22 @@
 MiniShield::~MiniShield() {}
 MiniShield::MiniShield() : FairModule("MiniShield", "") {}
 
-MiniShield::MiniShield(TString geofile)
-  : FairModule("MuonShield", "MiniShield")
+MiniShield::MiniShield(TString geofile,
+                               const Int_t withCoMagnet, const Bool_t StepGeo,
+                               const Bool_t WithConstAbsorberField, const Bool_t WithConstShieldField)
+  : FairModule("MuonShield", "ShipMuonShield")
 {
+  fWithConstAbsorberField = WithConstAbsorberField;
+  fWithConstShieldField = WithConstShieldField;
+  fStepGeo = StepGeo;
+  fWithCoMagnet = withCoMagnet;
   fGeofile = geofile;
   auto f = TFile::Open(geofile, "read");
   TVectorT<Double_t> params;
   params.Read("params");
   Double_t LE = 10. * m, floor = 5. * m;
   fDesign = 8;
-  fField = 2.0;
+  fField = 1.7;
   dZ0 = 1 * m;
   dZ1 = 0.4 * m;
   dZ2 = 2.31 * m;
