@@ -35,9 +35,6 @@ class fluxDetPoint : public FairMCPoint
 
     /** Output to screen **/
     virtual void Print() const;
-    Int_t PdgCode() const {return fPdgCode;}
-
-
 
     Int_t PdgCode() const {return fPdgCode;}
     TVector3 LastPoint() const {return fLpos;}
