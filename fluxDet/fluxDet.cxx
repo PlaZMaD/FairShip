@@ -175,12 +175,16 @@ void fluxDet::ConstructGeometry()
 }
 
 
-fluxDetPoint* fluxDet::AddHit(Int_t trackID, Int_t detID, TVector3 pos, TVector3 mom, Int_t pdgCode)
+fluxDetPoint* fluxDet::AddHit(Int_t trackID, Int_t detID,
+      TVector3 pos, TVector3 mom,
+      Double_t time, Double_t length,
+      Double_t eLoss, Int_t pdgCode,TVector3 Lpos, TVector3 Lmom)
 {
   TClonesArray& clref = *ffluxDetPointCollection;
   Int_t size = clref.GetEntriesFast();
   // cout << "veto hit called "<< pos.z()<<endl;
-  return new(clref[size]) fluxDetPoint(trackID, detID, pos, mom, pdgCode);
+  return new(clref[size]) fluxDetPoint(trackID, detID, pos, mom,
+             time, length, eLoss, pdgCode,Lpos,Lmom);
 }
 
 
