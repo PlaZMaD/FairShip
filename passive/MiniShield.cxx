@@ -568,105 +568,14 @@ void MiniShield::ConstructGeometry()
       new TGeoUniformMagField(-mField, 0., 0.),
       new TGeoUniformMagField(mField, 0., 0.)
     };
-    magnetName = {"MagnAbsorb1", "MagnAbsorb2", "Magn1", "Magn2", "Magn3",
-       "Magn4", "Magn5", "Magn6", "Magn7"
-     };
-    fieldDirection = {
-        FieldDirectionM::up, FieldDirectionM::up, FieldDirectionM::up,
-        FieldDirectionM::up, FieldDirectionM::up, FieldDirectionM::down,
-        FieldDirectionM::down, FieldDirectionM::down, FieldDirectionM::down,
-     };
-     dZgap = 0.1 * m;
-     zGap = 0.5 * dZgap;
-     dZ1 =  0.35 * m + zGap;
-     
-     dXIn[0] = 0.4 * m;
-     dXOut[0] = 0.40 * m;
-     dYIn[0] = 1.5 * m;
-     dYOut[0] = 1.5 * m;
-     gapIn[0] = 0.1 * mm;
-     gapOut[0] = 0.1 * mm;
-     dZ[0] = dZ1 - zgap / 2;
-     Z[0] = zEndOfAbsorb + dZ[0] + zgap;
-
-     dXIn[1] = 0.5 * m;
-     dXOut[1] = 0.5 * m;
-     dYIn[1] = 1.3 * m;
-     dYOut[1] = 1.3 * m;
-     gapIn[1] = 0.02 * m;
-     gapOut[1] = 0.02 * m;
-     dZ[1] = dZ2 - zgap / 2;
-     Z[1] = Z[0] + dZ[0] + dZ[1] + zgap;
-
-     dXIn[2] = 0.72 * m;
-     dXOut[2] = 0.51 * m;
-     dYIn[2] = 0.29 * m;
-     dYOut[2] = 0.46 * m;
-     gapIn[2] = 0.10 * m;
-     gapOut[2] = 0.07 * m;
-     dZ[2] = dZ3 - zgap / 2;
-     Z[2] = Z[1] + dZ[1] + dZ[2] + 2 * zgap;
-
-     dXIn[3] = 0.54 * m;
-     dXOut[3] = 0.38 * m;
-     dYIn[3] = 0.46 * m;
-     dYOut[3] = 1.92 * m;
-     gapIn[3] = 0.14 * m;
-     gapOut[3] = 0.09 * m;
-     dZ[3] = dZ4 - zgap / 2;
-     Z[3] = Z[2] + dZ[2] + dZ[3] + zgap;
-
-     dXIn[4] = 0.10 * m;
-     dXOut[4] = 0.31 * m;
-     dYIn[4] = 0.35 * m;
-     dYOut[4] = 0.31 * m;
-     gapIn[4] = 0.51 * m;
-     gapOut[4] = 0.11 * m;
-     dZ[4] = dZ5 - zgap / 2;
-     Z[4] = Z[3] + dZ[3] + dZ[4] + zgap;
-
-     dXIn[5] = 0.03 * m;
-     dXOut[5] = 0.32 * m;
-     dYIn[5] = 0.54 * m;
-     dYOut[5] = 0.24 * m;
-     gapIn[5] = 0.08 * m;
-     gapOut[5] = 0.08 * m;
-     dZ[5] = dZ6 - zgap / 2;
-     Z[5] = Z[4] + dZ[4] + dZ[5] + zgap;
-
-     dXIn[6] = 0.22 * m;
-     dXOut[6] = 0.32 * m;
-     dYIn[6] = 2.09 * m;
-     dYOut[6] = 0.35 * m;
-     gapIn[6] = 0.08 * m;
-     gapOut[6] = 0.13 * m;
-     dZ[6] = dZ7 - zgap / 2;
-     Z[6] = Z[5] + dZ[5] + dZ[6] + zgap;
-
-     dXIn[7] = 0.33 * m;
-     dXOut[7] = 0.77 * m;
-     dYIn[7] = 0.85 * m;
-     dYOut[7] = 2.41 * m;
-     gapIn[7] = 0.09 * m;
-     gapOut[7] = 0.26 * m;
-     dZ[7] = dZ8 - zgap / 2;
-     Z[7] = Z[6] + dZ[6] + dZ[7] + zgap;
-
-     dXIn[8] = dXOut[7];
-     dYIn[8] = dYOut[7];
-     dXOut[8] = dXIn[8];
-     dYOut[8] = dYIn[8];
-     gapIn[8] = gapOut[7];
-     gapOut[8] = gapIn[8];
-     dZ[8] = 0.1 * m;
-     Z[8] = Z[7] + dZ[7] + dZ[8];
-
-     for (int i = 0; i < 8; ++i) {
-        midGapIn[i] = 0.;
-        midGapOut[i] = 0.;
-        HmainSideMagIn[i] = dYIn[i] / 2;
-        HmainSideMagOut[i] = dYOut[i] / 2;
-     }
+    // magnetName = {"MagnAbsorb1", "MagnAbsorb2", "Magn1", "Magn2", "Magn3",
+    //    "Magn4", "Magn5", "Magn6", "Magn7"
+    //  };
+    // fieldDirection = {
+    //     FieldDirectionM::up, FieldDirectionM::up, FieldDirectionM::up,
+    //     FieldDirectionM::up, FieldDirectionM::up, FieldDirectionM::down,
+    //     FieldDirectionM::down, FieldDirectionM::down, FieldDirectionM::down,
+    //  };
     for (Int_t nM = 0; nM < 2; nM++) {
     CreateMagnet(magnetName[nM], iron, tShield, fieldsAbsorber,
            fieldDirection[nM], dXIn[nM], dYIn[nM], dXOut[nM],
