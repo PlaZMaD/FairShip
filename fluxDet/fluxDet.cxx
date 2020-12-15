@@ -176,9 +176,9 @@ void fluxDet::ConstructGeometry()
 
 
 fluxDetPoint* fluxDet::AddHit(Int_t trackID, Int_t detID,
-      TVector3 pos, TVector3 mom,
-      Double_t time, Double_t length,
-      Double_t eLoss, Int_t pdgCode,TVector3 Lpos, TVector3 Lmom)
+                             TVector3 pos, TVector3 mom,
+                             Double_t time, Double_t length,
+                             Double_t eLoss,Int_t pdgcode,TVector3 Lpos, TVector3 Lmom)
 {
   TClonesArray& clref = *ffluxDetPointCollection;
   Int_t size = clref.GetEntriesFast();
