@@ -408,15 +408,15 @@ void MiniShield::ConstructGeometry()
       absorber->SetLineColor(42); // brown / light red
       tShield->AddNode(absorber, 1, new TGeoTranslation(0, 0, zEndOfAbsorb + absorber_half_length + absorber_offset));
 
-      if (fDesign > 7) {
-         auto coatBox = new TGeoBBox("coat", 10 * m - 1 * mm, 10 * m - 1 * mm, absorber_half_length);
-         auto coatShape = new TGeoCompositeShape("CoatShape", "coat-absorber");
-         auto coat = new TGeoVolume("CoatVol", coatShape, concrete);
-         tShield->AddNode(coat, 1, new TGeoTranslation(0, 0, zEndOfAbsorb + absorber_half_length + absorber_offset ));
-         TGeoVolume *coatWall = gGeoManager->MakeBox("CoatWall",concrete,10 * m - 1 * mm, 10 * m - 1 * mm, 7 * cm - 1 * mm);
-         coatWall->SetLineColor(kRed);
-         tShield->AddNode(coatWall, 1, new TGeoTranslation(0, 0, zEndOfAbsorb + 2*absorber_half_length + absorber_offset+7 * cm));
+      
+     auto coatBox = new TGeoBBox("coat", 10 * m - 1 * mm, 10 * m - 1 * mm, absorber_half_length);
+     auto coatShape = new TGeoCompositeShape("CoatShape", "coat-absorber");
+     auto coat = new TGeoVolume("CoatVol", coatShape, concrete);
+     tShield->AddNode(coat, 1, new TGeoTranslation(0, 0, zEndOfAbsorb + absorber_half_length + absorber_offset ));
+     TGeoVolume *coatWall = gGeoManager->MakeBox("CoatWall",concrete,10 * m - 1 * mm, 10 * m - 1 * mm, 7 * cm - 1 * mm);
+     coatWall->SetLineColor(kRed);
+     tShield->AddNode(coatWall, 1, new TGeoTranslation(0, 0, zEndOfAbsorb + 2*absorber_half_length + absorber_offset+7 * cm));
 
-      }
+      
 }
 ClassImp(MiniShield)
