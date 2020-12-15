@@ -219,6 +219,182 @@ void MiniShield::CreateMagnet(TString magnetName,TGeoMedium* medium,TGeoVolume *
     
   }
 
+void MiniShield::CreateMagnet(TString magnetName,TGeoMedium* medium,TGeoVolume *tShield,TGeoUniformMagField *fields[4],FieldDirectionM fieldDirection,
+          Double_t dX, Double_t dY, Double_t dX2, Double_t dY2, Double_t dZ,
+          Double_t middleGap,Double_t middleGap2,
+          Double_t HmainSideMag, Double_t HmainSideMag2,
+          Double_t gap,Double_t gap2, Double_t Z, Bool_t NotMagnet,
+          Bool_t stepGeo)
+  {
+    Double_t coil_gap,coil_gap2;
+    Int_t color[4] = {45,31,30,38};
+
+    if (NotMagnet) {
+       coil_gap = gap;
+       coil_gap2 = gap2;
+    } else if (fDesign > 7) {
+       // Assuming 0.5A/mm^2 and 10000At needed, about 200cm^2 gaps are necessary
+       // Current design safely above this. Will consult with MISiS to get a better minimum.
+       gap = std::ceil(std::max(100. / dY, gap));
+       gap2 = std::ceil(std::max(100. / dY2, gap2));
+       coil_gap = gap;
+       coil_gap2 = gap2;
+    } else {
+       coil_gap = std::max(20., gap);
+       coil_gap2 = std::max(20., gap2);
+       gap = std::max(2., gap);
+       gap2 = std::max(2., gap2);
+    }
+
+    Double_t anti_overlap = (fDesign == 5) ? 0.0 : 0.1; // gap between fields in the
+               // corners for mitred joints
+               // (Geant goes crazy when
+               // they touch each other)
+
+    std::array<Double_t, 16> cornersMainL = {
+  middleGap, -(dY + dX - anti_overlap),
+  middleGap, dY + dX - anti_overlap,
+  dX + middleGap, dY - anti_overlap,
+  dX + middleGap, -(dY - anti_overlap),
+  middleGap2, -(dY2 + dX2 - anti_overlap),
+  middleGap2, dY2 + dX2 - anti_overlap,
+  dX2 + middleGap2, dY2 - anti_overlap,
+  dX2 + middleGap2, -(dY2 - anti_overlap)
+    };
+
+    std::array<Double_t, 16> cornersTL = {middleGap + dX,
+                                          dY,
+                                          middleGap,
+                                          dY + dX,
+                                          2 * dX + middleGap + coil_gap,
+                                          dY + dX,
+                                          dX + middleGap + coil_gap,
+                                          dY,
+                                          middleGap2 + dX2,
+                                          dY2,
+                                          middleGap2,
+                                          dY2 + dX2,
+                                          2 * dX2 + middleGap2 + coil_gap2,
+                                          dY2 + dX2,
+                                          dX2 + middleGap2 + coil_gap2,
+                                          dY2};
+
+    std::array<Double_t, 16> cornersMainSideL = 
+      fDesign <= 7 ?
+      std::array<Double_t, 16>{
+  dX + middleGap + gap, -HmainSideMag,
+  dX + middleGap + gap, HmainSideMag,
+  2 * dX + middleGap + gap, HmainSideMag,
+  2 * dX + middleGap + gap, -HmainSideMag,
+  dX2 + middleGap2 + gap2, -HmainSideMag2,
+  dX2 + middleGap2 + gap2, HmainSideMag2,
+  2 * dX2 + middleGap2 + gap2, HmainSideMag2,
+  2 * dX2 + middleGap2 + gap2, -HmainSideMag2
+      } :
+      std::array<Double_t, 16>{
+  dX + middleGap + gap, -(dY - anti_overlap),
+  dX + middleGap + gap, dY - anti_overlap,
+  2 * dX + middleGap + gap, dY + dX - anti_overlap,
+  2 * dX + middleGap + gap, -(dY + dX - anti_overlap),
+  dX2 + middleGap2 + gap2, -(dY2 - anti_overlap),
+  dX2 + middleGap2 + gap2, dY2 - anti_overlap,
+  2 * dX2 + middleGap2 + gap2, dY2 + dX2 - anti_overlap,
+  2 * dX2 + middleGap2 + gap2, -(dY2 + dX2 - anti_overlap)
+    };
+
+    std::array<Double_t, 16> cornersMainR, cornersCLBA,
+       cornersMainSideR, cornersCLTA, cornersCRBA,
+       cornersCRTA, cornersTR, cornersBL, cornersBR;
+
+    if (fDesign <= 7) {
+       cornersCLBA = {dX + middleGap + gap,
+                      -HmainSideMag,
+                      2 * dX + middleGap + gap,
+                      -HmainSideMag,
+                      2 * dX + middleGap + coil_gap,
+                      -(dY + dX - anti_overlap),
+                      dX + middleGap + coil_gap,
+                      -(dY - anti_overlap),
+                      dX2 + middleGap2 + gap2,
+                      -HmainSideMag2,
+                      2 * dX2 + middleGap2 + gap2,
+                      -HmainSideMag2,
+                      2 * dX2 + middleGap2 + coil_gap2,
+                      -(dY2 + dX2 - anti_overlap),
+                      dX2 + middleGap2 + coil_gap2,
+                      -(dY2 - anti_overlap)};
+    }
+
+    // Use symmetries to define remaining magnets
+    for (int i = 0; i < 16; ++i) {
+      cornersMainR[i] = -cornersMainL[i];
+      cornersMainSideR[i] = -cornersMainSideL[i];
+      cornersCRTA[i] = -cornersCLBA[i];
+      cornersBR[i] = -cornersTL[i];
+    }
+    // Need to change order as corners need to be defined clockwise
+    for (int i = 0, j = 4; i < 8; ++i) {
+      j = (11 - i) % 8;
+      cornersCLTA[2 * j] = cornersCLBA[2 * i];
+      cornersCLTA[2 * j + 1] = -cornersCLBA[2 * i + 1];
+      cornersTR[2 * j] = -cornersTL[2 * i];
+      cornersTR[2 * j + 1] = cornersTL[2 * i + 1];
+    }
+    for (int i = 0; i < 16; ++i) {
+      cornersCRBA[i] = -cornersCLTA[i];
+      cornersBL[i] = -cornersTR[i];
+    }
+
+    TString str1L = "_MiddleMagL";
+    TString str1R = "_MiddleMagR";
+    TString str2 = "_MagRetL";
+    TString str3 = "_MagRetR";
+    TString str4 = "_MagCLB";
+    TString str5 = "_MagCLT";
+    TString str6 = "_MagCRT";
+    TString str7 = "_MagCRB";
+    TString str8 = "_MagTopLeft";
+    TString str9 = "_MagTopRight";
+    TString str10 = "_MagBotLeft";
+    TString str11 = "_MagBotRight";
+    
+    switch (fieldDirection){
+
+    case FieldDirection::up: 
+      CreateArb8(magnetName + str1L, medium, dZ, cornersMainL, color[0], fields[0], tShield,  0, 0, Z, stepGeo);
+      CreateArb8(magnetName + str1R, medium, dZ, cornersMainR, color[0], fields[0], tShield,  0, 0, Z, stepGeo);
+      CreateArb8(magnetName + str2, medium, dZ, cornersMainSideL, color[1], fields[1], tShield,  0, 0, Z, stepGeo);
+      CreateArb8(magnetName + str3, medium, dZ, cornersMainSideR, color[1], fields[1], tShield,  0, 0, Z, stepGeo);
+      if (fDesign <= 7) {
+         CreateArb8(magnetName + str4, medium, dZ, cornersCLBA, color[1], fields[1], tShield, 0, 0, Z, stepGeo);
+         CreateArb8(magnetName + str5, medium, dZ, cornersCLTA, color[1], fields[1], tShield, 0, 0, Z, stepGeo);
+         CreateArb8(magnetName + str6, medium, dZ, cornersCRTA, color[1], fields[1], tShield, 0, 0, Z, stepGeo);
+         CreateArb8(magnetName + str7, medium, dZ, cornersCRBA, color[1], fields[1], tShield, 0, 0, Z, stepGeo);
+      }
+      CreateArb8(magnetName + str8, medium, dZ, cornersTL, color[3], fields[3], tShield,  0, 0, Z, stepGeo);
+      CreateArb8(magnetName + str9, medium, dZ, cornersTR, color[2], fields[2], tShield,  0, 0, Z, stepGeo);
+      CreateArb8(magnetName + str10, medium, dZ, cornersBL, color[2], fields[2], tShield,  0, 0, Z, stepGeo);
+      CreateArb8(magnetName + str11, medium, dZ, cornersBR, color[3], fields[3], tShield,  0, 0, Z, stepGeo);
+      break;
+    case FieldDirection::down:
+      CreateArb8(magnetName + str1L, medium, dZ, cornersMainL, color[1], fields[1], tShield,  0, 0, Z, stepGeo);
+      CreateArb8(magnetName + str1R, medium, dZ, cornersMainR, color[1], fields[1], tShield,  0, 0, Z, stepGeo);
+      CreateArb8(magnetName + str2, medium, dZ, cornersMainSideL, color[0], fields[0], tShield,  0, 0, Z, stepGeo);
+      CreateArb8(magnetName + str3, medium, dZ, cornersMainSideR, color[0], fields[0], tShield,  0, 0, Z, stepGeo);
+      if (fDesign <= 7) {
+         CreateArb8(magnetName + str4, medium, dZ, cornersCLBA, color[0], fields[0], tShield, 0, 0, Z, stepGeo);
+         CreateArb8(magnetName + str5, medium, dZ, cornersCLTA, color[0], fields[0], tShield, 0, 0, Z, stepGeo);
+         CreateArb8(magnetName + str6, medium, dZ, cornersCRTA, color[0], fields[0], tShield, 0, 0, Z, stepGeo);
+         CreateArb8(magnetName + str7, medium, dZ, cornersCRBA, color[0], fields[0], tShield, 0, 0, Z, stepGeo);
+      }
+      CreateArb8(magnetName + str8, medium, dZ, cornersTL, color[2], fields[2], tShield,  0, 0, Z, stepGeo);
+      CreateArb8(magnetName + str9, medium, dZ, cornersTR, color[3], fields[3], tShield,  0, 0, Z, stepGeo);
+      CreateArb8(magnetName + str10, medium, dZ, cornersBL, color[3], fields[3], tShield,  0, 0, Z, stepGeo);
+      CreateArb8(magnetName + str11, medium, dZ, cornersBR, color[2], fields[2], tShield,  0, 0, Z, stepGeo);
+      break;
+    }
+  }
+
 Int_t MiniShield::Initialize(std::vector<TString> &magnetName,
         std::vector<FieldDirectionM> &fieldDirection,
         std::vector<Double_t> &dXIn, std::vector<Double_t> &dYIn,
