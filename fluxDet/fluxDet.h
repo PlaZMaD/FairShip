@@ -22,9 +22,11 @@ class fluxDet : public FairDetector
  	virtual TClonesArray* GetCollection(Int_t iColl) const;
  	virtual void Reset();
  	void SetZposition(Double_t z) {fzPos = z;}
+    
  	fluxDetPoint* AddHit(Int_t trackID, Int_t detID,
-			 TVector3 pos, TVector3 mom,
-			 Int_t pdgCode);
+                             TVector3 pos, TVector3 mom,
+                             Double_t time, Double_t length,
+                             Double_t eLoss,Int_t pdgcode,TVector3 Lpos, TVector3 Lmom);
 
  	virtual void Register();
  	virtual void   EndOfEvent();
