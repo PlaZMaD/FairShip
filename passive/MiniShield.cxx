@@ -219,7 +219,7 @@ void MiniShield::CreateMagnet(TString magnetName,TGeoMedium* medium,TGeoVolume *
     
   }
 
-Int_t ShipMuonShield::Initialize(std::vector<TString> &magnetName,
+Int_t MiniShield::Initialize(std::vector<TString> &magnetName,
         std::vector<FieldDirectionM> &fieldDirection,
         std::vector<Double_t> &dXIn, std::vector<Double_t> &dYIn,
         std::vector<Double_t> &dXOut, std::vector<Double_t> &dYOut,
