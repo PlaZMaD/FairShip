@@ -91,12 +91,12 @@ MiniShield::MiniShield(const char* name, const Int_t Design, const char* Title,
      dZ6 = L6;
      dZ7 = L7;
      dZ8 = L8;
-     fMiniShieldLength =
-	 2 * (dZ1 + dZ2 + dZ3 + dZ4 + dZ5 + dZ6 + dZ7 + dZ8) + LE;
+     fMiniShieldLength = 500;
+	 // 2 * (dZ1 + dZ2 + dZ3 + dZ4 + dZ5 + dZ6 + dZ7 + dZ8) + LE;
    }
     
  fFloor = (fDesign >= 7) ? floor : 0;
-
+ fMiniShieldLength = 500;
  zEndOfAbsorb = Z + dZ0 - fMiniShieldLength/2.;   
  if(fDesign>=6){zEndOfAbsorb = Z - fMiniShieldLength/2.;}
  fSupport = true;
@@ -734,7 +734,7 @@ void MiniShield::ConstructGeometry()
     Double_t ironField = fField*tesla;
     TGeoUniformMagField *mainField = new TGeoUniformMagField(0., 2.0*tesla, 0.);
    
-	  CreateMagnet("MiniShield",iron,tShield,mainField, 500./2., 500./2., 500./2.0, -6250.);
+	  CreateMagnet("MiniShield",iron,tShield,mainField, 500./2., 500./2., 500./2.0, -6200.);
 
     top->AddNode(tShield, 1);
 

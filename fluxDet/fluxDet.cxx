@@ -71,7 +71,7 @@ fluxDet::fluxDet(const char* name,Bool_t Active)
       fVolumeID(-1),
       fPos(TLorentzVector(0., 0., -3350, 0.)),
       fMom(TLorentzVector (0., 0., 0., 0.)),
-      fzPos(-5900.),
+      fzPos(-5800.),
       fxSize(300.),
       fySize(300.),
       fzSize(0.5),

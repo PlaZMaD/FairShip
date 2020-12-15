@@ -112,7 +112,7 @@ def configure(run,ship_geo):
 
 
  MiniShield = ROOT.MiniShield(
-            "MiniShield", 0, "MiniMuonShield",
+            "MiniShield", 9, "MiniMuonShield",
       ship_geo.muShield.z, ship_geo.muShield.dZ0, ship_geo.muShield.dZ1,
       ship_geo.muShield.dZ2, ship_geo.muShield.dZ3,
       ship_geo.muShield.dZ4, ship_geo.muShield.dZ5,
