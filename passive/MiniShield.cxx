@@ -54,7 +54,9 @@ MiniShield::MiniShield(TString geofile)
 
 MiniShield::MiniShield(const char* name, const Int_t Design, const char* Title,
                                Double_t Z, Double_t L0, Double_t L1, Double_t L2, Double_t L3, Double_t L4, Double_t L5, Double_t L6,
-                               Double_t L7, Double_t L8, Double_t gap, Double_t LE, Double_t, Double_t floor, Double_t field, const Int_t withCoMagnet, const Bool_t StepGeo)
+                               Double_t L7, Double_t L8, Double_t gap, Double_t LE, Double_t, Double_t floor, Double_t field,
+                               const Int_t withCoMagnet, const Bool_t StepGeo,
+                               const Bool_t WithConstAbsorberField, const Bool_t WithConstShieldField)
   : FairModule(name ,Title)
 {
  fDesign = Design;

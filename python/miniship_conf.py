@@ -121,7 +121,7 @@ def configure(run,ship_geo):
       ship_geo.muShield.LE, ship_geo.Yheight * 4. / 10.,
       ship_geo.cave.floorHeightMuonShield,ship_geo.muShield.Field,
       ship_geo.muShieldWithCobaltMagnet, ship_geo.muShieldStepGeo,
-      ship_geo.hadronAbsorber.WithConstField, ship_geo.muShield.WithConstField)
+      True, True)
  detectorList.append(MiniShield)
  fluxDet = ROOT.fluxDet("fluxDet", ROOT.kTRUE)
  detectorList.append(fluxDet)
