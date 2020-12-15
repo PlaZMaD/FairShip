@@ -219,21 +219,328 @@ void MiniShield::CreateMagnet(TString magnetName,TGeoMedium* medium,TGeoVolume *
     
   }
 
-Int_t MiniShield::Initialize(std::vector<TString> &magnetName,
-				std::vector<Double_t> &dXIn, std::vector<Double_t> &dYIn,
-				std::vector<Double_t> &dXOut, std::vector<Double_t> &dYOut,
-				std::vector<Double_t> &dZ, std::vector<Double_t> &midGapIn,
-				std::vector<Double_t> &midGapOut,
-				std::vector<Double_t> &HmainSideMagIn,
-				std::vector<Double_t> &HmainSideMagOut,
-				std::vector<Double_t> &gapIn, std::vector<Double_t> &gapOut,
-				std::vector<Double_t> &Z) {
+Int_t ShipMuonShield::Initialize(std::vector<TString> &magnetName,
+        std::vector<FieldDirection> &fieldDirection,
+        std::vector<Double_t> &dXIn, std::vector<Double_t> &dYIn,
+        std::vector<Double_t> &dXOut, std::vector<Double_t> &dYOut,
+        std::vector<Double_t> &dZ, std::vector<Double_t> &midGapIn,
+        std::vector<Double_t> &midGapOut,
+        std::vector<Double_t> &HmainSideMagIn,
+        std::vector<Double_t> &HmainSideMagOut,
+        std::vector<Double_t> &gapIn, std::vector<Double_t> &gapOut,
+        std::vector<Double_t> &Z) {
+
+  const Int_t nMagnets = (fDesign >= 7) ? 9 : 8;
+  magnetName.reserve(nMagnets);
+  fieldDirection.reserve(nMagnets);
+  for (auto i :
+       {&dXIn, &dXOut, &dYIn, &dYOut, &dZ, &midGapIn, &midGapOut,
+  &HmainSideMagIn, &HmainSideMagOut, &gapIn, &gapOut, &Z}) {
+    i->reserve(nMagnets);
+  }
+
+  Double_t zgap = (fDesign > 6) ? 10 : 0;  // fixed distance between magnets in Z-axis
+
+  if (fDesign == 8) {
+
+    magnetName = {"MagnAbsorb1", "MagnAbsorb2", "Magn1", "Magn2", "Magn3",
+      "Magn4",       "Magn5",       "Magn6", "Magn7"};
+
+    fieldDirection = {
+  FieldDirection::up,   FieldDirection::up,   FieldDirection::up,
+  FieldDirection::up,   FieldDirection::up,   FieldDirection::down,
+  FieldDirection::down, FieldDirection::down, FieldDirection::down,
+    };
 
     auto f = TFile::Open(fGeofile, "read");
     TVectorT<Double_t> params;
     params.Read("params");
 
-  return 0;
+    const int offset = 7;
+
+    dXIn[0] = 0.4 * m;
+    dXOut[0] = 0.40 * m;
+    gapIn[0] = 0.1 * mm;
+    dYIn[0] = 1.5 * m;
+    dYOut[0] = 1.5 * m;
+    gapOut[0] = 0.1 * mm;
+    dXIn[1] = 0.5 * m;
+    dXOut[1] = 0.5 * m;
+    gapIn[1] = 0.02 * m;
+    dYIn[1] = 1.3 * m;
+    dYOut[1] = 1.3 * m;
+    gapOut[1] = 0.02 * m;
+
+    for (Int_t i = 2; i < nMagnets - 1; ++i) {
+      dXIn[i] = params[offset + i * 6 + 1];
+      dXOut[i] = params[offset + i * 6 + 2];
+      dYIn[i] = params[offset + i * 6 + 3];
+      dYOut[i] = params[offset + i * 6 + 4];
+      gapIn[i] = params[offset + i * 6 + 5];
+      gapOut[i] = params[offset + i * 6 + 6];
+    }
+
+    dZ[0] = dZ1 - zgap / 2;
+    Z[0] = zEndOfAbsorb + dZ[0] + zgap;
+    dZ[1] = dZ2 - zgap / 2;
+    Z[1] = Z[0] + dZ[0] + dZ[1] + zgap;
+    dZ[2] = dZ3 - zgap / 2;
+    Z[2] = Z[1] + dZ[1] + dZ[2] + 2 * zgap;
+    dZ[3] = dZ4 - zgap / 2;
+    Z[3] = Z[2] + dZ[2] + dZ[3] + zgap;
+    dZ[4] = dZ5 - zgap / 2;
+    Z[4] = Z[3] + dZ[3] + dZ[4] + zgap;
+    dZ[5] = dZ6 - zgap / 2;
+    Z[5] = Z[4] + dZ[4] + dZ[5] + zgap;
+    dZ[6] = dZ7 - zgap / 2;
+    Z[6] = Z[5] + dZ[5] + dZ[6] + zgap;
+    dZ[7] = dZ8 - zgap / 2;
+    Z[7] = Z[6] + dZ[6] + dZ[7] + zgap;
+
+    dXIn[8] = dXOut[7];
+    dYIn[8] = dYOut[7];
+    dXOut[8] = dXIn[8];
+    dYOut[8] = dYIn[8];
+    gapIn[8] = gapOut[7];
+    gapOut[8] = gapIn[8];
+    dZ[8] = 0.1 * m;
+    Z[8] = Z[7] + dZ[7] + dZ[8];
+
+    for (int i = 0; i < nMagnets; ++i) {
+      midGapIn[i] = 0.;
+      midGapOut[i] = 0.;
+      HmainSideMagIn[i] = dYIn[i] / 2;
+      HmainSideMagOut[i] = dYOut[i] / 2;
+    }
+
+  } else if (fDesign == 9) {
+     magnetName = {"MagnAbsorb1", "MagnAbsorb2", "Magn1", "Magn2", "Magn3",
+       "Magn4", "Magn5", "Magn6", "Magn7"
+     };
+
+     fieldDirection = {
+        FieldDirection::up, FieldDirection::up, FieldDirection::up,
+  FieldDirection::up, FieldDirection::up, FieldDirection::down,
+  FieldDirection::down, FieldDirection::down, FieldDirection::down,
+     };
+
+     dXIn[0] = 0.4 * m;
+     dXOut[0] = 0.40 * m;
+     dYIn[0] = 1.5 * m;
+     dYOut[0] = 1.5 * m;
+     gapIn[0] = 0.1 * mm;
+     gapOut[0] = 0.1 * mm;
+     dZ[0] = dZ1 - zgap / 2;
+     Z[0] = zEndOfAbsorb + dZ[0] + zgap;
+
+     dXIn[1] = 0.5 * m;
+     dXOut[1] = 0.5 * m;
+     dYIn[1] = 1.3 * m;
+     dYOut[1] = 1.3 * m;
+     gapIn[1] = 0.02 * m;
+     gapOut[1] = 0.02 * m;
+     dZ[1] = dZ2 - zgap / 2;
+     Z[1] = Z[0] + dZ[0] + dZ[1] + zgap;
+
+     dXIn[2] = 0.72 * m;
+     dXOut[2] = 0.51 * m;
+     dYIn[2] = 0.29 * m;
+     dYOut[2] = 0.46 * m;
+     gapIn[2] = 0.10 * m;
+     gapOut[2] = 0.07 * m;
+     dZ[2] = dZ3 - zgap / 2;
+     Z[2] = Z[1] + dZ[1] + dZ[2] + 2 * zgap;
+
+     dXIn[3] = 0.54 * m;
+     dXOut[3] = 0.38 * m;
+     dYIn[3] = 0.46 * m;
+     dYOut[3] = 1.92 * m;
+     gapIn[3] = 0.14 * m;
+     gapOut[3] = 0.09 * m;
+     dZ[3] = dZ4 - zgap / 2;
+     Z[3] = Z[2] + dZ[2] + dZ[3] + zgap;
+
+     dXIn[4] = 0.10 * m;
+     dXOut[4] = 0.31 * m;
+     dYIn[4] = 0.35 * m;
+     dYOut[4] = 0.31 * m;
+     gapIn[4] = 0.51 * m;
+     gapOut[4] = 0.11 * m;
+     dZ[4] = dZ5 - zgap / 2;
+     Z[4] = Z[3] + dZ[3] + dZ[4] + zgap;
+
+     dXIn[5] = 0.03 * m;
+     dXOut[5] = 0.32 * m;
+     dYIn[5] = 0.54 * m;
+     dYOut[5] = 0.24 * m;
+     gapIn[5] = 0.08 * m;
+     gapOut[5] = 0.08 * m;
+     dZ[5] = dZ6 - zgap / 2;
+     Z[5] = Z[4] + dZ[4] + dZ[5] + zgap;
+
+     dXIn[6] = 0.22 * m;
+     dXOut[6] = 0.32 * m;
+     dYIn[6] = 2.09 * m;
+     dYOut[6] = 0.35 * m;
+     gapIn[6] = 0.08 * m;
+     gapOut[6] = 0.13 * m;
+     dZ[6] = dZ7 - zgap / 2;
+     Z[6] = Z[5] + dZ[5] + dZ[6] + zgap;
+
+     dXIn[7] = 0.33 * m;
+     dXOut[7] = 0.77 * m;
+     dYIn[7] = 0.85 * m;
+     dYOut[7] = 2.41 * m;
+     gapIn[7] = 0.09 * m;
+     gapOut[7] = 0.26 * m;
+     dZ[7] = dZ8 - zgap / 2;
+     Z[7] = Z[6] + dZ[6] + dZ[7] + zgap;
+
+     dXIn[8] = dXOut[7];
+     dYIn[8] = dYOut[7];
+     dXOut[8] = dXIn[8];
+     dYOut[8] = dYIn[8];
+     gapIn[8] = gapOut[7];
+     gapOut[8] = gapIn[8];
+     dZ[8] = 0.1 * m;
+     Z[8] = Z[7] + dZ[7] + dZ[8];
+
+     for (int i = 0; i < nMagnets; ++i) {
+        midGapIn[i] = 0.;
+        midGapOut[i] = 0.;
+        HmainSideMagIn[i] = dYIn[i] / 2;
+        HmainSideMagOut[i] = dYOut[i] / 2;
+     }
+
+  } else if (fDesign == 7) {
+  magnetName = {"MagnAbsorb1", "MagnAbsorb2", "Magn1", "Magn2", "Magn3",
+                "Magn4", "Magn5", "Magn6", "Magn7"};
+
+  fieldDirection[0] = FieldDirection::up;
+  dXIn[0]  = 0.4*m;     dYIn[0] = 1.5*m;
+  dXOut[0] = 0.40*m;      dYOut[0]= 1.5*m;
+  gapIn[0] = 0.02 * m;      gapOut[0] = 0.02 * m;
+  dZ[0] = dZ1-zgap/2;     Z[0] = zEndOfAbsorb + dZ[0]+zgap;
+  
+  fieldDirection[1] = FieldDirection::up;
+  dXIn[1]  = 0.8*m;     dYIn[1] = 1.5*m;
+  dXOut[1] = 0.8*m;     dYOut[1]= 1.5*m;
+  gapIn[1] = 0.02*m;      gapOut[1] = 0.02*m;
+  dZ[1] = dZ2-zgap/2;     Z[1] = Z[0] + dZ[0] + dZ[1]+zgap;
+    
+  fieldDirection[2] = FieldDirection::up;
+  dXIn[2]  = 0.87*m;      dYIn[2] = 0.35*m;
+  dXOut[2] = 0.65*m;      dYOut[2]= 1.21*m;
+  gapIn[2] = 0.11 * m;      gapOut[2] = 0.065 * m;
+  dZ[2] = dZ3-zgap/2;     Z[2] = Z[1] + dZ[1] + dZ[2] + zgap;
+
+  fieldDirection[3] = FieldDirection::up;
+  dXIn[3]  = 0.65*m;      dYIn[3] = 1.21*m;
+  dXOut[3] = 0.43*m;      dYOut[3]= 2.07*m;
+  gapIn[3] = 0.065 * m;     gapOut[3] = 0.02 * m;
+  dZ[3] = dZ4-zgap/2;     Z[3] = Z[2] + dZ[2] + dZ[3]+zgap;
+
+  fieldDirection[4] = FieldDirection::up;
+  dXIn[4]  = 0.06*m;      dYIn[4] = 0.32*m;
+  dXOut[4] = 0.33*m;      dYOut[4]= 0.13*m;
+  gapIn[4] = 0.7*m;     gapOut[4] = 0.11*m;
+  dZ[4] = dZ5-zgap/2;     Z[4] = Z[3] + dZ[3] + dZ[4]+zgap;
+  
+  fieldDirection[5] = FieldDirection::down;
+  dXIn[5]  = 0.05*m;      dYIn[5] = 1.12*m;
+  dXOut[5] =0.16*m;     dYOut[5]= 0.05*m;
+  gapIn[5] = 0.04*m;      gapOut[5] = 0.02*m;
+  dZ[5] = dZ6-zgap/2;     Z[5] = Z[4] + dZ[4] + dZ[5]+zgap;
+  
+  fieldDirection[6] = FieldDirection::down;
+  dXIn[6]  = 0.15*m;      dYIn[6] = 2.35*m;
+  dXOut[6] = 0.34*m;      dYOut[6]= 0.32*m;
+  gapIn[6] = 0.05*m;      gapOut[6] = 0.08*m;
+  dZ[6] = dZ7-zgap/2;     Z[6] = Z[5] + dZ[5] + dZ[6]+zgap;
+  
+  Double_t clip_width = 0.1*m; // clip field width by this width
+  fieldDirection[7] = FieldDirection::down;
+  dXIn[7]  = 0.31*m;      dYIn[7] = 1.86*m;
+  dXOut[7] = 0.9*m - clip_width;  dYOut[7]= 3.1*m;
+  Double_t clip_len =
+       (dZ8-zgap/2) * (1 - (dXOut[7] - dXIn[7]) / (dXOut[7] + clip_width - dXIn[7]));
+  gapIn[7] = 0.02*m;      gapOut[7] = 0.55*m;
+  dZ[7] = dZ8 - clip_len - zgap / 2;  Z[7] = Z[6] + dZ[6] + dZ[7] + zgap;
+
+  fieldDirection[8] = FieldDirection::down;
+  dXIn[8]  = dXOut[7];      dYIn[8] = dYOut[7];
+  dXOut[8] = dXOut[7];      dYOut[8]= dYOut[7];
+  gapIn[8] = 0.55*m;      gapOut[8] = 0.55*m;
+  dZ[8] = clip_len;     Z[8] = Z[7] + dZ[7] + dZ[8];
+
+  for (int i = 0; i < nMagnets; ++i) {
+    midGapIn[i] = 0.;
+    midGapOut[i] = 0.;
+    HmainSideMagIn[i] = dYIn[i] / 2;
+    HmainSideMagOut[i] = dYOut[i] / 2;
+  }
+
+  } else {
+
+  magnetName = {"1", "2", "3", "4", "5", "6", "7"};
+
+  fieldDirection[0] = FieldDirection::up;
+  dXIn[0]  = 0.7*m;     dYIn[0] = 1.*m; 
+  dXOut[0] = 0.7*m;     dYOut[0]= 0.8158*m;
+  midGapIn[0] = 0;      midGapOut[0] = 0;
+  HmainSideMagIn[0] = dYIn[0];    HmainSideMagOut[0] = dYOut[0];
+  gapIn[0] = 20;      gapOut[0] = 20;
+  dZ[0] = dZ1-zgap;     Z[0] = zEndOfAbsorb + dZ[0]+zgap;
+    
+  fieldDirection[1] = FieldDirection::up;
+  dXIn[1]  = 0.36*m;      dYIn[1] = 0.8158*m;
+  dXOut[1] = 0.19*m;      dYOut[1]= 0.499*m;
+  midGapIn[1] = 0;      midGapOut[1] = 0;
+  HmainSideMagIn[1] = dYIn[1]/2;    HmainSideMagOut[1] = dYOut[1]/2;
+  gapIn[1] = 88;      gapOut[1] = 122;
+  dZ[1] = dZ2-zgap/2;     Z[1] = Z[0] + dZ[0] + dZ[1]+zgap;
+  
+  fieldDirection[2] = FieldDirection::down;
+  dXIn[2]  = 0.075*m;     dYIn[2] = 0.499*m;
+  dXOut[2] = 0.25*m;      dYOut[2]= 1.10162*m;
+  midGapIn[2] = 0;      midGapOut[2] = 0;
+  HmainSideMagIn[2] = dYIn[2]/2;    HmainSideMagOut[2] = dYOut[2]/2;
+  gapIn[2] = 0;       gapOut[2] = 0;
+  dZ[2] = dZ3-zgap/2;     Z[2] = Z[1] + dZ[1] + dZ[2]+zgap;
+    
+  fieldDirection[3] = FieldDirection::down;
+  dXIn[3]  = 0.25*m;      dYIn[3] = 1.10262*m;
+  dXOut[3] = 0.3*m;     dYOut[3]= 1.82697*m;
+  midGapIn[3] = 0;      midGapOut[3] = 0;
+  HmainSideMagIn[3] = dXIn[3];    HmainSideMagOut[3] = dXOut[3];
+  gapIn[3] = 0;       gapOut[3] = 25;
+  dZ[3] = dZ4-zgap/2;     Z[3] = Z[2] + dZ[2] + dZ[3]+zgap;
+
+  fieldDirection[4] = FieldDirection::down;
+  dXIn[4]  = 0.3*m;     dYIn[4] = 1.82697*m;
+  dXOut[4] = 0.4*m;     dYOut[4]= 2.55131*m;
+  midGapIn[4] = 5;      midGapOut[4] = 25;
+  HmainSideMagIn[4] = dXIn[4];    HmainSideMagOut[4] = dXOut[4];
+  gapIn[4] = 20;      gapOut[4] = 20;
+  dZ[4] = dZ6-zgap/2;     Z[4] = Z[3] + dZ[3] + dZ[4]+zgap;
+  
+  fieldDirection[5] = FieldDirection::down;
+  dXIn[5]  = 0.4*m;     dYIn[5] = 2.55131*m;
+  dXOut[5] =0.4*m;      dYOut[5]= 3.27566*m;
+  midGapIn[5] = 25;       midGapOut[5] = 65;
+  HmainSideMagIn[5] = dXIn[5];    HmainSideMagOut[5] = dXOut[5];
+  gapIn[5] = 20;      gapOut[5] = 20;
+  dZ[5] = dZ7-zgap/2;     Z[5] = Z[4] + dZ[4] + dZ[5]+zgap;
+  
+  fieldDirection[6] = FieldDirection::down;
+  dXIn[6]  = 0.4*m;     dYIn[6] = 3.27566*m;
+  dXOut[6] = 0.75*m;      dYOut[6]= 4*m;
+  midGapIn[6] = 65;             midGapOut[6] = 75;
+  HmainSideMagIn[6] = dXIn[6];    HmainSideMagOut[6] = dXOut[6];
+  gapIn[6] = 20;      gapOut[6] = 20;
+  dZ[6] = dZ8-zgap/2;     Z[6] = Z[5] + dZ[5] + dZ[6]+zgap;
+  }
+  return nMagnets;
 }
 void MiniShield::ConstructGeometry()
 {
