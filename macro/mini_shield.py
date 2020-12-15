@@ -87,8 +87,8 @@ if (simEngine == "Ntuple" or simEngine == "MuonBack") and defaultInputFile :
   sys.exit()
 ROOT.gRandom.SetSeed(options.theSeed)  # this should be propagated via ROOT to Pythia8 and Geant4VMC
 shipRoot_conf.configure(0)     # load basic libraries, prepare atexit for python
-ship_geo = ConfigRegistry.loadpy("$FAIRSHIP/geometry/geometry_config.py", Yheight = options.dy,
-                                                muShieldDesign = options.ds, 
+ship_geo = ConfigRegistry.loadpy("$FAIRSHIP/geometry/geometry_config.py",
+                                                muShieldDesign = 9, 
                                                 muShieldGeo=options.geofile,
                                                 muShieldStepGeo=False, muShieldWithCobaltMagnet=False)
 
@@ -216,8 +216,8 @@ if debug > 0:
  geomGeant4.printWeightsandFields(onlyWithField = True,\
              exclude=['DecayVolume','Tr1','Tr2','Tr3','Tr4','Veto','Ecal','Hcal','MuonDetector','SplitCal'])
 # Plot the field example
-#fieldMaker.plotField(1, ROOT.TVector3(-9000.0, 6000.0, 50.0), ROOT.TVector3(-300.0, 300.0, 6.0), 'Bzx.png')
-#fieldMaker.plotField(2, ROOT.TVector3(-9000.0, 6000.0, 50.0), ROOT.TVector3(-400.0, 400.0, 6.0), 'Bzy.png')
+fieldMaker.plotField(1, ROOT.TVector3(-9000.0, -3000.0, 10.0), ROOT.TVector3(-300.0, 300.0, 6.0), 'Bzx.png')
+fieldMaker.plotField(2, ROOT.TVector3(-9000.0, -3000.0, 10.0), ROOT.TVector3(-400.0, 400.0, 6.0), 'Bzy.png')
 
 if inactivateMuonProcesses :
  ROOT.gROOT.ProcessLine('#include "Geant4/G4ProcessTable.hh"')
