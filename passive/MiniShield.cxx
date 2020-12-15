@@ -62,6 +62,10 @@ MiniShield::MiniShield(const char* name, const Int_t Design, const char* Title,
  fDesign = Design;
  fField  = field;
  fGeofile = "";
+ fWithConstAbsorberField = WithConstAbsorberField;
+ fWithConstShieldField = WithConstShieldField;
+ fStepGeo = StepGeo;
+ fWithCoMagnet = withCoMagnet;
  if (fDesign==1){
      fMiniShieldLength = L1;   
     }
@@ -747,7 +751,7 @@ void MiniShield::ConstructGeometry()
       TGeoUniformMagField *fields[4] = {magFieldIron,RetField,ConRField,ConLField};
 
       std::vector<TString> magnetName;
-      std::vector<FieldDirection> fieldDirection;
+      std::vector<FieldDirectionM> fieldDirection;
       std::vector<Double_t> dXIn, dYIn, dXOut, dYOut, dZf, midGapIn, midGapOut,
     HmainSideMagIn, HmainSideMagOut, gapIn, gapOut, Z;
       const Int_t nMagnets = Initialize(magnetName, fieldDirection, dXIn, dYIn, dXOut, dYOut, dZf,
@@ -757,9 +761,9 @@ void MiniShield::ConstructGeometry()
 
       if (fDesign == 6){
   Double_t dA = 3*m;
-  CreateMagnet("AbsorberStop-1",iron,tShield,fields,FieldDirection::up,
+  CreateMagnet("AbsorberStop-1",iron,tShield,fields,FieldDirectionM::up,
       dA/6.,dA/6.,dA/6.,dA/6.,dZ0/3.,0,0,dA/12.,dA/12.,0,0,zEndOfAbsorb - 5.*dZ0/3.,0, false);
-  CreateMagnet("AbsorberStop-2",iron,tShield,fields,FieldDirection::up,
+  CreateMagnet("AbsorberStop-2",iron,tShield,fields,FieldDirectionM::up,
       dA/2.,dA/2.,dA/2.,dA/2.,dZ0*2./3.,0,0,dA/4.,dA/4.,0,0,zEndOfAbsorb - 2.*dZ0/3.,0, false);
         TGeoBBox* fullAbsorber = new TGeoBBox("fullAbsorber", dA, dA, dZ0/3.);
         TGeoBBox* cutOut = new TGeoBBox("cutout", dA/3.+20*cm, dA/3.+20*cm, dZ0/3.+0.1*mm); //no idea why to add 20cm
@@ -859,11 +863,75 @@ void MiniShield::ConstructGeometry()
            Fatal( "ShipMuonShield", "Exception out of range for --coMuonShield occurred \n");
         }
       }
- else {
+      for (Int_t nM = 2; nM 2; nM++) {
+  Double_t ironField_s = fField * fieldScale[nM] * tesla;
+  TGeoUniformMagField *magFieldIron_s = new TGeoUniformMagField(0.,ironField_s,0.);
+  TGeoUniformMagField *RetField_s     = new TGeoUniformMagField(0.,-ironField_s,0.);
+  TGeoUniformMagField *ConRField_s    = new TGeoUniformMagField(-ironField_s,0.,0.);
+  TGeoUniformMagField *ConLField_s    = new TGeoUniformMagField(ironField_s,0.,0.);
+  TGeoUniformMagField *fields_s[4] = {magFieldIron_s,RetField_s,ConRField_s,ConLField_s};      
+  CreateMagnet(magnetName[nM], iron, tShield, fields_s, fieldDirection[nM],
+         dXIn[nM], dYIn[nM], dXOut[nM], dYOut[nM], dZf[nM],
+         midGapIn[nM], midGapOut[nM], HmainSideMagIn[nM],
+         HmainSideMagOut[nM], gapIn[nM], gapOut[nM], Z[nM], nM==8, fStepGeo);
+
+  if (nM==8 || !fSupport) continue;
+  Double_t dymax = std::max(dYIn[nM] + dXIn[nM], dYOut[nM] + dXOut[nM]);
+  Double_t dymin = std::min(dYIn[nM] + dXIn[nM], dYOut[nM] + dXOut[nM]);
+  Double_t slope =
+      (dYIn[nM] + dXIn[nM] - dYOut[nM] - dXOut[nM]) / (2 * dZf[nM]);
+  Double_t w1 = 2 * dXIn[nM] + std::max(20., gapIn[nM]);
+  Double_t w2 = 2 * dXOut[nM] + std::max(20., gapOut[nM]);
+  Double_t anti_overlap = 0.1;
+  Double_t h1 = 0.5 * (dYIn[nM] + dXIn[nM] + anti_overlap - 10 * m + fFloor);
+  Double_t h2 = 0.5 * (dYOut[nM] + dXOut[nM] + anti_overlap - 10 * m + fFloor);
+  Double_t length = std::min(0.5 * m, std::abs(dZf[nM]/2. - 5 * cm));
+  std::array<Double_t, 16> verticesIn = {
+      -w1, -h1,
+      +w1, -h1,
+      +w1, +h1,
+      -w1, +h1,
+      -w1, -h1 + slope * 2. * length,
+      +w1, -h1 + slope * 2. * length,
+      +w1, +h1,
+      -w1, +h1,
+  };
+  std::array<Double_t, 16> verticesOut = {
+      -w2, -h2 - slope * 2. * length,
+      +w2, -h2 - slope * 2. * length,
+      +w2, +h2,
+      -w2, +h2,
+      -w2, -h2,
+      +w2, -h2,
+      +w2, +h2,
+      -w2, +h2,
+  };
+  if (!fStepGeo)
+  {
+
+
+    TGeoVolume *pillar1 =
+        gGeoManager->MakeArb8(TString::Format("pillar_%d", 2 * nM - 1),
+            steel, length, verticesIn.data());
+    TGeoVolume *pillar2 =
+        gGeoManager->MakeArb8(TString::Format("pillar_%d", 2 * nM), steel,
+            length, verticesOut.data());
+    pillar1->SetLineColor(kGreen-5);
+    pillar2->SetLineColor(kGreen-5);
+    tShield->AddNode(pillar1, 1, new TGeoTranslation(
+               0, -0.5 * (dYIn[nM] + dXIn[nM] + 10 * m - fFloor),
+               Z[nM] - dZf[nM] + length));
+    tShield->AddNode(pillar2, 1, new TGeoTranslation(
+               0, -0.5 * (dYOut[nM] + dXOut[nM] + 10 * m - fFloor),
+               Z[nM] + dZf[nM] - length));
+  }
+      }
+          
+      } else {
   CreateTube("AbsorberAdd", iron, 15, 400, dZ0, 43, tShield, 0, 0, zEndOfAbsorb - dZ0);
   CreateTube("AbsorberAddCore", iron, 0, 15, dZ0, 38, tShield, 0, 0, zEndOfAbsorb - dZ0);
 
-  for (Int_t nM = 0; nM < 2; nM++) {
+  for (Int_t nM = 0; nM < (nMagnets - 1); nM++) {
     CreateMagnet(magnetName[nM],iron,tShield,fields,fieldDirection[nM],
        dXIn[nM],dYIn[nM],dXOut[nM],dYOut[nM],dZf[nM],
        midGapIn[nM],midGapOut[nM],HmainSideMagIn[nM],HmainSideMagOut[nM],
@@ -910,6 +978,7 @@ void MiniShield::ConstructGeometry()
 //
     } else {
      Fatal("ShipMuonShield","Design %i does not match implemented designs",fDesign);
-    }    
+    }
+}   
 }
 ClassImp(MiniShield)

@@ -49,6 +49,11 @@ class MiniShield : public FairModule
   Bool_t fSupport;
   Double_t  dZ0,dZ1,dZ2,dZ3,dZ4,dZ5,dZ6,dZ7,dZ8,dXgap,zEndOfAbsorb,mag4Gap,midGapOut7,midGapOut8;
   Int_t InitMedium(TString name);
+  
+  Int_t fWithCoMagnet;
+  Bool_t fStepGeo;
+  Bool_t fWithConstAbsorberField;
+  Bool_t fWithConstShieldField;
 
   void CreateArb8(TString arbName, TGeoMedium *medium, Double_t dZ,
 		  std::array<Double_t, 16> corners, Int_t color,
