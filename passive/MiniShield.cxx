@@ -18,12 +18,6 @@
 #include <iostream>                     // for operator<<, basic_ostream, etc
 
 
-Double_t cm = 1;
-Double_t m = 100 * cm;
-Double_t mm = 0.1 * cm;
-Double_t kilogauss = 1.;
-Double_t tesla = 10 * kilogauss;
-
 MiniShield::~MiniShield() {}
 MiniShield::MiniShield() : FairModule("MiniShield", "") {}
 
