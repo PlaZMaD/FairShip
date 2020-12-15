@@ -252,5 +252,171 @@ void MiniShield::ConstructGeometry()
 	  CreateMagnet("MiniShield",iron,tShield,mainField, 500./2., 500./2., 500./2.0, -6250.);
 
     top->AddNode(tShield, 1);
+
+
+    float mField = 1.6 * tesla;
+    TGeoUniformMagField *fieldsAbsorber[4] = {
+      new TGeoUniformMagField(0., mField, 0.),
+      new TGeoUniformMagField(0., -mField, 0.),
+      new TGeoUniformMagField(-mField, 0., 0.),
+      new TGeoUniformMagField(mField, 0., 0.)
+    };
+    magnetName = {"MagnAbsorb1", "MagnAbsorb2", "Magn1", "Magn2", "Magn3",
+       "Magn4", "Magn5", "Magn6", "Magn7"
+     };
+    fieldDirection = {
+        FieldDirection::up, FieldDirection::up, FieldDirection::up,
+        FieldDirection::up, FieldDirection::up, FieldDirection::down,
+        FieldDirection::down, FieldDirection::down, FieldDirection::down,
+     };
+     dZgap = 0.1 * m;
+     zGap = 0.5 * dZgap;
+     dZ1 =  0.35 * m + zGap;
+     
+     dXIn[0] = 0.4 * m;
+     dXOut[0] = 0.40 * m;
+     dYIn[0] = 1.5 * m;
+     dYOut[0] = 1.5 * m;
+     gapIn[0] = 0.1 * mm;
+     gapOut[0] = 0.1 * mm;
+     dZ[0] = dZ1 - zgap / 2;
+     Z[0] = zEndOfAbsorb + dZ[0] + zgap;
+
+     dXIn[1] = 0.5 * m;
+     dXOut[1] = 0.5 * m;
+     dYIn[1] = 1.3 * m;
+     dYOut[1] = 1.3 * m;
+     gapIn[1] = 0.02 * m;
+     gapOut[1] = 0.02 * m;
+     dZ[1] = dZ2 - zgap / 2;
+     Z[1] = Z[0] + dZ[0] + dZ[1] + zgap;
+
+     dXIn[2] = 0.72 * m;
+     dXOut[2] = 0.51 * m;
+     dYIn[2] = 0.29 * m;
+     dYOut[2] = 0.46 * m;
+     gapIn[2] = 0.10 * m;
+     gapOut[2] = 0.07 * m;
+     dZ[2] = dZ3 - zgap / 2;
+     Z[2] = Z[1] + dZ[1] + dZ[2] + 2 * zgap;
+
+     dXIn[3] = 0.54 * m;
+     dXOut[3] = 0.38 * m;
+     dYIn[3] = 0.46 * m;
+     dYOut[3] = 1.92 * m;
+     gapIn[3] = 0.14 * m;
+     gapOut[3] = 0.09 * m;
+     dZ[3] = dZ4 - zgap / 2;
+     Z[3] = Z[2] + dZ[2] + dZ[3] + zgap;
+
+     dXIn[4] = 0.10 * m;
+     dXOut[4] = 0.31 * m;
+     dYIn[4] = 0.35 * m;
+     dYOut[4] = 0.31 * m;
+     gapIn[4] = 0.51 * m;
+     gapOut[4] = 0.11 * m;
+     dZ[4] = dZ5 - zgap / 2;
+     Z[4] = Z[3] + dZ[3] + dZ[4] + zgap;
+
+     dXIn[5] = 0.03 * m;
+     dXOut[5] = 0.32 * m;
+     dYIn[5] = 0.54 * m;
+     dYOut[5] = 0.24 * m;
+     gapIn[5] = 0.08 * m;
+     gapOut[5] = 0.08 * m;
+     dZ[5] = dZ6 - zgap / 2;
+     Z[5] = Z[4] + dZ[4] + dZ[5] + zgap;
+
+     dXIn[6] = 0.22 * m;
+     dXOut[6] = 0.32 * m;
+     dYIn[6] = 2.09 * m;
+     dYOut[6] = 0.35 * m;
+     gapIn[6] = 0.08 * m;
+     gapOut[6] = 0.13 * m;
+     dZ[6] = dZ7 - zgap / 2;
+     Z[6] = Z[5] + dZ[5] + dZ[6] + zgap;
+
+     dXIn[7] = 0.33 * m;
+     dXOut[7] = 0.77 * m;
+     dYIn[7] = 0.85 * m;
+     dYOut[7] = 2.41 * m;
+     gapIn[7] = 0.09 * m;
+     gapOut[7] = 0.26 * m;
+     dZ[7] = dZ8 - zgap / 2;
+     Z[7] = Z[6] + dZ[6] + dZ[7] + zgap;
+
+     dXIn[8] = dXOut[7];
+     dYIn[8] = dYOut[7];
+     dXOut[8] = dXIn[8];
+     dYOut[8] = dYIn[8];
+     gapIn[8] = gapOut[7];
+     gapOut[8] = gapIn[8];
+     dZ[8] = 0.1 * m;
+     Z[8] = Z[7] + dZ[7] + dZ[8];
+
+     for (int i = 0; i < 8; ++i) {
+        midGapIn[i] = 0.;
+        midGapOut[i] = 0.;
+        HmainSideMagIn[i] = dYIn[i] / 2;
+        HmainSideMagOut[i] = dYOut[i] / 2;
+     }
+    for (Int_t nM = 0; nM < 2; nM++) {
+    CreateMagnet(magnetName[nM], iron, tShield, fieldsAbsorber,
+           fieldDirection[nM], dXIn[nM], dYIn[nM], dXOut[nM],
+           dYOut[nM], dZf[nM], midGapIn[nM], midGapOut[nM],
+           HmainSideMagIn[nM], HmainSideMagOut[nM], gapIn[nM],
+           gapOut[nM], Z[nM], true, false);
+  }
+
+      std::vector<TGeoTranslation*> mag_trans;
+
+      auto mag2 = new TGeoTranslation("mag2", 0, 0, +dZ1);
+      mag2->RegisterYourself();
+      mag_trans.push_back(mag2);
+
+      Double_t zgap = 10;
+      Double_t absorber_offset = zgap;
+      Double_t absorber_half_length = (dZf[0] + dZf[1]) + zgap / 2.;
+      auto abs = new TGeoBBox("absorber", 3.95 * m, 3.4 * m, absorber_half_length);
+      const std::vector<TString> absorber_magnets =
+         (fDesign == 7) ? std::vector<TString>{"MagnAbsorb1", "MagnAbsorb2"} : std::vector<TString>{"MagnAbsorb2"};
+      const std::vector<TString> magnet_components = fDesign == 7 ? std::vector<TString>{
+    "_MiddleMagL", "_MiddleMagR",  "_MagRetL",    "_MagRetR",
+    "_MagCLB",     "_MagCLT",      "_MagCRT",     "_MagCRB",
+    "_MagTopLeft", "_MagTopRight", "_MagBotLeft", "_MagBotRight",
+      }: std::vector<TString>{
+    "_MiddleMagL", "_MiddleMagR",  "_MagRetL",    "_MagRetR",
+    "_MagTopLeft", "_MagTopRight", "_MagBotLeft", "_MagBotRight",
+      };
+      TString absorber_magnet_components;
+      for (auto &&magnet_component : magnet_components) {
+  // format: "-<magnetName>_<magnet_component>:<translation>"
+  absorber_magnet_components +=
+      ("-" + absorber_magnets[0] + magnet_component + ":" +
+       mag_trans[0]->GetName());
+  if (fDesign == 7) {
+  absorber_magnet_components +=
+      ("-" + absorber_magnets[1] + magnet_component + ":" +
+       mag_trans[1]->GetName());
+  }
+      }
+      TGeoCompositeShape *absorberShape = new TGeoCompositeShape(
+    "Absorber", "absorber" + absorber_magnet_components); // cutting out
+                // magnet parts
+                // from absorber
+      TGeoVolume *absorber = new TGeoVolume("AbsorberVol", absorberShape, iron);
+      absorber->SetLineColor(42); // brown / light red
+      tShield->AddNode(absorber, 1, new TGeoTranslation(0, 0, zEndOfAbsorb + absorber_half_length + absorber_offset));
+
+      if (fDesign > 7) {
+         auto coatBox = new TGeoBBox("coat", 10 * m - 1 * mm, 10 * m - 1 * mm, absorber_half_length);
+         auto coatShape = new TGeoCompositeShape("CoatShape", "coat-absorber");
+         auto coat = new TGeoVolume("CoatVol", coatShape, concrete);
+         tShield->AddNode(coat, 1, new TGeoTranslation(0, 0, zEndOfAbsorb + absorber_half_length + absorber_offset ));
+         TGeoVolume *coatWall = gGeoManager->MakeBox("CoatWall",concrete,10 * m - 1 * mm, 10 * m - 1 * mm, 7 * cm - 1 * mm);
+         coatWall->SetLineColor(kRed);
+         tShield->AddNode(coatWall, 1, new TGeoTranslation(0, 0, zEndOfAbsorb + 2*absorber_half_length + absorber_offset+7 * cm));
+
+      }
 }
 ClassImp(MiniShield)
