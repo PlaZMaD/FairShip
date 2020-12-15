@@ -95,8 +95,8 @@ MiniShield::MiniShield(const char* name, const Int_t Design, const char* Title,
      dZ6 = L6;
      dZ7 = L7;
      dZ8 = L8;
-     fMiniShieldLength = 500;
-	 // 2 * (dZ1 + dZ2 + dZ3 + dZ4 + dZ5 + dZ6 + dZ7 + dZ8) + LE;
+     fMiniShieldLength = 
+	  2 * (dZ1 + dZ2 + dZ3 + dZ4 + dZ5 + dZ6 + dZ7 + dZ8) + LE;
    }
     
  fFloor = (fDesign >= 7) ? floor : 0;
@@ -863,69 +863,69 @@ void MiniShield::ConstructGeometry()
            Fatal( "ShipMuonShield", "Exception out of range for --coMuonShield occurred \n");
         }
       }
-      for (Int_t nM = 2; nM 2; nM++) {
-  Double_t ironField_s = fField * fieldScale[nM] * tesla;
-  TGeoUniformMagField *magFieldIron_s = new TGeoUniformMagField(0.,ironField_s,0.);
-  TGeoUniformMagField *RetField_s     = new TGeoUniformMagField(0.,-ironField_s,0.);
-  TGeoUniformMagField *ConRField_s    = new TGeoUniformMagField(-ironField_s,0.,0.);
-  TGeoUniformMagField *ConLField_s    = new TGeoUniformMagField(ironField_s,0.,0.);
-  TGeoUniformMagField *fields_s[4] = {magFieldIron_s,RetField_s,ConRField_s,ConLField_s};      
-  CreateMagnet(magnetName[nM], iron, tShield, fields_s, fieldDirection[nM],
-         dXIn[nM], dYIn[nM], dXOut[nM], dYOut[nM], dZf[nM],
-         midGapIn[nM], midGapOut[nM], HmainSideMagIn[nM],
-         HmainSideMagOut[nM], gapIn[nM], gapOut[nM], Z[nM], nM==8, fStepGeo);
+  //     for (Int_t nM = 2; nM < 2; nM++) {
+  // Double_t ironField_s = fField * fieldScale[nM] * tesla;
+  // TGeoUniformMagField *magFieldIron_s = new TGeoUniformMagField(0.,ironField_s,0.);
+  // TGeoUniformMagField *RetField_s     = new TGeoUniformMagField(0.,-ironField_s,0.);
+  // TGeoUniformMagField *ConRField_s    = new TGeoUniformMagField(-ironField_s,0.,0.);
+  // TGeoUniformMagField *ConLField_s    = new TGeoUniformMagField(ironField_s,0.,0.);
+  // TGeoUniformMagField *fields_s[4] = {magFieldIron_s,RetField_s,ConRField_s,ConLField_s};      
+  // CreateMagnet(magnetName[nM], iron, tShield, fields_s, fieldDirection[nM],
+  //        dXIn[nM], dYIn[nM], dXOut[nM], dYOut[nM], dZf[nM],
+  //        midGapIn[nM], midGapOut[nM], HmainSideMagIn[nM],
+  //        HmainSideMagOut[nM], gapIn[nM], gapOut[nM], Z[nM], nM==8, fStepGeo);
 
-  if (nM==8 || !fSupport) continue;
-  Double_t dymax = std::max(dYIn[nM] + dXIn[nM], dYOut[nM] + dXOut[nM]);
-  Double_t dymin = std::min(dYIn[nM] + dXIn[nM], dYOut[nM] + dXOut[nM]);
-  Double_t slope =
-      (dYIn[nM] + dXIn[nM] - dYOut[nM] - dXOut[nM]) / (2 * dZf[nM]);
-  Double_t w1 = 2 * dXIn[nM] + std::max(20., gapIn[nM]);
-  Double_t w2 = 2 * dXOut[nM] + std::max(20., gapOut[nM]);
-  Double_t anti_overlap = 0.1;
-  Double_t h1 = 0.5 * (dYIn[nM] + dXIn[nM] + anti_overlap - 10 * m + fFloor);
-  Double_t h2 = 0.5 * (dYOut[nM] + dXOut[nM] + anti_overlap - 10 * m + fFloor);
-  Double_t length = std::min(0.5 * m, std::abs(dZf[nM]/2. - 5 * cm));
-  std::array<Double_t, 16> verticesIn = {
-      -w1, -h1,
-      +w1, -h1,
-      +w1, +h1,
-      -w1, +h1,
-      -w1, -h1 + slope * 2. * length,
-      +w1, -h1 + slope * 2. * length,
-      +w1, +h1,
-      -w1, +h1,
-  };
-  std::array<Double_t, 16> verticesOut = {
-      -w2, -h2 - slope * 2. * length,
-      +w2, -h2 - slope * 2. * length,
-      +w2, +h2,
-      -w2, +h2,
-      -w2, -h2,
-      +w2, -h2,
-      +w2, +h2,
-      -w2, +h2,
-  };
-  if (!fStepGeo)
-  {
+  // if (nM==8 || !fSupport) continue;
+  // Double_t dymax = std::max(dYIn[nM] + dXIn[nM], dYOut[nM] + dXOut[nM]);
+  // Double_t dymin = std::min(dYIn[nM] + dXIn[nM], dYOut[nM] + dXOut[nM]);
+  // Double_t slope =
+  //     (dYIn[nM] + dXIn[nM] - dYOut[nM] - dXOut[nM]) / (2 * dZf[nM]);
+  // Double_t w1 = 2 * dXIn[nM] + std::max(20., gapIn[nM]);
+  // Double_t w2 = 2 * dXOut[nM] + std::max(20., gapOut[nM]);
+  // Double_t anti_overlap = 0.1;
+  // Double_t h1 = 0.5 * (dYIn[nM] + dXIn[nM] + anti_overlap - 10 * m + fFloor);
+  // Double_t h2 = 0.5 * (dYOut[nM] + dXOut[nM] + anti_overlap - 10 * m + fFloor);
+  // Double_t length = std::min(0.5 * m, std::abs(dZf[nM]/2. - 5 * cm));
+  // std::array<Double_t, 16> verticesIn = {
+  //     -w1, -h1,
+  //     +w1, -h1,
+  //     +w1, +h1,
+  //     -w1, +h1,
+  //     -w1, -h1 + slope * 2. * length,
+  //     +w1, -h1 + slope * 2. * length,
+  //     +w1, +h1,
+  //     -w1, +h1,
+  // };
+  // std::array<Double_t, 16> verticesOut = {
+  //     -w2, -h2 - slope * 2. * length,
+  //     +w2, -h2 - slope * 2. * length,
+  //     +w2, +h2,
+  //     -w2, +h2,
+  //     -w2, -h2,
+  //     +w2, -h2,
+  //     +w2, +h2,
+  //     -w2, +h2,
+  // };
+  // if (!fStepGeo)
+  // {
 
 
-    TGeoVolume *pillar1 =
-        gGeoManager->MakeArb8(TString::Format("pillar_%d", 2 * nM - 1),
-            steel, length, verticesIn.data());
-    TGeoVolume *pillar2 =
-        gGeoManager->MakeArb8(TString::Format("pillar_%d", 2 * nM), steel,
-            length, verticesOut.data());
-    pillar1->SetLineColor(kGreen-5);
-    pillar2->SetLineColor(kGreen-5);
-    tShield->AddNode(pillar1, 1, new TGeoTranslation(
-               0, -0.5 * (dYIn[nM] + dXIn[nM] + 10 * m - fFloor),
-               Z[nM] - dZf[nM] + length));
-    tShield->AddNode(pillar2, 1, new TGeoTranslation(
-               0, -0.5 * (dYOut[nM] + dXOut[nM] + 10 * m - fFloor),
-               Z[nM] + dZf[nM] - length));
-  }
-      }
+  //   TGeoVolume *pillar1 =
+  //       gGeoManager->MakeArb8(TString::Format("pillar_%d", 2 * nM - 1),
+  //           steel, length, verticesIn.data());
+  //   TGeoVolume *pillar2 =
+  //       gGeoManager->MakeArb8(TString::Format("pillar_%d", 2 * nM), steel,
+  //           length, verticesOut.data());
+  //   pillar1->SetLineColor(kGreen-5);
+  //   pillar2->SetLineColor(kGreen-5);
+  //   tShield->AddNode(pillar1, 1, new TGeoTranslation(
+  //              0, -0.5 * (dYIn[nM] + dXIn[nM] + 10 * m - fFloor),
+  //              Z[nM] - dZf[nM] + length));
+  //   tShield->AddNode(pillar2, 1, new TGeoTranslation(
+  //              0, -0.5 * (dYOut[nM] + dXOut[nM] + 10 * m - fFloor),
+  //              Z[nM] + dZf[nM] - length));
+  // }
+  //     }
           
       } else {
   CreateTube("AbsorberAdd", iron, 15, 400, dZ0, 43, tShield, 0, 0, zEndOfAbsorb - dZ0);
@@ -955,19 +955,19 @@ void MiniShield::ConstructGeometry()
       rockS->SetTransparency(50);
       top->AddNode(rockS, 1, new TGeoTranslation(0, 0, ZT ));
 // Concrete around decay tunnel
-      Double_t dZD =  100*m + fMuonShieldLength;
+      Double_t dZD =  100*m + fMiniShieldLength;
       TGeoBBox *box3    = new TGeoBBox("box3", 15*m, 15*m,dZD/2.);
       TGeoBBox *box4    = new TGeoBBox("box4", 10*m, 10*m,dZD/2.);
 
       if (fDesign >= 7 && fFloor > 0) {
   // Only add floor for new shield
   TGeoBBox *box5 = new TGeoBBox("shield_floor", 10 * m, fFloor / 2.,
-              fMuonShieldLength / 2. - dZ - 14.2 * cm); // substract CoatWall
+              fMiniShieldLength / 2. - dZ - 14.2 * cm); // substract CoatWall
   TGeoVolume *floor = new TGeoVolume("floorM", box5, concrete);
   floor->SetLineColor(11); // grey
   top->AddNode(floor, 1, new TGeoTranslation(0, -10 * m + fFloor / 2.,
                zEndOfAbsorb +
-                   fMuonShieldLength / 2. +dZ + 14.2 * cm)); // avoiding overlap with CoatWall
+                   fMiniShieldLength / 2. +dZ + 14.2 * cm)); // avoiding overlap with CoatWall
       }
       TGeoCompositeShape *compRockD =
     new TGeoCompositeShape("compRockD", "(box3-box4)");
