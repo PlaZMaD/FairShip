@@ -930,7 +930,7 @@ void MiniShield::ConstructGeometry()
   CreateTube("AbsorberAdd", iron, 15, 400, dZ0, 43, tShield, 0, 0, zEndOfAbsorb - dZ0);
   CreateTube("AbsorberAddCore", iron, 0, 15, dZ0, 38, tShield, 0, 0, zEndOfAbsorb - dZ0);
 
-  for (Int_t nM = 0; nM < (nMagnets - 1); nM++) {
+  for (Int_t nM = 0; nM < 2; nM++) {
     CreateMagnet(magnetName[nM],iron,tShield,fields,fieldDirection[nM],
        dXIn[nM],dYIn[nM],dXOut[nM],dYOut[nM],dZf[nM],
        midGapIn[nM],midGapOut[nM],HmainSideMagIn[nM],HmainSideMagOut[nM],
