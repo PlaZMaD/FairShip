@@ -247,9 +247,9 @@ Int_t ShipMuonShield::Initialize(std::vector<TString> &magnetName,
       "Magn4",       "Magn5",       "Magn6", "Magn7"};
 
     fieldDirection = {
-  FieldDirection::up,   FieldDirection::up,   FieldDirection::up,
-  FieldDirection::up,   FieldDirection::up,   FieldDirection::down,
-  FieldDirection::down, FieldDirection::down, FieldDirection::down,
+  FieldDirectionM::up,   FieldDirectionM::up,   FieldDirectionM::up,
+  FieldDirectionM::up,   FieldDirectionM::up,   FieldDirectionM::down,
+  FieldDirectionM::down, FieldDirectionM::down, FieldDirectionM::down,
     };
 
     auto f = TFile::Open(fGeofile, "read");
@@ -319,9 +319,9 @@ Int_t ShipMuonShield::Initialize(std::vector<TString> &magnetName,
      };
 
      fieldDirection = {
-        FieldDirection::up, FieldDirection::up, FieldDirection::up,
-  FieldDirection::up, FieldDirection::up, FieldDirection::down,
-  FieldDirection::down, FieldDirection::down, FieldDirection::down,
+        FieldDirectionM::up, FieldDirectionM::up, FieldDirectionM::up,
+  FieldDirectionM::up, FieldDirectionM::up, FieldDirectionM::down,
+  FieldDirectionM::down, FieldDirectionM::down, FieldDirectionM::down,
      };
 
      dXIn[0] = 0.4 * m;
@@ -416,50 +416,50 @@ Int_t ShipMuonShield::Initialize(std::vector<TString> &magnetName,
   magnetName = {"MagnAbsorb1", "MagnAbsorb2", "Magn1", "Magn2", "Magn3",
                 "Magn4", "Magn5", "Magn6", "Magn7"};
 
-  fieldDirection[0] = FieldDirection::up;
+  fieldDirection[0] = FieldDirectionM::up;
   dXIn[0]  = 0.4*m;     dYIn[0] = 1.5*m;
   dXOut[0] = 0.40*m;      dYOut[0]= 1.5*m;
   gapIn[0] = 0.02 * m;      gapOut[0] = 0.02 * m;
   dZ[0] = dZ1-zgap/2;     Z[0] = zEndOfAbsorb + dZ[0]+zgap;
   
-  fieldDirection[1] = FieldDirection::up;
+  fieldDirection[1] = FieldDirectionM::up;
   dXIn[1]  = 0.8*m;     dYIn[1] = 1.5*m;
   dXOut[1] = 0.8*m;     dYOut[1]= 1.5*m;
   gapIn[1] = 0.02*m;      gapOut[1] = 0.02*m;
   dZ[1] = dZ2-zgap/2;     Z[1] = Z[0] + dZ[0] + dZ[1]+zgap;
     
-  fieldDirection[2] = FieldDirection::up;
+  fieldDirection[2] = FieldDirectionM::up;
   dXIn[2]  = 0.87*m;      dYIn[2] = 0.35*m;
   dXOut[2] = 0.65*m;      dYOut[2]= 1.21*m;
   gapIn[2] = 0.11 * m;      gapOut[2] = 0.065 * m;
   dZ[2] = dZ3-zgap/2;     Z[2] = Z[1] + dZ[1] + dZ[2] + zgap;
 
-  fieldDirection[3] = FieldDirection::up;
+  fieldDirection[3] = FieldDirectionM::up;
   dXIn[3]  = 0.65*m;      dYIn[3] = 1.21*m;
   dXOut[3] = 0.43*m;      dYOut[3]= 2.07*m;
   gapIn[3] = 0.065 * m;     gapOut[3] = 0.02 * m;
   dZ[3] = dZ4-zgap/2;     Z[3] = Z[2] + dZ[2] + dZ[3]+zgap;
 
-  fieldDirection[4] = FieldDirection::up;
+  fieldDirection[4] = FieldDirectionM::up;
   dXIn[4]  = 0.06*m;      dYIn[4] = 0.32*m;
   dXOut[4] = 0.33*m;      dYOut[4]= 0.13*m;
   gapIn[4] = 0.7*m;     gapOut[4] = 0.11*m;
   dZ[4] = dZ5-zgap/2;     Z[4] = Z[3] + dZ[3] + dZ[4]+zgap;
   
-  fieldDirection[5] = FieldDirection::down;
+  fieldDirection[5] = FieldDirectionM::down;
   dXIn[5]  = 0.05*m;      dYIn[5] = 1.12*m;
   dXOut[5] =0.16*m;     dYOut[5]= 0.05*m;
   gapIn[5] = 0.04*m;      gapOut[5] = 0.02*m;
   dZ[5] = dZ6-zgap/2;     Z[5] = Z[4] + dZ[4] + dZ[5]+zgap;
   
-  fieldDirection[6] = FieldDirection::down;
+  fieldDirection[6] = FieldDirectionM::down;
   dXIn[6]  = 0.15*m;      dYIn[6] = 2.35*m;
   dXOut[6] = 0.34*m;      dYOut[6]= 0.32*m;
   gapIn[6] = 0.05*m;      gapOut[6] = 0.08*m;
   dZ[6] = dZ7-zgap/2;     Z[6] = Z[5] + dZ[5] + dZ[6]+zgap;
   
   Double_t clip_width = 0.1*m; // clip field width by this width
-  fieldDirection[7] = FieldDirection::down;
+  fieldDirection[7] = FieldDirectionM::down;
   dXIn[7]  = 0.31*m;      dYIn[7] = 1.86*m;
   dXOut[7] = 0.9*m - clip_width;  dYOut[7]= 3.1*m;
   Double_t clip_len =
@@ -467,7 +467,7 @@ Int_t ShipMuonShield::Initialize(std::vector<TString> &magnetName,
   gapIn[7] = 0.02*m;      gapOut[7] = 0.55*m;
   dZ[7] = dZ8 - clip_len - zgap / 2;  Z[7] = Z[6] + dZ[6] + dZ[7] + zgap;
 
-  fieldDirection[8] = FieldDirection::down;
+  fieldDirection[8] = FieldDirectionM::down;
   dXIn[8]  = dXOut[7];      dYIn[8] = dYOut[7];
   dXOut[8] = dXOut[7];      dYOut[8]= dYOut[7];
   gapIn[8] = 0.55*m;      gapOut[8] = 0.55*m;
@@ -484,7 +484,7 @@ Int_t ShipMuonShield::Initialize(std::vector<TString> &magnetName,
 
   magnetName = {"1", "2", "3", "4", "5", "6", "7"};
 
-  fieldDirection[0] = FieldDirection::up;
+  fieldDirection[0] = FieldDirectionM::up;
   dXIn[0]  = 0.7*m;     dYIn[0] = 1.*m; 
   dXOut[0] = 0.7*m;     dYOut[0]= 0.8158*m;
   midGapIn[0] = 0;      midGapOut[0] = 0;
@@ -492,7 +492,7 @@ Int_t ShipMuonShield::Initialize(std::vector<TString> &magnetName,
   gapIn[0] = 20;      gapOut[0] = 20;
   dZ[0] = dZ1-zgap;     Z[0] = zEndOfAbsorb + dZ[0]+zgap;
     
-  fieldDirection[1] = FieldDirection::up;
+  fieldDirection[1] = FieldDirectionM::up;
   dXIn[1]  = 0.36*m;      dYIn[1] = 0.8158*m;
   dXOut[1] = 0.19*m;      dYOut[1]= 0.499*m;
   midGapIn[1] = 0;      midGapOut[1] = 0;
@@ -500,7 +500,7 @@ Int_t ShipMuonShield::Initialize(std::vector<TString> &magnetName,
   gapIn[1] = 88;      gapOut[1] = 122;
   dZ[1] = dZ2-zgap/2;     Z[1] = Z[0] + dZ[0] + dZ[1]+zgap;
   
-  fieldDirection[2] = FieldDirection::down;
+  fieldDirection[2] = FieldDirectionM::down;
   dXIn[2]  = 0.075*m;     dYIn[2] = 0.499*m;
   dXOut[2] = 0.25*m;      dYOut[2]= 1.10162*m;
   midGapIn[2] = 0;      midGapOut[2] = 0;
@@ -508,7 +508,7 @@ Int_t ShipMuonShield::Initialize(std::vector<TString> &magnetName,
   gapIn[2] = 0;       gapOut[2] = 0;
   dZ[2] = dZ3-zgap/2;     Z[2] = Z[1] + dZ[1] + dZ[2]+zgap;
     
-  fieldDirection[3] = FieldDirection::down;
+  fieldDirection[3] = FieldDirectionM::down;
   dXIn[3]  = 0.25*m;      dYIn[3] = 1.10262*m;
   dXOut[3] = 0.3*m;     dYOut[3]= 1.82697*m;
   midGapIn[3] = 0;      midGapOut[3] = 0;
@@ -516,7 +516,7 @@ Int_t ShipMuonShield::Initialize(std::vector<TString> &magnetName,
   gapIn[3] = 0;       gapOut[3] = 25;
   dZ[3] = dZ4-zgap/2;     Z[3] = Z[2] + dZ[2] + dZ[3]+zgap;
 
-  fieldDirection[4] = FieldDirection::down;
+  fieldDirection[4] = FieldDirectionM::down;
   dXIn[4]  = 0.3*m;     dYIn[4] = 1.82697*m;
   dXOut[4] = 0.4*m;     dYOut[4]= 2.55131*m;
   midGapIn[4] = 5;      midGapOut[4] = 25;
@@ -524,7 +524,7 @@ Int_t ShipMuonShield::Initialize(std::vector<TString> &magnetName,
   gapIn[4] = 20;      gapOut[4] = 20;
   dZ[4] = dZ6-zgap/2;     Z[4] = Z[3] + dZ[3] + dZ[4]+zgap;
   
-  fieldDirection[5] = FieldDirection::down;
+  fieldDirection[5] = FieldDirectionM::down;
   dXIn[5]  = 0.4*m;     dYIn[5] = 2.55131*m;
   dXOut[5] =0.4*m;      dYOut[5]= 3.27566*m;
   midGapIn[5] = 25;       midGapOut[5] = 65;
@@ -532,7 +532,7 @@ Int_t ShipMuonShield::Initialize(std::vector<TString> &magnetName,
   gapIn[5] = 20;      gapOut[5] = 20;
   dZ[5] = dZ7-zgap/2;     Z[5] = Z[4] + dZ[4] + dZ[5]+zgap;
   
-  fieldDirection[6] = FieldDirection::down;
+  fieldDirection[6] = FieldDirectionM::down;
   dXIn[6]  = 0.4*m;     dYIn[6] = 3.27566*m;
   dXOut[6] = 0.75*m;      dYOut[6]= 4*m;
   midGapIn[6] = 65;             midGapOut[6] = 75;
