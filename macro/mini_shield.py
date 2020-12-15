@@ -85,7 +85,7 @@ if (simEngine == "Ntuple" or simEngine == "MuonBack") and defaultInputFile :
   sys.exit()
 ROOT.gRandom.SetSeed(options.theSeed)  # this should be propagated via ROOT to Pythia8 and Geant4VMC
 shipRoot_conf.configure(0)     # load basic libraries, prepare atexit for python
-ship_geo = ConfigRegistry.loadpy("$FAIRSHIP/geometry/miniship_config.py")
+ship_geo = ConfigRegistry.loadpy("$FAIRSHIP/geometry/geometry_config.py")
 
 # Output file name, add dy to be able to setup geometry with ambiguities.
 
