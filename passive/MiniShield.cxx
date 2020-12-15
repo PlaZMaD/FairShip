@@ -220,7 +220,7 @@ void MiniShield::CreateMagnet(TString magnetName,TGeoMedium* medium,TGeoVolume *
   }
 
 Int_t ShipMuonShield::Initialize(std::vector<TString> &magnetName,
-        std::vector<FieldDirection> &fieldDirection,
+        std::vector<FieldDirectionM> &fieldDirection,
         std::vector<Double_t> &dXIn, std::vector<Double_t> &dYIn,
         std::vector<Double_t> &dXOut, std::vector<Double_t> &dYOut,
         std::vector<Double_t> &dZ, std::vector<Double_t> &midGapIn,
@@ -572,9 +572,9 @@ void MiniShield::ConstructGeometry()
        "Magn4", "Magn5", "Magn6", "Magn7"
      };
     fieldDirection = {
-        FieldDirection::up, FieldDirection::up, FieldDirection::up,
-        FieldDirection::up, FieldDirection::up, FieldDirection::down,
-        FieldDirection::down, FieldDirection::down, FieldDirection::down,
+        FieldDirectionM::up, FieldDirectionM::up, FieldDirectionM::up,
+        FieldDirectionM::up, FieldDirectionM::up, FieldDirectionM::down,
+        FieldDirectionM::down, FieldDirectionM::down, FieldDirectionM::down,
      };
      dZgap = 0.1 * m;
      zGap = 0.5 * dZgap;

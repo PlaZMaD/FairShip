@@ -13,7 +13,7 @@
 #include <vector>
 #include <array>
 
-enum class FieldDirection : bool { up, down };
+enum class FieldDirectionM : bool { up, down };
 
 class MiniShield : public FairModule
 {
@@ -68,7 +68,7 @@ class MiniShield : public FairModule
 		  Double_t z_translation);
 
   Int_t Initialize(std::vector<TString> &magnetName,
-      std::vector<FieldDirection> &fieldDirection,
+      std::vector<FieldDirectionM> &fieldDirection,
       std::vector<Double_t> &dXIn, std::vector<Double_t> &dYIn,
       std::vector<Double_t> &dXOut, std::vector<Double_t> &dYOut,
       std::vector<Double_t> &dZ, std::vector<Double_t> &midGapIn,
