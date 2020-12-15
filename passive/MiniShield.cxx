@@ -561,6 +561,14 @@ void MiniShield::ConstructGeometry()
     top->AddNode(tShield, 1);
 
 
+    std::vector<TString> magnetName;
+    std::vector<FieldDirectionM> fieldDirection;
+    std::vector<Double_t> dXIn, dYIn, dXOut, dYOut, dZf, midGapIn, midGapOut,
+    HmainSideMagIn, HmainSideMagOut, gapIn, gapOut, Z;
+    const Int_t nMagnets = Initialize(magnetName, fieldDirection, dXIn, dYIn, dXOut, dYOut, dZf,
+    midGapIn, midGapOut, HmainSideMagIn, HmainSideMagOut, gapIn,
+    gapOut, Z);
+
     float mField = 1.6 * tesla;
     TGeoUniformMagField *fieldsAbsorber[4] = {
       new TGeoUniformMagField(0., mField, 0.),
@@ -568,14 +576,7 @@ void MiniShield::ConstructGeometry()
       new TGeoUniformMagField(-mField, 0., 0.),
       new TGeoUniformMagField(mField, 0., 0.)
     };
-    // magnetName = {"MagnAbsorb1", "MagnAbsorb2", "Magn1", "Magn2", "Magn3",
-    //    "Magn4", "Magn5", "Magn6", "Magn7"
-    //  };
-    // fieldDirection = {
-    //     FieldDirectionM::up, FieldDirectionM::up, FieldDirectionM::up,
-    //     FieldDirectionM::up, FieldDirectionM::up, FieldDirectionM::down,
-    //     FieldDirectionM::down, FieldDirectionM::down, FieldDirectionM::down,
-    //  };
+
     for (Int_t nM = 0; nM < 2; nM++) {
     CreateMagnet(magnetName[nM], iron, tShield, fieldsAbsorber,
            fieldDirection[nM], dXIn[nM], dYIn[nM], dXOut[nM],
