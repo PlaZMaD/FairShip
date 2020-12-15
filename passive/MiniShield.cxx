@@ -980,5 +980,5 @@ void MiniShield::ConstructGeometry()
      Fatal("ShipMuonShield","Design %i does not match implemented designs",fDesign);
     }
 }   
-}
+
 ClassImp(MiniShield)

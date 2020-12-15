@@ -86,7 +86,7 @@ def configure(run,ship_geo):
  if not hasattr(ship_geo,'NuTauTT') : ship_geo.NuTauTT= AttrDict(z=0*u.cm)
  if not hasattr(ship_geo.NuTauTT,'design') : ship_geo.NuTauTT.design = 0
  if not hasattr(ship_geo,'EcalOption'):     ship_geo.EcalOption = 1      
- latestShipGeo = ConfigRegistry.loadpy("$FAIRSHIP/geometry/miniship_config.py")
+ latestShipGeo = ConfigRegistry.loadpy("$FAIRSHIP/geometry/geometry_config.py",Yheight = ship_geo.Yheight/u.m, tankDesign = ship_geo.tankDesign, muShieldDesign = ship_geo.muShieldDesign, nuTauTargetDesign = ship_geo.nuTauTargetDesign, muShieldGeo = ship_geo.muShieldGeo)
 # -----Create media-------------------------------------------------
  run.SetMaterials("media.geo")  # Materials
 # ------------------------------------------------------------------------
@@ -97,8 +97,13 @@ def configure(run,ship_geo):
  detectorList.append(cave)
  # MiniShield = ROOT.MiniShield("MiniShield") 
 
- TargetStation = ROOT.ShipTargetStation("TargetStation",ship_geo.target.length,
-                                                        ship_geo.target.z,ship_geo.targetOpt,ship_geo.target.sl);
+ if ship_geo.muShieldDesign in [6, 7, 8, 9, 10]:  # magnetized hadron absorber defined in ShipMuonShield 
+  TargetStation = ROOT.ShipTargetStation("TargetStation",ship_geo.target.length,
+                                                        ship_geo.target.z,ship_geo.targetOpt,ship_geo.target.sl)
+ else:
+  TargetStation = ROOT.ShipTargetStation("TargetStation",ship_geo.target.length,ship_geo.hadronAbsorber.length,
+                                                        ship_geo.target.z,ship_geo.hadronAbsorber.z,ship_geo.targetOpt,ship_geo.target.sl)
+   
  if ship_geo.targetOpt>10:
   slices_length   = ROOT.std.vector('float')()
   slices_material = ROOT.std.vector('std::string')()
@@ -111,8 +116,9 @@ def configure(run,ship_geo):
 
 
 
+
  MiniShield = ROOT.MiniShield(
-            "MiniShield", 9, "MiniMuonShield",
+      "MiniShield", ship_geo.muShieldDesign, "MiniMuonShield",
       ship_geo.muShield.z, ship_geo.muShield.dZ0, ship_geo.muShield.dZ1,
       ship_geo.muShield.dZ2, ship_geo.muShield.dZ3,
       ship_geo.muShield.dZ4, ship_geo.muShield.dZ5,
@@ -121,8 +127,9 @@ def configure(run,ship_geo):
       ship_geo.muShield.LE, ship_geo.Yheight * 4. / 10.,
       ship_geo.cave.floorHeightMuonShield,ship_geo.muShield.Field,
       ship_geo.muShieldWithCobaltMagnet, ship_geo.muShieldStepGeo,
-      True, True)
+      ship_geo.hadronAbsorber.WithConstField, ship_geo.muShield.WithConstField)
  detectorList.append(MiniShield)
+ 
  fluxDet = ROOT.fluxDet("fluxDet", ROOT.kTRUE)
  detectorList.append(fluxDet)
 
