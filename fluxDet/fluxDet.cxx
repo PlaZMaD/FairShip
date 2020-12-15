@@ -178,13 +178,13 @@ void fluxDet::ConstructGeometry()
 fluxDetPoint* fluxDet::AddHit(Int_t trackID, Int_t detID,
                              TVector3 pos, TVector3 mom,
                              Double_t time, Double_t length,
-                             Double_t eLoss,Int_t pdgcode,TVector3 Lpos, TVector3 Lmom)
+                             Double_t eLoss,Int_t pdgcode)//,TVector3 Lpos, TVector3 Lmom)
 {
   TClonesArray& clref = *ffluxDetPointCollection;
   Int_t size = clref.GetEntriesFast();
   // cout << "veto hit called "<< pos.z()<<endl;
   return new(clref[size]) fluxDetPoint(trackID, detID, pos, mom,
-             time, length, eLoss, pdgCode,Lpos,Lmom);
+             time, length, eLoss, pdgCode)//,Lpos,Lmom);
 }
 
 
@@ -200,10 +200,11 @@ Bool_t  fluxDet::ProcessHits(FairVolume* vol)
     Int_t pdgCode = p->GetPdgCode();
     Int_t uniqueId;
     gMC->CurrentVolID(uniqueId);
-
+    Float_t fTime   = gMC->TrackTime() * 1.0e09;
+    Float_t fLength = gMC->TrackLength();
   
 
-	AddHit(fTrackID, uniqueId, TVector3(fPos.X(), fPos.Y(),  fPos.Z()), TVector3(fMom.Px(), fMom.Py(), fMom.Pz()), pdgCode);
+	AddHit(fTrackID, uniqueId, TVector3(fPos.X(), fPos.Y(),  fPos.Z()), TVector3(fMom.Px(), fMom.Py(), fMom.Pz()), fTime, fLength, pdgCode);
 	// Increment number of flux det points in TParticle
 	ShipStack* stack = (ShipStack*) gMC->GetStack();
 	stack->AddPoint(kfluxDet);
