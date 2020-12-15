@@ -18,6 +18,11 @@
 #include <iostream>                     // for operator<<, basic_ostream, etc
 
 
+Double_t cm = 1;
+Double_t m = 100 * cm;
+Double_t mm = 0.1 * cm;
+Double_t kilogauss = 1.;
+Double_t tesla = 10 * kilogauss;
 
 MiniShield::~MiniShield() {}
 MiniShield::MiniShield() : FairModule("MiniShield", "") {}
@@ -70,7 +75,7 @@ MiniShield::MiniShield(const char* name, const Int_t Design, const char* Title,
      fMiniShieldLength = L1;   
     }
  if (fDesign==2 || fDesign==3 || fDesign==4 ){
-     Fatal("MiniShield","Design %i not anymore supported",fDesign);
+     Fatal("ShipMuonShield","Design %i not anymore supported",fDesign);
     }
  if (fDesign==5 || fDesign==6){
      dZ0 = L0;
@@ -95,12 +100,12 @@ MiniShield::MiniShield(const char* name, const Int_t Design, const char* Title,
      dZ6 = L6;
      dZ7 = L7;
      dZ8 = L8;
-     fMiniShieldLength = 
-	  2 * (dZ1 + dZ2 + dZ3 + dZ4 + dZ5 + dZ6 + dZ7 + dZ8) + LE;
+     fMiniShieldLength =
+   2 * (dZ1 + dZ2 + dZ3 + dZ4 + dZ5 + dZ6 + dZ7 + dZ8) + LE;
    }
     
  fFloor = (fDesign >= 7) ? floor : 0;
- fMiniShieldLength = 500;
+
  zEndOfAbsorb = Z + dZ0 - fMiniShieldLength/2.;   
  if(fDesign>=6){zEndOfAbsorb = Z - fMiniShieldLength/2.;}
  fSupport = true;
