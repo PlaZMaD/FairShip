@@ -64,6 +64,8 @@ parser.add_argument("-i", "--firstEvent",dest="firstEvent",  help="First event o
 parser.add_argument("-s", "--seed",dest="theSeed",  help="Seed for random number. Only for experts, see TRrandom::SetSeed documentation", required=False,  default=0, type=int)
 parser.add_argument("-S", "--sameSeed",dest="sameSeed",  help="can be set to an integer for the muonBackground simulation with specific seed for each muon, only for experts!"\
                                             ,required=False,  default=False, type=int)
+parser.add_argument("--muShieldDesign", dest="ds",  help="5=TP muon shield, 6=magnetized hadron, 7=short magnet design, 9=optimised with T4 as constraint, 8=requires config file\
+                                            ,10=with field map for hadron absorber", required=False, default=globalDesigns[default]['ds'], type=int)
 group.add_argument("-f",        dest="inputFile",       help="Input file if not default file", required=False, default=False)
 parser.add_argument("-g",        dest="geofile",       help="geofile for muon shield geometry, for experts only", required=False, default=None)
 parser.add_argument("-o", "--output",dest="outputDir",  help="Output directory", required=False,  default=".")
@@ -85,7 +87,10 @@ if (simEngine == "Ntuple" or simEngine == "MuonBack") and defaultInputFile :
   sys.exit()
 ROOT.gRandom.SetSeed(options.theSeed)  # this should be propagated via ROOT to Pythia8 and Geant4VMC
 shipRoot_conf.configure(0)     # load basic libraries, prepare atexit for python
-ship_geo = ConfigRegistry.loadpy("$FAIRSHIP/geometry/geometry_config.py")
+ship_geo = ConfigRegistry.loadpy("$FAIRSHIP/geometry/geometry_config.py", Yheight = options.dy,
+                                                muShieldDesign = options.ds, 
+                                                muShieldGeo=options.geofile,
+                                                muShieldStepGeo=False, muShieldWithCobaltMagnet=False)
 
 # Output file name, add dy to be able to setup geometry with ambiguities.
 

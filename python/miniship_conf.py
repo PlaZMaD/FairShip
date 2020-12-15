@@ -36,7 +36,7 @@ def posHcal(z,hfile,HcalOption):
  for l in f.readlines():
    if rewrite:
     if not l.find("ZPos")<0:
-      l ="ZPos="+str(z)+ "	#Position of Hcal  center	[cm]\n"
+      l ="ZPos="+str(z)+ "  #Position of Hcal  center [cm]\n"
     fn.write(l)
    if not l.find("HcalZSize")<0:
      HcalZSize = float(l[len('HcalZSize')+1:].split('#')[0]) 
@@ -60,7 +60,7 @@ def makeEcalGeoFile(z,efile):
  for l in f.readlines():
    if rewrite:
     if not l.find("ZPos")<0:
-      l ="ZPos="+str(z)+ "	#Position of Ecal start		[cm]\n"
+      l ="ZPos="+str(z)+ "  #Position of Ecal start   [cm]\n"
     fn.write(l)
    if not l.find("EcalZSize")<0:
      EcalZSize = float(l[len('EcalZSize')+1:].split('#')[0]) 
@@ -93,8 +93,10 @@ def configure(run,ship_geo):
   
 # -----Create geometry----------------------------------------------
  cave= ROOT.ShipCave("CAVE")
- cave.SetGeometryFileName("cave.geo")
+ if ship_geo.tankDesign < 5: cave.SetGeometryFileName("cave.geo")
+ else: cave.SetGeometryFileName("caveWithAir.geo")
  detectorList.append(cave)
+
  # MiniShield = ROOT.MiniShield("MiniShield") 
 
  if ship_geo.muShieldDesign in [6, 7, 8, 9, 10]:  # magnetized hadron absorber defined in ShipMuonShield 
