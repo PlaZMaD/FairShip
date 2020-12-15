@@ -360,7 +360,7 @@ void MiniShield::CreateMagnet(TString magnetName,TGeoMedium* medium,TGeoVolume *
     
     switch (fieldDirection){
 
-    case FieldDirection::up: 
+    case FieldDirectionM::up: 
       CreateArb8(magnetName + str1L, medium, dZ, cornersMainL, color[0], fields[0], tShield,  0, 0, Z, stepGeo);
       CreateArb8(magnetName + str1R, medium, dZ, cornersMainR, color[0], fields[0], tShield,  0, 0, Z, stepGeo);
       CreateArb8(magnetName + str2, medium, dZ, cornersMainSideL, color[1], fields[1], tShield,  0, 0, Z, stepGeo);
@@ -376,7 +376,7 @@ void MiniShield::CreateMagnet(TString magnetName,TGeoMedium* medium,TGeoVolume *
       CreateArb8(magnetName + str10, medium, dZ, cornersBL, color[2], fields[2], tShield,  0, 0, Z, stepGeo);
       CreateArb8(magnetName + str11, medium, dZ, cornersBR, color[3], fields[3], tShield,  0, 0, Z, stepGeo);
       break;
-    case FieldDirection::down:
+    case FieldDirectionM::down:
       CreateArb8(magnetName + str1L, medium, dZ, cornersMainL, color[1], fields[1], tShield,  0, 0, Z, stepGeo);
       CreateArb8(magnetName + str1R, medium, dZ, cornersMainR, color[1], fields[1], tShield,  0, 0, Z, stepGeo);
       CreateArb8(magnetName + str2, medium, dZ, cornersMainSideL, color[0], fields[0], tShield,  0, 0, Z, stepGeo);
