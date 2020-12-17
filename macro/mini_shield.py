@@ -70,16 +70,35 @@ group.add_argument("-f",        dest="inputFile",       help="Input file if not 
 parser.add_argument("-g",        dest="geofile",       help="geofile for muon shield geometry, for experts only", required=False, default=None)
 parser.add_argument("-o", "--output",dest="outputDir",  help="Output directory", required=False,  default=".")
 parser.add_argument("--charm", dest="charm",  help="!=0 create charm detector instead of SHiP", required=False, default=0)
+parser.add_argument("--PG",      dest="pg",      help="Use Particle Gun", required=False, action="store_true")
+parser.add_argument("--pID",     dest="pID",     help="id of particle used by the gun (default=22)", required=False, default=22, type=int)
+parser.add_argument("--Estart",  dest="Estart",  help="start of energy range of particle gun for muflux detector (default=10 GeV)", required=False, default=10, type=float)
+parser.add_argument("--Eend",    dest="Eend",    help="end of energy range of particle gun for muflux detector (default=10 GeV)", required=False, default=10, type=float)
 
 
 options = parser.parse_args()
 
 if options.ntuple:   simEngine = "Ntuple"
 if options.muonback: simEngine = "MuonBack"
+if options.pg:       simEngine = "PG"
 if options.inputFile:
   if options.inputFile == "none": options.inputFile = None
   inputFile = options.inputFile
   defaultInputFile = False
+
+
+if simEngine == "PG": 
+  myPgun = ROOT.FairBoxGenerator(options.pID, 1)
+  myPgun.SetPRange(options.Estart,options.Eend)
+  myPgun.SetPhiRange(0, 360) # // Azimuth angle range [degree]
+  myPgun.SetXYZ(0.*u.cm, 0.*u.cm, -7200.*u.cm) 
+  if options.charm!=0:
+     myPgun.SetThetaRange(0,6) # // Pdefault for muon flux
+     primGen.SetTarget(ship_geo.target.z0,0.)
+  else:  
+     myPgun.SetThetaRange(0,0) # // Polar angle in lab system range [degree]
+  primGen.AddGenerator(myPgun)
+
 
 if (simEngine == "Ntuple" or simEngine == "MuonBack") and defaultInputFile :
   print('input file required if simEngine = Ntuple or MuonBack')
