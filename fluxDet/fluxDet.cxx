@@ -169,6 +169,10 @@ void fluxDet::ConstructGeometry()
   AddSensitiveVolume(fDetector);
   top->AddNode(fDetector, 1, new TGeoTranslation(0,0,fzPos));
 
+  fpDetector = gGeoManager->MakeBox("pre_fluxDet", vacuums, fxSize, fySize, fzSize);
+  fpDetector->SetLineColor(kBlue);
+  AddSensitiveVolume(fpDetector);
+  top->AddNode(fpDetector, 1, new TGeoTranslation(0,0, -6455));
   ///////////////////////////////////////////////////////
 
   return;
