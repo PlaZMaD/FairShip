@@ -150,7 +150,7 @@ void MiniShield::CreateArb8(TString arbName, TGeoMedium *medium,
   TGeoVolume *magF =
       gGeoManager->MakeArb8(arbName, medium, dZ, corners.data());
   magF->SetLineColor(color);
-  if (fDesign != 11 || arbName.Contains("Absorb")){magF->SetField(magField);}
+  if (fDesign != 11 &&  !arbName.Contains("Absorb")){magF->SetField(magField);}
   tShield->AddNode(magF, 1, new TGeoTranslation(x_translation, y_translation,
 						z_translation));
 }
@@ -766,15 +766,15 @@ void MiniShield::ConstructGeometry()
 
       if (fDesign == 6){
   Double_t dA = 3*m;
-  CreateMagnet("AbsorberStop-1",iron,tShield,fields,FieldDirectionM::up,
+  CreateMagnet("AbsorberStop-1",concrete,tShield,fields,FieldDirectionM::up,
       dA/6.,dA/6.,dA/6.,dA/6.,dZ0/3.,0,0,dA/12.,dA/12.,0,0,zEndOfAbsorb - 5.*dZ0/3.,0, false);
-  CreateMagnet("AbsorberStop-2",iron,tShield,fields,FieldDirectionM::up,
+  CreateMagnet("AbsorberStop-2",concrete,tShield,fields,FieldDirectionM::up,
       dA/2.,dA/2.,dA/2.,dA/2.,dZ0*2./3.,0,0,dA/4.,dA/4.,0,0,zEndOfAbsorb - 2.*dZ0/3.,0, false);
         TGeoBBox* fullAbsorber = new TGeoBBox("fullAbsorber", dA, dA, dZ0/3.);
         TGeoBBox* cutOut = new TGeoBBox("cutout", dA/3.+20*cm, dA/3.+20*cm, dZ0/3.+0.1*mm); //no idea why to add 20cm
         TGeoSubtraction *subtraction = new TGeoSubtraction("fullAbsorber","cutout");
         TGeoCompositeShape *Tc = new TGeoCompositeShape("passiveAbsorberStopSubtr", subtraction);
-        TGeoVolume* passivAbsorber = new TGeoVolume("passiveAbsorberStop-1",Tc, iron);
+        TGeoVolume* passivAbsorber = new TGeoVolume("passiveAbsorberStop-1",Tc, concrete);
         tShield->AddNode(passivAbsorber, 1, new TGeoTranslation(0,0,zEndOfAbsorb - 5.*dZ0/3.));
       } else if (fDesign >= 7) {
         float mField = 1.6 * tesla;
@@ -786,7 +786,7 @@ void MiniShield::ConstructGeometry()
   };
 
   for (Int_t nM = (fDesign == 7) ? 0 : 1; nM < 2; nM++) {
-    CreateMagnet(magnetName[nM], iron, tShield, fieldsAbsorber,
+    CreateMagnet(magnetName[nM], concrete, tShield, fieldsAbsorber,
            fieldDirection[nM], dXIn[nM], dYIn[nM], dXOut[nM],
            dYOut[nM], dZf[nM], midGapIn[nM], midGapOut[nM],
            HmainSideMagIn[nM], HmainSideMagOut[nM], gapIn[nM],
@@ -834,7 +834,7 @@ void MiniShield::ConstructGeometry()
     "Absorber", "absorber" + absorber_magnet_components); // cutting out
                 // magnet parts
                 // from absorber
-      TGeoVolume *absorber = new TGeoVolume("AbsorberVol", absorberShape, iron);
+      TGeoVolume *absorber = new TGeoVolume("AbsorberVol", absorberShape, concrete);
       absorber->SetLineColor(42); // brown / light red
       tShield->AddNode(absorber, 1, new TGeoTranslation(0, 0, zEndOfAbsorb + absorber_half_length + absorber_offset));
 
@@ -933,11 +933,11 @@ void MiniShield::ConstructGeometry()
   //     }
           
       } else {
-  CreateTube("AbsorberAdd", iron, 15, 400, dZ0, 43, tShield, 0, 0, zEndOfAbsorb - dZ0);
-  CreateTube("AbsorberAddCore", iron, 0, 15, dZ0, 38, tShield, 0, 0, zEndOfAbsorb - dZ0);
+  CreateTube("AbsorberAdd", concrete, 15, 400, dZ0, 43, tShield, 0, 0, zEndOfAbsorb - dZ0);
+  CreateTube("AbsorberAddCore", concrete, 0, 15, dZ0, 38, tShield, 0, 0, zEndOfAbsorb - dZ0);
 
   for (Int_t nM = 0; nM < 2; nM++) {
-    CreateMagnet(magnetName[nM],iron,tShield,fields,fieldDirection[nM],
+    CreateMagnet(magnetName[nM],concrete,tShield,fields,fieldDirection[nM],
        dXIn[nM],dYIn[nM],dXOut[nM],dYOut[nM],dZf[nM],
        midGapIn[nM],midGapOut[nM],HmainSideMagIn[nM],HmainSideMagOut[nM],
        gapIn[nM],gapOut[nM],Z[nM],0, fStepGeo);
