@@ -72,6 +72,7 @@ parser.add_argument("-o", "--output",dest="outputDir",  help="Output directory",
 parser.add_argument("--charm", dest="charm",  help="!=0 create charm detector instead of SHiP", required=False, default=0)
 parser.add_argument("--PG",      dest="pg",      help="Use Particle Gun", required=False, action="store_true")
 parser.add_argument("--pID",     dest="pID",     help="id of particle used by the gun (default=22)", required=False, default=22, type=int)
+parser.add_argument("--factor",     dest="factor", required=False, default=1.0, type=float)
 parser.add_argument("--Estart",  dest="Estart",  help="start of energy range of particle gun for muflux detector (default=10 GeV)", required=False, default=10, type=float)
 parser.add_argument("--Eend",    dest="Eend",    help="end of energy range of particle gun for muflux detector (default=10 GeV)", required=False, default=10, type=float)
 
@@ -158,7 +159,7 @@ if simEngine == "PG":
   else:  
      myPgun.SetThetaRange(0,0) # // Polar angle in lab system range [degree]
   primGen.AddGenerator(myPgun)
-  
+
 if simEngine == "MuonBack":
 # reading muon tracks from previous Pythia8/Geant4 simulation with charm replaced by cascade production 
  fileType = ut.checkFileExists(inputFile)
@@ -170,7 +171,7 @@ if simEngine == "MuonBack":
  #
  MuonBackgen = ROOT.MuonBackGenerator()
  # MuonBackgen.FollowAllParticles() # will follow all particles after hadron absorber, not only muons
- MuonBackgen.Init(inputFile,options.firstEvent,options.phiRandom)
+ MuonBackgen.Init(inputFile,options.firstEvent, options.factor, options.phiRandom)
  if options.charm == 0: MuonBackgen.SetSmearBeam(5 * u.cm) # radius of ring, thickness 8mm
  elif DownScaleDiMuon: 
     if inputFile[0:4] == "/eos": test = os.environ["EOSSHIP"]+inputFile

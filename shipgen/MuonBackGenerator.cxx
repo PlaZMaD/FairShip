@@ -23,10 +23,11 @@ MuonBackGenerator::MuonBackGenerator() {
 // -------------------------------------------------------------------------
 // -----   Default constructor   -------------------------------------------
 Bool_t MuonBackGenerator::Init(const char* fileName) {
-  return Init(fileName, 0, false);
+  return Init(fileName, 0, 1.0, false);
 }
 // -----   Default constructor   -------------------------------------------
-Bool_t MuonBackGenerator::Init(const char* fileName, const int firstEvent, const Bool_t fl = false ) {
+Bool_t MuonBackGenerator::Init(const char* fileName, const int firstEvent, const Double_t mFact, const Bool_t fl = false ) {
+  factor = mFact;
   LOGF(info, "Opening input file %s", fileName);
   if (0 == strncmp("/eos",fileName,4) ) {
      TString tmp = gSystem->Getenv("EOSSHIP");
@@ -102,7 +103,6 @@ Bool_t MuonBackGenerator::checkDiMuon(Int_t muIndex){
 // -----   Passing the event   ---------------------------------------------
 Bool_t MuonBackGenerator::ReadEvent(FairPrimaryGenerator* cpg)
 {
-  Double_t factor = 1.0;
   TDatabasePDG* pdgBase = TDatabasePDG::Instance();
   Double_t mass,e,tof,phi;
   Double_t dx = 0, dy = 0;

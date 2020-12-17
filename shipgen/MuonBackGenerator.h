@@ -21,7 +21,7 @@ class MuonBackGenerator : public FairGenerator
   
   /** public method ReadEvent **/
   Bool_t ReadEvent(FairPrimaryGenerator*);  
-  virtual Bool_t Init(const char*, int, const Bool_t fl); //!
+  virtual Bool_t Init(const char*, int, const Double_t, const Bool_t fl); //!
   virtual Bool_t Init(const char*); //!
   Int_t GetNevents();//!
   void CloseFile();//!
@@ -42,6 +42,7 @@ protected:
   TClonesArray* vetoPoints; //!
   TFile* fInputFile;    //! 
   TTree* fTree;         //! 
+  Double_t factor;
   int fNevents;
   float f_zOffset;      //!
   int fn;
