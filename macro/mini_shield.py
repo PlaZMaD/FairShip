@@ -87,17 +87,7 @@ if options.inputFile:
   defaultInputFile = False
 
 
-if simEngine == "PG": 
-  myPgun = ROOT.FairBoxGenerator(options.pID, 1)
-  myPgun.SetPRange(options.Estart,options.Eend)
-  myPgun.SetPhiRange(0, 360) # // Azimuth angle range [degree]
-  myPgun.SetXYZ(0.*u.cm, 0.*u.cm, -7200.*u.cm) 
-  if options.charm!=0:
-     myPgun.SetThetaRange(0,6) # // Pdefault for muon flux
-     primGen.SetTarget(ship_geo.target.z0,0.)
-  else:  
-     myPgun.SetThetaRange(0,0) # // Polar angle in lab system range [degree]
-  primGen.AddGenerator(myPgun)
+
 
 
 if (simEngine == "Ntuple" or simEngine == "MuonBack") and defaultInputFile :
@@ -157,6 +147,18 @@ if simEngine == "Ntuple":
  options.nEvents = min(options.nEvents,Ntuplegen.GetNevents())
  print('Process ',options.nEvents,' from input file')
 #
+if simEngine == "PG": 
+  myPgun = ROOT.FairBoxGenerator(options.pID, 1)
+  myPgun.SetPRange(options.Estart,options.Eend)
+  myPgun.SetPhiRange(0, 360) # // Azimuth angle range [degree]
+  myPgun.SetXYZ(0.*u.cm, 0.*u.cm, -7200.*u.cm) 
+  if options.charm!=0:
+     myPgun.SetThetaRange(0,6) # // Pdefault for muon flux
+     primGen.SetTarget(ship_geo.target.z0,0.)
+  else:  
+     myPgun.SetThetaRange(0,0) # // Polar angle in lab system range [degree]
+  primGen.AddGenerator(myPgun)
+  
 if simEngine == "MuonBack":
 # reading muon tracks from previous Pythia8/Geant4 simulation with charm replaced by cascade production 
  fileType = ut.checkFileExists(inputFile)
