@@ -60,6 +60,7 @@ class fluxDet : public FairDetector
     Double_t fzPos;     //!  z-position of flux plane			
 
     TGeoVolume* fDetector; // flux detector object
+    TGeoVolume* fpDetector;
 
     /** container for data points */
     TClonesArray* ffluxDetPointCollection;
