@@ -102,7 +102,7 @@ Bool_t MuonBackGenerator::checkDiMuon(Int_t muIndex){
 // -----   Passing the event   ---------------------------------------------
 Bool_t MuonBackGenerator::ReadEvent(FairPrimaryGenerator* cpg)
 {
-  Double_t factor = 5;
+  Double_t factor = 1.0;
   TDatabasePDG* pdgBase = TDatabasePDG::Instance();
   Double_t mass,e,tof,phi;
   Double_t dx = 0, dy = 0;
@@ -118,9 +118,9 @@ Bool_t MuonBackGenerator::ReadEvent(FairPrimaryGenerator* cpg)
    }
 // test if we have a muon, don't look at neutrinos:
    if (TMath::Abs(int(id))==13) {
-        px = px/factor;
-        py = py/factor;
-        pz = pz/factor;
+        px = px*factor;
+        py = py*factor;
+        pz = pz*factor;
         mass = pdgBase->GetParticle(id)->Mass();
         e = TMath::Sqrt( px*px+py*py+pz*pz+mass*mass );
         tof = 0;
@@ -184,9 +184,9 @@ Bool_t MuonBackGenerator::ReadEvent(FairPrimaryGenerator* cpg)
      for (unsigned i = 0; i< MCTrack->GetEntries();  i++ ){
        ShipMCTrack* track = (ShipMCTrack*)MCTrack->At(i);
        Int_t abspid = TMath::Abs(track->GetPdgCode());
-       px = track->GetPx()/factor;
-       py = track->GetPy()/factor;
-       pz = track->GetPz()/factor;
+       px = track->GetPx()*factor;
+       py = track->GetPy()*factor;
+       pz = track->GetPz()*factor;
        if (fPhiRandomize){
         Double_t phi0 = TMath::ATan2(py,px);
         Double_t pt  = track->GetPt();
@@ -208,9 +208,9 @@ Bool_t MuonBackGenerator::ReadEvent(FairPrimaryGenerator* cpg)
            TVector3 lmv = v->LastMom();
            if (abspid == 22){ e=lmv.Mag();}
            else{ e = TMath::Sqrt(lmv.Mag2()+(track->GetMass())*(track->GetMass()));}
-           px = lmv[0]/factor;
-           py = lmv[1]/factor;
-           pz = lmv[2]/factor;
+           px = lmv[0]*factor;
+           py = lmv[1]*factor;
+           pz = lmv[2]*factor;
            vx = lpv[0];
            vy = lpv[1];
            vz = lpv[2];
