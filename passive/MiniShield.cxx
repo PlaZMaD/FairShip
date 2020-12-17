@@ -741,7 +741,7 @@ void MiniShield::ConstructGeometry()
     TGeoMedium *concrete  =gGeoManager->GetMedium("Concrete");
 
     Double_t ironField = fField*tesla;
-    TGeoUniformMagField *mainField = new TGeoUniformMagField(0., 2.0*tesla, 0.);
+    TGeoUniformMagField *mainField = new TGeoUniformMagField(0., 1.6*tesla, 0.);
    
 	  CreateMagnet("MiniShield",iron,tShield,mainField, 500./2., 500./2., 500./2.0, -6200.);
 
