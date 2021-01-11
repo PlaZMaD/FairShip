@@ -64,6 +64,7 @@ MiniShield::MiniShield(const char* name, const Int_t Design, const char* Title,
                                const Bool_t WithConstAbsorberField, const Bool_t WithConstShieldField)
   : FairModule(name ,Title)
 {
+ // optParams = [10, 20, 30];
  fDesign = Design;
  fField  = field;
  fGeofile = "";
@@ -110,7 +111,7 @@ MiniShield::MiniShield(const char* name, const Int_t Design, const char* Title,
  if(fDesign>=6){zEndOfAbsorb = Z - fMiniShieldLength/2.;}
  fSupport = true;
 }
-MiniShield::MiniShield(Double_t* params):FairModule("MiniShield", "opt_config")
+MiniShield::MiniShield(std::vector<Double_t> params):FairModule("MiniShield", "opt_config")
 {
   optParams = params;
   nParts = params[1];

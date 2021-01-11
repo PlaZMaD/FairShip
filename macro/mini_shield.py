@@ -75,7 +75,7 @@ parser.add_argument("--pID",     dest="pID",     help="id of particle used by th
 parser.add_argument("--factor",     dest="factor", required=False, default=1.0, type=float)
 parser.add_argument("--Estart",  dest="Estart",  help="start of energy range of particle gun for muflux detector (default=10 GeV)", required=False, default=10, type=float)
 parser.add_argument("--Eend",    dest="Eend",    help="end of energy range of particle gun for muflux detector (default=10 GeV)", required=False, default=10, type=float)
-
+parser.add_argument("--optParams", dest='optParams', required=False)
 
 options = parser.parse_args()
 
