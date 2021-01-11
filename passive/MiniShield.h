@@ -87,7 +87,7 @@ class MiniShield : public FairModule
       std::vector<Double_t> &HmainSideMagOut,
       std::vector<Double_t> &gapIn, std::vector<Double_t> &gapOut,
       std::vector<Double_t> &Z);
-  Int_t MiniShield::mini_Initialize(std::vector<TString> &magnetName,
+  Int_t mini_Initialize(std::vector<TString> &magnetName,
       std::vector<FieldDirectionM> &fieldDirection,
       std::vector<Double_t> &dXIn, std::vector<Double_t> &dYIn,
       std::vector<Double_t> &dXOut, std::vector<Double_t> &dYOut,
