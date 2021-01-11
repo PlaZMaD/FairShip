@@ -28,6 +28,7 @@ class MiniShield : public FairModule
    MiniShield(TString geofile, const Int_t withCoMagnet=0, const Bool_t StepGeo=false,
    const Bool_t WithConstAbsorberField=true, const Bool_t WithConstShieldField=true);
    MiniShield();
+   MiniShield(const double* params);
    virtual ~MiniShield();
    void ConstructGeometry();
    ClassDef(MiniShield,4)
@@ -38,6 +39,8 @@ class MiniShield : public FairModule
   // }
     
  protected:
+  Int_t nParts;
+  Double_t* optParams;
   Double_t cm = 1;
   Double_t m = 100 * cm;
   Double_t mm = 0.1 * cm;
@@ -84,7 +87,16 @@ class MiniShield : public FairModule
       std::vector<Double_t> &HmainSideMagOut,
       std::vector<Double_t> &gapIn, std::vector<Double_t> &gapOut,
       std::vector<Double_t> &Z);
-
+  Int_t MiniShield::mini_Initialize(std::vector<TString> &magnetName,
+      std::vector<FieldDirectionM> &fieldDirection,
+      std::vector<Double_t> &dXIn, std::vector<Double_t> &dYIn,
+      std::vector<Double_t> &dXOut, std::vector<Double_t> &dYOut,
+      std::vector<Double_t> &dZ, std::vector<Double_t> &midGapIn,
+      std::vector<Double_t> &midGapOut,
+      std::vector<Double_t> &HmainSideMagIn,
+      std::vector<Double_t> &HmainSideMagOut,
+      std::vector<Double_t> &gapIn, std::vector<Double_t> &gapOut,
+      std::vector<Double_t> &Z);
   void CreateMagnet(TString magnetName, TGeoMedium *medium, TGeoVolume *tShield,
 		    TGeoUniformMagField *field,
 		    Double_t dX, Double_t dY,

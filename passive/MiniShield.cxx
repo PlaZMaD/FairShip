@@ -110,7 +110,10 @@ MiniShield::MiniShield(const char* name, const Int_t Design, const char* Title,
  if(fDesign>=6){zEndOfAbsorb = Z - fMiniShieldLength/2.;}
  fSupport = true;
 }
-
+MiniShield::MiniShield(const double* params):FairModule("MiniShield", "opt_config")
+{
+  optParams = params;
+}
 // -----   Private method InitMedium 
 Int_t MiniShield::InitMedium(TString name) 
 {
@@ -405,6 +408,58 @@ void MiniShield::CreateMagnet(TString magnetName,TGeoMedium* medium,TGeoVolume *
       break;
     }
   }
+Int_t MiniShield::mini_Initialize(std::vector<TString> &magnetName,
+        std::vector<FieldDirectionM> &fieldDirection,
+        std::vector<Double_t> &dXIn, std::vector<Double_t> &dYIn,
+        std::vector<Double_t> &dXOut, std::vector<Double_t> &dYOut,
+        std::vector<Double_t> &dZ, std::vector<Double_t> &midGapIn,
+        std::vector<Double_t> &midGapOut,
+        std::vector<Double_t> &HmainSideMagIn,
+        std::vector<Double_t> &HmainSideMagOut,
+        std::vector<Double_t> &gapIn, std::vector<Double_t> &gapOut,
+        std::vector<Double_t> &Z){
+  fField = optParams[0];
+  nParts = Int_t(optParams[1]);
+
+  // fieldDirection.reserve(nParts);
+  // magnetName.reserve(nParts);
+
+  for (auto i :
+       {&dXIn, &dXOut, &dYIn, &dYOut, &dZ, &midGapIn, &midGapOut,
+  &HmainSideMagIn, &HmainSideMagOut, &gapIn, &gapOut, &Z}) {
+    i->reserve(nParts);
+  }
+  Double_t zgap = 10.;
+
+  Double_t start_position = -6450.;
+  int fixed_shift = 2;
+  for (unsigned int i = 0; i < nParts; i++){
+    if (i < nParts/2){
+      fieldDirection.push_back(FieldDirectionM::up);
+    }else
+    {
+      fieldDirection.push_back(FieldDirectionM::down);
+    }
+    magnetName.push_back("mini_shield_part_" + TString(i));
+
+    dXIn[i] = optParams[i*6+fixed_shift + 0] * m;
+    dXOut[i] = optParams[i*6+fixed_shift + 1] * m;
+    dYIn[i] = optParams[i*6+fixed_shift + 2] * m;
+    dYOut[i] = optParams[i*6+fixed_shift + 3] * m;
+    gapIn[i] = optParams[i*6+fixed_shift + 4] * m;
+    gapOut[i] = optParams[i*6+fixed_shift + 5] * m;
+
+    midGapIn[i] = 0.;
+    midGapOut[i] = 0.;
+    HmainSideMagIn[i] = dYIn[i] / 2;
+    HmainSideMagOut[i] = dYOut[i] / 2;
+
+    dZ[i] = optParams[i*6+fixed_shift + 6] * m - zgap / 2;
+    Z[i] = i>0? Z[i-1] + dZ[i] + dZ[i-1] + zgap : start_position + dZ[0] + zgap;
+  }
+  return nParts;
+}
+
 
 Int_t MiniShield::Initialize(std::vector<TString> &magnetName,
         std::vector<FieldDirectionM> &fieldDirection,
@@ -741,9 +796,27 @@ void MiniShield::ConstructGeometry()
     TGeoMedium *concrete  =gGeoManager->GetMedium("Concrete");
 
     Double_t ironField = fField*tesla;
-    TGeoUniformMagField *mainField = new TGeoUniformMagField(0., 1.6*tesla, 0.);
-   
-	  CreateMagnet("MiniShield",iron,tShield,mainField, 500./2., 500./2., 500./2.0, -6200.);
+    if (nParts > 1){
+        TGeoUniformMagField *magFieldIron = new TGeoUniformMagField(0.,ironField,0.);
+        TGeoUniformMagField *RetField     = new TGeoUniformMagField(0.,-ironField,0.);
+        TGeoUniformMagField *ConRField    = new TGeoUniformMagField(-ironField,0.,0.);
+        TGeoUniformMagField *ConLField    = new TGeoUniformMagField(ironField,0.,0.);
+        TGeoUniformMagField *fields[4] = {magFieldIron,RetField,ConRField,ConLField};
+        std::vector<FieldDirectionM> fieldDirection;
+        
+        std::vector<TString> magnetName;
+        std::vector<Double_t> dXIn, dYIn, dXOut, dYOut, dZf, midGapIn, midGapOut, HmainSideMagIn, HmainSideMagOut, gapIn, gapOut, Z;
+        const Int_t nMagnets = mini_Initialize(magnetName, fieldDirection, dXIn, dYIn, dXOut, dYOut, dZf, midGapIn, midGapOut, HmainSideMagIn, HmainSideMagOut, gapIn, gapOut, Z);
+      for (unsigned int i = 0; i<nParts; i++){
+        CreateMagnet(miniMagnetName, steel, tShield, fields,fieldDirection[i],
+         dXIn[i],dYIn[i],dXOut[i],dYOut[i],dZf[i],
+         midGapIn[i],midGapOut[i],HmainSideMagIn[i],HmainSideMagOut[i],
+         gapIn[i],gapOut[i],Z[i],0, fStepGeo);
+      }
+    }else{
+      CreateMagnet("MiniShield",iron,tShield,mainField, 500./2., 500./2., 500./2.0, -6200.);
+    }
+	  
 
     top->AddNode(tShield, 1);
 

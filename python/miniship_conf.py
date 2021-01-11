@@ -117,19 +117,21 @@ def configure(run,ship_geo):
 
 
 
+ if not hasattr(ship_geo,"optParams"):
 
-
- MiniShield = ROOT.MiniShield(
-      "MiniShield", ship_geo.muShieldDesign, "MiniMuonShield",
-      ship_geo.muShield.z, ship_geo.muShield.dZ0, ship_geo.muShield.dZ1,
-      ship_geo.muShield.dZ2, ship_geo.muShield.dZ3,
-      ship_geo.muShield.dZ4, ship_geo.muShield.dZ5,
-      ship_geo.muShield.dZ6, ship_geo.muShield.dZ7,
-      ship_geo.muShield.dZ8, ship_geo.muShield.dXgap,
-      ship_geo.muShield.LE, ship_geo.Yheight * 4. / 10.,
-      ship_geo.cave.floorHeightMuonShield,ship_geo.muShield.Field,
-      ship_geo.muShieldWithCobaltMagnet, ship_geo.muShieldStepGeo,
-      ship_geo.hadronAbsorber.WithConstField, ship_geo.muShield.WithConstField)
+    MiniShield = ROOT.MiniShield(
+        "MiniShield", ship_geo.muShieldDesign, "MiniMuonShield",
+        ship_geo.muShield.z, ship_geo.muShield.dZ0, ship_geo.muShield.dZ1,
+        ship_geo.muShield.dZ2, ship_geo.muShield.dZ3,
+        ship_geo.muShield.dZ4, ship_geo.muShield.dZ5,
+        ship_geo.muShield.dZ6, ship_geo.muShield.dZ7,
+        ship_geo.muShield.dZ8, ship_geo.muShield.dXgap,
+        ship_geo.muShield.LE, ship_geo.Yheight * 4. / 10.,
+        ship_geo.cave.floorHeightMuonShield,ship_geo.muShield.Field,
+        ship_geo.muShieldWithCobaltMagnet, ship_geo.muShieldStepGeo,
+        ship_geo.hadronAbsorber.WithConstField, ship_geo.muShield.WithConstField)
+ else:
+  MiniShield = ROOT.MiniShield(ship_geo.optParams)
  detectorList.append(MiniShield)
 
  # MuonShield = ROOT.ShipMuonShield(
