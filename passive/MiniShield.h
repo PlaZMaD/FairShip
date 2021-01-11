@@ -40,7 +40,7 @@ class MiniShield : public FairModule
     
  protected:
   Int_t nParts;
-  std::vector<Double_t> optParams(3, 10.);
+  std::vector<Double_t> optParams{1.6, 1};
   Double_t cm = 1;
   Double_t m = 100 * cm;
   Double_t mm = 0.1 * cm;
