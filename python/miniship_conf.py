@@ -131,7 +131,7 @@ def configure(run,ship_geo):
         ship_geo.muShieldWithCobaltMagnet, ship_geo.muShieldStepGeo,
         ship_geo.hadronAbsorber.WithConstField, ship_geo.muShield.WithConstField)
  else:
-  MiniShield = ROOT.MiniShield(ship_geo.optParams)
+  MiniShield = ROOT.MiniShield([float(i) for i in ship_geo.optParams.split(',')])
  detectorList.append(MiniShield)
 
  # MuonShield = ROOT.ShipMuonShield(

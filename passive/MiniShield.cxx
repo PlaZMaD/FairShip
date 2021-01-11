@@ -113,6 +113,7 @@ MiniShield::MiniShield(const char* name, const Int_t Design, const char* Title,
 MiniShield::MiniShield(Double_t* params):FairModule("MiniShield", "opt_config")
 {
   optParams = params;
+  nParts = params[1];
 }
 // -----   Private method InitMedium 
 Int_t MiniShield::InitMedium(TString name) 
