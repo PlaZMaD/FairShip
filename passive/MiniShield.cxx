@@ -110,7 +110,7 @@ MiniShield::MiniShield(const char* name, const Int_t Design, const char* Title,
  if(fDesign>=6){zEndOfAbsorb = Z - fMiniShieldLength/2.;}
  fSupport = true;
 }
-MiniShield::MiniShield(const double* params):FairModule("MiniShield", "opt_config")
+MiniShield::MiniShield(Double_t* params):FairModule("MiniShield", "opt_config")
 {
   optParams = params;
 }
@@ -440,7 +440,7 @@ Int_t MiniShield::mini_Initialize(std::vector<TString> &magnetName,
     {
       fieldDirection.push_back(FieldDirectionM::down);
     }
-    magnetName.push_back("mini_shield_part_" + TString(i));
+    magnetName.push_back("mini_shield_part_" + std::to_string(i));
 
     dXIn[i] = optParams[i*6+fixed_shift + 0] * m;
     dXOut[i] = optParams[i*6+fixed_shift + 1] * m;
@@ -808,20 +808,21 @@ void MiniShield::ConstructGeometry()
         std::vector<Double_t> dXIn, dYIn, dXOut, dYOut, dZf, midGapIn, midGapOut, HmainSideMagIn, HmainSideMagOut, gapIn, gapOut, Z;
         const Int_t nMagnets = mini_Initialize(magnetName, fieldDirection, dXIn, dYIn, dXOut, dYOut, dZf, midGapIn, midGapOut, HmainSideMagIn, HmainSideMagOut, gapIn, gapOut, Z);
       for (unsigned int i = 0; i<nParts; i++){
-        CreateMagnet(miniMagnetName, steel, tShield, fields,fieldDirection[i],
+        CreateMagnet(magnetName, steel, tShield, fields,fieldDirection[i],
          dXIn[i],dYIn[i],dXOut[i],dYOut[i],dZf[i],
          midGapIn[i],midGapOut[i],HmainSideMagIn[i],HmainSideMagOut[i],
          gapIn[i],gapOut[i],Z[i],0, fStepGeo);
       }
     }else{
-      CreateMagnet("MiniShield",iron,tShield,mainField, 500./2., 500./2., 500./2.0, -6200.);
+      TGeoUniformMagField *mainField = new TGeoUniformMagField(0., ironField, 0.);
+      CreateMagnet("MiniShield", iron, tShield, mainField, 500./2., 500./2., 500./2.0, -6200.);
     }
 	  
 
     top->AddNode(tShield, 1);
 
     if (fDesign >= 5 && fDesign <= 9) {
-      Double_t ironField = fField*tesla;
+      // Double_t ironField = fField*tesla;
       TGeoUniformMagField *magFieldIron = new TGeoUniformMagField(0.,ironField,0.);
       TGeoUniformMagField *RetField     = new TGeoUniformMagField(0.,-ironField,0.);
       TGeoUniformMagField *ConRField    = new TGeoUniformMagField(-ironField,0.,0.);
