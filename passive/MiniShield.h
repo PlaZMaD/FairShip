@@ -32,7 +32,7 @@ class MiniShield : public FairModule
    MiniShield(Double_t* params);
    virtual ~MiniShield();
    void ConstructGeometry();
-   ClassDef(MiniShield,4)
+   ClassDef(MiniShield,5)
 
   // void SetSupports(Bool_t supports) { 
   //   fSupport = supports;
@@ -40,7 +40,7 @@ class MiniShield : public FairModule
   // }
     
  protected:
-  Int_t nParts;
+  Int_t nParts=0;
   // Double_t* dParams;
   TString optParams = "";
   Double_t cm = 1;
