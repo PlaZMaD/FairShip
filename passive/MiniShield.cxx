@@ -116,6 +116,7 @@ MiniShield::MiniShield(TString params, TString adg):FairModule("MiniShield", "op
 {
   optParams = params;
   fDesign = 9;
+  dZ0 = dZ1 = dZ2 = dZ3 = dZ4 = dZ5 = dZ6 = dZ7 = dZ8 = dXgap = zEndOfAbsorb = mag4Gap = midGapOut7 = midGapOut8 = 0.;
 
   fWithConstAbsorberField = true;
   fGeofile = "";
@@ -126,7 +127,7 @@ MiniShield::MiniShield(TString params, TString adg):FairModule("MiniShield", "op
   fMiniShieldLength = 5*m;
   zEndOfAbsorb = -6400;
   fSupport = false;
-  dZ0 = dZ1 = dZ2 = dZ3 = dZ4 = dZ5 = dZ6 = dZ7 = dZ8 = dXgap = zEndOfAbsorb = mag4Gap = midGapOut7 = midGapOut8 = 0.;
+  
 
   // fField = params[0];
   // nParts = params[1];
