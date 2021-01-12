@@ -69,7 +69,8 @@ MiniShield::MiniShield(const char* name, const Int_t Design, const char* Title,
  fDesign = Design;
  fField  = field;
  fGeofile = "";
- nParts = 1;
+ // nParts = 1;
+ optParams = "a";
  fWithConstAbsorberField = WithConstAbsorberField;
  fWithConstShieldField = WithConstShieldField;
  fStepGeo = StepGeo;
@@ -454,7 +455,7 @@ Int_t MiniShield::mini_Initialize(std::vector<TString> &magnetName,
     std::cout << *i << ' ';
   
   fField = digiOptParams[0];
-  nParts = Int_t(digiOptParams[1]);
+  Int_t nParts = Int_t(digiOptParams[1]);
 
   // fieldDirection.reserve(nParts);
   // magnetName.reserve(nParts);
