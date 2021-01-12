@@ -112,7 +112,7 @@ MiniShield::MiniShield(const char* name, const Int_t Design, const char* Title,
  if(fDesign>=6){zEndOfAbsorb = Z - fMiniShieldLength/2.;}
  fSupport = true;
 }
-MiniShield::MiniShield(TString params):FairModule("MiniShield", "opt_config")
+MiniShield::MiniShield(TString params, TString adg):FairModule("MiniShield", "opt_config")
 {
   optParams = params;
   fDesign = 9;
