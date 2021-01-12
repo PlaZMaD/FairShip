@@ -17,6 +17,7 @@
 #include "TFile.h"
 #include <iostream>                     // for operator<<, basic_ostream, etc
 #include <sstream>
+#include <iterator>
 
 MiniShield::~MiniShield() {}
 MiniShield::MiniShield() : FairModule("MiniShield", "") {}
@@ -421,18 +422,14 @@ Int_t MiniShield::mini_Initialize(std::vector<TString> &magnetName,
         std::vector<Double_t> &HmainSideMagOut,
         std::vector<Double_t> &gapIn, std::vector<Double_t> &gapOut,
         std::vector<Double_t> &Z){
-  std::vector<Double_t> digiOptParams;
-  
-  Double_t d = 0.;
-  std::size_t pos = 0;
 
-  while (pos < optParams.Length ())
-    if ((pos = optParams.First  (',',pos)) != std::string::npos)
-      optParams[pos] = ' ';
-
-  std::stringstream ss(std::string(optParams));
-  while (ss >> d)
-    digiOptParams.push_back (d);
+  double d = 0.;
+  optParams.ReplaceAll(",", " ");
+  std::istringstream ss(std::string(optParams));
+  // std::vector<Double_t> digiOptParams
+  const auto digiOptParams = std::vector<double> (std::istream_iterator<double>(ss),  std::istream_iterator<double>());
+  // while (ss >> d)
+  //   digiOptParams.push_back (d);
   
   fField = digiOptParams[0];
   nParts = Int_t(digiOptParams[1]);
