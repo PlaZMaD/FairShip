@@ -69,6 +69,7 @@ MiniShield::MiniShield(const char* name, const Int_t Design, const char* Title,
  fDesign = Design;
  fField  = field;
  fGeofile = "";
+ nParts = 1;
  fWithConstAbsorberField = WithConstAbsorberField;
  fWithConstShieldField = WithConstShieldField;
  fStepGeo = StepGeo;
