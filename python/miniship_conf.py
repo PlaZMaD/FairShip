@@ -117,7 +117,7 @@ def configure(run,ship_geo):
 
 
 
- if len(ship_geo.optParams)>3:
+ if ship_geo.optParams:
     MiniShield = ROOT.MiniShield(ship_geo.optParams, "adg")#[float(i) for i in ship_geo.optParams.split(',')])
  else:
     MiniShield = ROOT.MiniShield(

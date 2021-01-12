@@ -41,7 +41,7 @@ class MiniShield : public FairModule
     
  protected:
   Int_t nParts;
-  Double_t* dParams;
+  // Double_t* dParams;
   TString optParams = "";
   Double_t cm = 1;
   Double_t m = 100 * cm;

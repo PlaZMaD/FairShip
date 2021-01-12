@@ -116,15 +116,27 @@ MiniShield::MiniShield(TString params, TString adg):FairModule("MiniShield", "op
 {
   optParams = params;
   fDesign = 9;
+
+  fWithConstAbsorberField = true;
+  fGeofile = "";
+  fWithConstShieldField = true;
+  fStepGeo = false;
+  fWithCoMagnet = false;
+  fFloor = 5*m;
+  fMiniShieldLength = 5*m;
+  zEndOfAbsorb = -6400;
+  fSupport = false;
+
+
   // fField = params[0];
   // nParts = params[1];
 }
 MiniShield::MiniShield(Double_t* params):FairModule("MiniShield", "opt_config")
 {
-  dParams = params;
+  // dParams = params;
   fDesign = 9;
-  fField = params[0];
-  nParts = params[1];
+  // fField = params[0];
+  // nParts = params[1];
 }
 // -----   Private method InitMedium 
 Int_t MiniShield::InitMedium(TString name) 
