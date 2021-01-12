@@ -114,6 +114,63 @@ MiniShield::MiniShield(const char* name, const Int_t Design, const char* Title,
  if(fDesign>=6){zEndOfAbsorb = Z - fMiniShieldLength/2.;}
  fSupport = true;
 }
+MiniShield::MiniShield(TString params, const char* name, const Int_t Design, const char* Title,
+                               Double_t Z, Double_t L0, Double_t L1, Double_t L2, Double_t L3, Double_t L4, Double_t L5, Double_t L6,
+                               Double_t L7, Double_t L8, Double_t gap, Double_t LE, Double_t, Double_t floor, Double_t field,
+                               const Int_t withCoMagnet, const Bool_t StepGeo,
+                               const Bool_t WithConstAbsorberField, const Bool_t WithConstShieldField)
+  : FairModule(name ,Title)
+{
+ // optParams = [10, 20, 30];
+ fDesign = Design;
+ fField  = field;
+ fGeofile = "";
+ // nParts = 1;
+ // optParams = "a";
+ fWithConstAbsorberField = WithConstAbsorberField;
+ fWithConstShieldField = WithConstShieldField;
+ fStepGeo = StepGeo;
+ fWithCoMagnet = withCoMagnet;
+ if (fDesign==1){
+     fMiniShieldLength = L1;   
+    }
+ if (fDesign==2 || fDesign==3 || fDesign==4 ){
+     Fatal("ShipMuonShield","Design %i not anymore supported",fDesign);
+    }
+ if (fDesign==5 || fDesign==6){
+     dZ0 = L0;
+     dZ1 = L1;
+     dZ2 = L2;
+     dZ3 = L3;
+     dZ4 = L4;
+     dZ5 = L5;
+     dZ6 = L6;
+     dZ7 = L7;
+     dZ8 = L8;
+     dXgap= gap;
+     fMiniShieldLength = 2*(dZ1+dZ2+dZ3+dZ4+dZ5+dZ6+dZ7+dZ8) + LE ; //leave some space for nu-tau detector   
+    }
+    
+ if (fDesign>=7){
+     dZ1 = L1;
+     dZ2 = L2;
+     dZ3 = L3;
+     dZ4 = L4;
+     dZ5 = L5;
+     dZ6 = L6;
+     dZ7 = L7;
+     dZ8 = L8;
+     fMiniShieldLength =
+   2 * (dZ1 + dZ2 + dZ3 + dZ4 + dZ5 + dZ6 + dZ7 + dZ8) + LE;
+   }
+    
+ fFloor = (fDesign >= 7) ? floor : 0;
+
+ zEndOfAbsorb = Z + dZ0 - fMiniShieldLength/2.;   
+ if(fDesign>=6){zEndOfAbsorb = Z - fMiniShieldLength/2.;}
+ fSupport = true;
+ optParams = params;
+}
 MiniShield::MiniShield(TString params, TString adg):FairModule("MiniShield", "opt_config")
 {
   optParams = params;
