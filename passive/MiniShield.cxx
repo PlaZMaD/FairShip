@@ -425,12 +425,12 @@ Int_t MiniShield::mini_Initialize(std::vector<TString> &magnetName,
   
   Double_t d = 0.;
   std::size_t pos = 0;
-  
-  while (pos < optParams.size ())
-    if ((pos = optParams.find_first_of (',',pos)) != std::string::npos)
+
+  while (pos < optParams.Length ())
+    if ((pos = optParams.First  (',',pos)) != std::string::npos)
       optParams[pos] = ' ';
 
-  std::stringstream ss(optParams);
+  std::stringstream ss(std::string(optParams));
   while (ss >> d)
     digiOptParams.push_back (d);
   
