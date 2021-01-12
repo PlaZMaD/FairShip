@@ -28,7 +28,7 @@ class MiniShield : public FairModule
    MiniShield(TString geofile, const Int_t withCoMagnet=0, const Bool_t StepGeo=false,
    const Bool_t WithConstAbsorberField=true, const Bool_t WithConstShieldField=true);
    MiniShield();
-   MiniShield(std::vector<Double_t>);
+   MiniShield(TString params);
    virtual ~MiniShield();
    void ConstructGeometry();
    ClassDef(MiniShield,4)
@@ -40,7 +40,7 @@ class MiniShield : public FairModule
     
  protected:
   Int_t nParts;
-  std::vector<Double_t> optParams{1.6, 1};
+  TString optParams = "";
   Double_t cm = 1;
   Double_t m = 100 * cm;
   Double_t mm = 0.1 * cm;

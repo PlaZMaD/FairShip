@@ -16,7 +16,7 @@
 #include "TVectorT.h"
 #include "TFile.h"
 #include <iostream>                     // for operator<<, basic_ostream, etc
-
+#include <sstream>
 
 MiniShield::~MiniShield() {}
 MiniShield::MiniShield() : FairModule("MiniShield", "") {}
@@ -111,10 +111,11 @@ MiniShield::MiniShield(const char* name, const Int_t Design, const char* Title,
  if(fDesign>=6){zEndOfAbsorb = Z - fMiniShieldLength/2.;}
  fSupport = true;
 }
-MiniShield::MiniShield(std::vector<Double_t> params):FairModule("MiniShield", "opt_config")
+MiniShield::MiniShield(TString params):FairModule("MiniShield", "opt_config")
 {
   optParams = params;
-  nParts = params[1];
+  // fField = params[0];
+  // nParts = params[1];
 }
 // -----   Private method InitMedium 
 Int_t MiniShield::InitMedium(TString name) 
@@ -420,8 +421,21 @@ Int_t MiniShield::mini_Initialize(std::vector<TString> &magnetName,
         std::vector<Double_t> &HmainSideMagOut,
         std::vector<Double_t> &gapIn, std::vector<Double_t> &gapOut,
         std::vector<Double_t> &Z){
-  fField = optParams[0];
-  nParts = Int_t(optParams[1]);
+  std::vector<Double_t> digiOptParams;
+  
+  Double_t d = 0.;
+  std::size_t pos = 0;
+  
+  while (pos < optParams.size ())
+    if ((pos = optParams.find_first_of (',',pos)) != std::string::npos)
+      optParams[pos] = ' ';
+
+  std::stringstream ss(optParams);
+  while (ss >> d)
+    digiOptParams.push_back (d);
+  
+  fField = digiOptParams[0];
+  nParts = Int_t(digiOptParams[1]);
 
   // fieldDirection.reserve(nParts);
   // magnetName.reserve(nParts);
@@ -444,19 +458,19 @@ Int_t MiniShield::mini_Initialize(std::vector<TString> &magnetName,
     }
     magnetName.push_back("mini_shield_part_" + std::to_string(i));
 
-    dXIn[i] = optParams[i*6+fixed_shift + 0] * m;
-    dXOut[i] = optParams[i*6+fixed_shift + 1] * m;
-    dYIn[i] = optParams[i*6+fixed_shift + 2] * m;
-    dYOut[i] = optParams[i*6+fixed_shift + 3] * m;
-    gapIn[i] = optParams[i*6+fixed_shift + 4] * m;
-    gapOut[i] = optParams[i*6+fixed_shift + 5] * m;
+    dXIn[i] = digiOptParams[i*6+fixed_shift + 0] * m;
+    dXOut[i] = digiOptParams[i*6+fixed_shift + 1] * m;
+    dYIn[i] = digiOptParams[i*6+fixed_shift + 2] * m;
+    dYOut[i] = digiOptParams[i*6+fixed_shift + 3] * m;
+    gapIn[i] = digiOptParams[i*6+fixed_shift + 4] * m;
+    gapOut[i] = digiOptParams[i*6+fixed_shift + 5] * m;
 
     midGapIn[i] = 0.;
     midGapOut[i] = 0.;
     HmainSideMagIn[i] = dYIn[i] / 2;
     HmainSideMagOut[i] = dYOut[i] / 2;
 
-    dZ[i] = optParams[i*6+fixed_shift + 6] * m - zgap / 2;
+    dZ[i] = digiOptParams[i*6+fixed_shift + 6] * m - zgap / 2;
     Z[i] = i>0? Z[i-1] + dZ[i] + dZ[i-1] + zgap : start_position + dZ[0] + zgap;
   }
   return nParts;
@@ -798,7 +812,7 @@ void MiniShield::ConstructGeometry()
     TGeoMedium *concrete  =gGeoManager->GetMedium("Concrete");
 
     Double_t ironField = fField*tesla;
-    if (nParts > 1){
+    if (optParams.Length() > 3){
         TGeoUniformMagField *magFieldIron = new TGeoUniformMagField(0.,ironField,0.);
         TGeoUniformMagField *RetField     = new TGeoUniformMagField(0.,-ironField,0.);
         TGeoUniformMagField *ConRField    = new TGeoUniformMagField(-ironField,0.,0.);
