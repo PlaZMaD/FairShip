@@ -428,8 +428,8 @@ Int_t MiniShield::mini_Initialize(std::vector<TString> &magnetName,
   auto ss = std::istringstream(std::string(optParams));
   // std::vector<Double_t> digiOptParams
   const auto digiOptParams = std::vector<double> (std::istream_iterator<double>(ss),  std::istream_iterator<double>());
-  // while (ss >> d)
-  //   digiOptParams.push_back (d);
+  for (std::vector<char>::const_iterator i = digiOptParams.begin(); i != digiOptParams.end(); ++i)
+    std::cout << *i << ' ';
   
   fField = digiOptParams[0];
   nParts = Int_t(digiOptParams[1]);
@@ -809,6 +809,7 @@ void MiniShield::ConstructGeometry()
     TGeoMedium *concrete  =gGeoManager->GetMedium("Concrete");
 
     Double_t ironField = fField*tesla;
+
     if (optParams.Length() > 3){
         TGeoUniformMagField *magFieldIron = new TGeoUniformMagField(0.,ironField,0.);
         TGeoUniformMagField *RetField     = new TGeoUniformMagField(0.,-ironField,0.);
@@ -820,12 +821,13 @@ void MiniShield::ConstructGeometry()
         std::vector<TString> magnetName;
         std::vector<Double_t> dXIn, dYIn, dXOut, dYOut, dZf, midGapIn, midGapOut, HmainSideMagIn, HmainSideMagOut, gapIn, gapOut, Z;
         const Int_t nMagnets = mini_Initialize(magnetName, fieldDirection, dXIn, dYIn, dXOut, dYOut, dZf, midGapIn, midGapOut, HmainSideMagIn, HmainSideMagOut, gapIn, gapOut, Z);
-      for (unsigned int i = 0; i<nParts; i++){
-        CreateMagnet(magnetName[i], steel, tShield, fields,fieldDirection[i],
-         dXIn[i],dYIn[i],dXOut[i],dYOut[i],dZf[i],
-         midGapIn[i],midGapOut[i],HmainSideMagIn[i],HmainSideMagOut[i],
-         gapIn[i],gapOut[i],Z[i],0, fStepGeo);
-      }
+
+        for (unsigned int i = 0; i<nParts; i++){
+          CreateMagnet(magnetName[i], steel, tShield, fields,fieldDirection[i],
+           dXIn[i],dYIn[i],dXOut[i],dYOut[i],dZf[i],
+           midGapIn[i],midGapOut[i],HmainSideMagIn[i],HmainSideMagOut[i],
+           gapIn[i],gapOut[i],Z[i],0, fStepGeo);
+        }
     }else{
       std::cout<<"ALARM NORMAL GEO!!!!!!!!$$$$$$$$$$$\n";
       TGeoUniformMagField *mainField = new TGeoUniformMagField(0., ironField, 0.);
