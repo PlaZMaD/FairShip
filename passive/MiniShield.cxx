@@ -845,7 +845,7 @@ void MiniShield::ConstructGeometry()
         
         std::vector<TString> magnetName;
         std::vector<Double_t> dXIn, dYIn, dXOut, dYOut, dZf, midGapIn, midGapOut, HmainSideMagIn, HmainSideMagOut, gapIn, gapOut, Z;
-        const Int_t nMagnets = mini_Initialize(magnetName, fieldDirection, dXIn, dYIn, dXOut, dYOut, dZf, midGapIn, midGapOut, HmainSideMagIn, HmainSideMagOut, gapIn, gapOut, Z);
+        const Int_t nParts = mini_Initialize(magnetName, fieldDirection, dXIn, dYIn, dXOut, dYOut, dZf, midGapIn, midGapOut, HmainSideMagIn, HmainSideMagOut, gapIn, gapOut, Z);
 
         for (unsigned int i = 0; i<nParts; i++){
           CreateMagnet(magnetName[i], steel, tShield, fields,fieldDirection[i],
