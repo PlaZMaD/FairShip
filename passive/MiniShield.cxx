@@ -818,13 +818,14 @@ void MiniShield::ConstructGeometry()
     TGeoMedium *concrete  =gGeoManager->GetMedium("Concrete");
 
     Double_t ironField = fField*tesla;
+    TGeoUniformMagField *magFieldIron = new TGeoUniformMagField(0.,ironField,0.);
+    TGeoUniformMagField *RetField     = new TGeoUniformMagField(0.,-ironField,0.);
+    TGeoUniformMagField *ConRField    = new TGeoUniformMagField(-ironField,0.,0.);
+    TGeoUniformMagField *ConLField    = new TGeoUniformMagField(ironField,0.,0.);
+    TGeoUniformMagField *fields[4] = {magFieldIron,RetField,ConRField,ConLField};
 
     if (optParams.Length() > 3){
-        TGeoUniformMagField *magFieldIron = new TGeoUniformMagField(0.,ironField,0.);
-        TGeoUniformMagField *RetField     = new TGeoUniformMagField(0.,-ironField,0.);
-        TGeoUniformMagField *ConRField    = new TGeoUniformMagField(-ironField,0.,0.);
-        TGeoUniformMagField *ConLField    = new TGeoUniformMagField(ironField,0.,0.);
-        TGeoUniformMagField *fields[4] = {magFieldIron,RetField,ConRField,ConLField};
+        
         std::vector<FieldDirectionM> fieldDirection;
         
         std::vector<TString> magnetName;
@@ -839,8 +840,8 @@ void MiniShield::ConstructGeometry()
         }
     }else{
       std::cout<<"ALARM NORMAL GEO!!!!!!!!$$$$$$$$$$$\n";
-      TGeoUniformMagField *mainField = new TGeoUniformMagField(0., ironField, 0.);
-      CreateMagnet("MiniShield", iron, tShield, mainField, 500./2., 500./2., 500./2.0, -6200.);
+      // TGeoUniformMagField *mainField = new TGeoUniformMagField(0., ironField, 0.);
+      CreateMagnet("MiniShield", iron, tShield, magFieldIron, 500./2., 500./2., 500./2.0, -6200.);
     }
 	  
 
@@ -848,11 +849,11 @@ void MiniShield::ConstructGeometry()
 
     if (fDesign >= 5 && fDesign <= 9) {
       // Double_t ironField = fField*tesla;
-      TGeoUniformMagField *magFieldIron = new TGeoUniformMagField(0.,ironField,0.);
-      TGeoUniformMagField *RetField     = new TGeoUniformMagField(0.,-ironField,0.);
-      TGeoUniformMagField *ConRField    = new TGeoUniformMagField(-ironField,0.,0.);
-      TGeoUniformMagField *ConLField    = new TGeoUniformMagField(ironField,0.,0.);
-      TGeoUniformMagField *fields[4] = {magFieldIron,RetField,ConRField,ConLField};
+      // TGeoUniformMagField *magFieldIron = new TGeoUniformMagField(0.,ironField,0.);
+      // TGeoUniformMagField *RetField     = new TGeoUniformMagField(0.,-ironField,0.);
+      // TGeoUniformMagField *ConRField    = new TGeoUniformMagField(-ironField,0.,0.);
+      // TGeoUniformMagField *ConLField    = new TGeoUniformMagField(ironField,0.,0.);
+      // TGeoUniformMagField *fields[4] = {magFieldIron,RetField,ConRField,ConLField};
 
       std::vector<TString> magnetName;
       std::vector<FieldDirectionM> fieldDirection;
