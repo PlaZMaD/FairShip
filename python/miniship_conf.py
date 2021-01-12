@@ -118,7 +118,7 @@ def configure(run,ship_geo):
 
 
  if len(ship_geo.optParams)>3:
-    MiniShield = ROOT.MiniShield(ship_geo.optParams)#[float(i) for i in ship_geo.optParams.split(',')])
+    MiniShield = ROOT.MiniShield(ship_geo.optParams, "adg")#[float(i) for i in ship_geo.optParams.split(',')])
  else:
     MiniShield = ROOT.MiniShield(
         "MiniShield", ship_geo.muShieldDesign, "MiniMuonShield",
@@ -133,7 +133,7 @@ def configure(run,ship_geo):
         ship_geo.hadronAbsorber.WithConstField, ship_geo.muShield.WithConstField)
 
   
- detectorList.append(MiniShield, "adg")
+ detectorList.append(MiniShield)
 
  # MuonShield = ROOT.ShipMuonShield(
  #      "MuonShield", ship_geo.muShieldDesign, "ShipMuonShield",

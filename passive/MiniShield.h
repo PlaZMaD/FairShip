@@ -29,6 +29,7 @@ class MiniShield : public FairModule
    const Bool_t WithConstAbsorberField=true, const Bool_t WithConstShieldField=true);
    MiniShield();
    MiniShield(TString params, TString adg);
+   MiniShield(Double_t* params);
    virtual ~MiniShield();
    void ConstructGeometry();
    ClassDef(MiniShield,4)
@@ -40,6 +41,7 @@ class MiniShield : public FairModule
     
  protected:
   Int_t nParts;
+  Double_t* dParams;
   TString optParams = "";
   Double_t cm = 1;
   Double_t m = 100 * cm;
