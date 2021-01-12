@@ -463,19 +463,19 @@ Int_t MiniShield::mini_Initialize(std::vector<TString> &magnetName,
     }
     magnetName.push_back("mini_shield_part_" + std::to_string(i));
 
-    dXIn[i] = digiOptParams[i*6+fixed_shift + 0] * m;
-    dXOut[i] = digiOptParams[i*6+fixed_shift + 1] * m;
-    dYIn[i] = digiOptParams[i*6+fixed_shift + 2] * m;
-    dYOut[i] = digiOptParams[i*6+fixed_shift + 3] * m;
-    gapIn[i] = digiOptParams[i*6+fixed_shift + 4] * m;
-    gapOut[i] = digiOptParams[i*6+fixed_shift + 5] * m;
+    dXIn[i] = digiOptParams[i*7+fixed_shift + 0] * cm;
+    dXOut[i] = digiOptParams[i*7+fixed_shift + 1] * cm;
+    dYIn[i] = digiOptParams[i*7+fixed_shift + 2] * cm;
+    dYOut[i] = digiOptParams[i*7+fixed_shift + 3] * cm;
+    gapIn[i] = digiOptParams[i*7+fixed_shift + 4] * cm;
+    gapOut[i] = digiOptParams[i*7+fixed_shift + 5] * cm;
 
     midGapIn[i] = 0.;
     midGapOut[i] = 0.;
     HmainSideMagIn[i] = dYIn[i] / 2;
     HmainSideMagOut[i] = dYOut[i] / 2;
 
-    dZ[i] = digiOptParams[i*6+fixed_shift + 6] * m - zgap / 2;
+    dZ[i] = digiOptParams[i*7+fixed_shift + 6] * m - zgap / 2;
     Z[i] = i>0? Z[i-1] + dZ[i] + dZ[i-1] + zgap : start_position + dZ[0] + zgap;
   }
   return nParts;
