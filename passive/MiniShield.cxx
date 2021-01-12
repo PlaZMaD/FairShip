@@ -475,7 +475,7 @@ Int_t MiniShield::mini_Initialize(std::vector<TString> &magnetName,
     HmainSideMagIn[i] = dYIn[i] / 2;
     HmainSideMagOut[i] = dYOut[i] / 2;
 
-    dZ[i] = digiOptParams[i*7+fixed_shift + 6] * m - zgap / 2;
+    dZ[i] = digiOptParams[i*7+fixed_shift + 6] * cm - zgap / 2;
     Z[i] = i>0? Z[i-1] + dZ[i] + dZ[i-1] + zgap : start_position + dZ[0] + zgap;
   }
   return nParts;
