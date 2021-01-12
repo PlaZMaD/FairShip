@@ -100,7 +100,7 @@ shipRoot_conf.configure(0)     # load basic libraries, prepare atexit for python
 ship_geo = ConfigRegistry.loadpy("$FAIRSHIP/geometry/geometry_config.py",
                                                 muShieldDesign = 9, 
                                                 muShieldGeo=options.geofile,
-                                                muShieldStepGeo=False, muShieldWithCobaltMagnet=False)
+                                                muShieldStepGeo=False, muShieldWithCobaltMagnet=False, optParams=options.optParams)
 
 # Output file name, add dy to be able to setup geometry with ambiguities.
 

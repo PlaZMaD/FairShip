@@ -428,7 +428,7 @@ Int_t MiniShield::mini_Initialize(std::vector<TString> &magnetName,
   auto ss = std::istringstream(std::string(optParams));
   // std::vector<Double_t> digiOptParams
   const auto digiOptParams = std::vector<double> (std::istream_iterator<double>(ss),  std::istream_iterator<double>());
-  for (std::vector<char>::const_iterator i = digiOptParams.begin(); i != digiOptParams.end(); ++i)
+  for (auto i = digiOptParams.begin(); i != digiOptParams.end(); ++i)
     std::cout << *i << ' ';
   
   fField = digiOptParams[0];
