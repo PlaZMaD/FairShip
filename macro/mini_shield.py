@@ -75,7 +75,7 @@ parser.add_argument("--pID",     dest="pID",     help="id of particle used by th
 parser.add_argument("--factor",     dest="factor", required=False, default=1.0, type=float)
 parser.add_argument("--Estart",  dest="Estart",  help="start of energy range of particle gun for muflux detector (default=10 GeV)", required=False, default=10, type=float)
 parser.add_argument("--Eend",    dest="Eend",    help="end of energy range of particle gun for muflux detector (default=10 GeV)", required=False, default=10, type=float)
-parser.add_argument("--optParams", dest='optParams', required=False)
+parser.add_argument("--optParams", dest='optParams', required=False, default=False)
 
 options = parser.parse_args()
 
@@ -103,7 +103,7 @@ ship_geo = ConfigRegistry.loadpy("$FAIRSHIP/geometry/geometry_config.py",
                                                 muShieldStepGeo=False, muShieldWithCobaltMagnet=False, optParams=options.optParams)
 
 # Output file name, add dy to be able to setup geometry with ambiguities.
-
+ship_geo.optParams = options.optParams
 tag = simEngine+"-"+mcEngine
 if not os.path.exists(options.outputDir):
   os.makedirs(options.outputDir)

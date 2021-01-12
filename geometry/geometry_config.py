@@ -49,7 +49,7 @@ if "muShieldWithCobaltMagnet" not in globals():
 
 with ConfigRegistry.register_config("basic") as c:
     # global muShieldDesign, targetOpt, strawDesign, Yheight
-    c.optParams = False
+    c.optParams = ""
     c.Yheight = Yheight*u.m
     # decision by the SP 
     totalLength       = 2.5*c.Yheight + 35*u.m
