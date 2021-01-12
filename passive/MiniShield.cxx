@@ -425,7 +425,7 @@ Int_t MiniShield::mini_Initialize(std::vector<TString> &magnetName,
 
   double d = 0.;
   optParams.ReplaceAll(",", " ");
-  std::istringstream ss(std::string(optParams));
+  auto ss = std::istringstream(std::string(optParams));
   // std::vector<Double_t> digiOptParams
   const auto digiOptParams = std::vector<double> (std::istream_iterator<double>(ss),  std::istream_iterator<double>());
   // while (ss >> d)
@@ -827,6 +827,7 @@ void MiniShield::ConstructGeometry()
          gapIn[i],gapOut[i],Z[i],0, fStepGeo);
       }
     }else{
+      std::cout<<"ALARM NORMAL GEO!!!!!!!!$$$$$$$$$$$\n";
       TGeoUniformMagField *mainField = new TGeoUniformMagField(0., ironField, 0.);
       CreateMagnet("MiniShield", iron, tShield, mainField, 500./2., 500./2., 500./2.0, -6200.);
     }
