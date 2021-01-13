@@ -12,6 +12,7 @@
 #include "TString.h"
 #include <vector>
 #include <array>
+#include "TGeoManager.h"
 
 enum class FieldDirectionM : bool { up, down };
 

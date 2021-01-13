@@ -1157,7 +1157,7 @@ void MiniShield::ConstructGeometry()
      Fatal("ShipMuonShield","Design %i does not match implemented designs",fDesign);
     }
 }   
-void veto::MiniShield(){
+void MiniShield::PreTrack(){
     if (false){return;}
     if (TMath::Abs(gMC->TrackPid())!=13){
         gMC->StopTrack();
