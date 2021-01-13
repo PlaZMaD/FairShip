@@ -18,6 +18,7 @@
 #include <iostream>                     // for operator<<, basic_ostream, etc
 #include <sstream>
 #include <iterator>
+#include "TVirtualMC.h"
 
 MiniShield::~MiniShield() {}
 MiniShield::MiniShield() : FairModule("MiniShield", "") {}
@@ -1158,7 +1159,6 @@ void MiniShield::ConstructGeometry()
     }
 }   
 void MiniShield::PreTrack(){
-    if (false){return;}
     if (TMath::Abs(gMC->TrackPid())!=13){
         gMC->StopTrack();
     }

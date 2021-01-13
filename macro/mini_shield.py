@@ -401,7 +401,8 @@ if simEngine == "MuonBack":
                     hit.GetPdgCode(),
                     hit.GetWeight()
                 ]
-                muons_stats.append(muon)
+                if abs(muon[-2]) == 13:
+                  muons_stats.append(muon)
                 if len(muon_veto_points[index]) > 1:
                     events_with_more_than_two_hits_per_mc += 1
                     continue
