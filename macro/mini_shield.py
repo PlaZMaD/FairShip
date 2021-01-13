@@ -271,7 +271,7 @@ saveBasicParameters.execute("%s/geofile_full.%s.root" % (options.outputDir, tag)
 
 # checking for overlaps
 lGeo = ROOT.gGeoManager
-miniShield = sGeo.GetVolume('MiniShieldArea')
+miniShield = lGeo.GetVolume('MiniShieldArea')
 nodes = miniShield.GetNodes()
 m = 0.
 for node in nodes:
@@ -410,7 +410,7 @@ if simEngine == "MuonBack":
  muons_stats = process_file(os.path.join(options.outputDir,"ship.MuonBack-TGeant4.root"), apply_acceptance_cut=True, debug=False)
  if len(muons_stats) == 0:
         veto_points, muon_kinematics = np.array([]), np.array([])
-    else:
+ else:
         veto_points = muons_stats[:, -2:]
         muon_kinematics = muons_stats[:, :-2]
  returned_params = {
