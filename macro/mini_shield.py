@@ -12,6 +12,9 @@ import shipRoot_conf
 import rootUtils as ut
 from ShipGeoConfig import ConfigRegistry
 from argparse import ArgumentParser
+from collections import defaultdict
+import numpy as np
+import json
 
 debug = 0  # 1 print weights and field
            # 2 make overlap check
@@ -398,7 +401,7 @@ if simEngine == "MuonBack":
                     hit.GetPdgCode(),
                     hit.GetWeight()
                 ]
-                muons_stats.append(muon + muon_veto_points[index][0])
+                muons_stats.append(muon)
                 if len(muon_veto_points[index]) > 1:
                     events_with_more_than_two_hits_per_mc += 1
                     continue
@@ -409,13 +412,12 @@ if simEngine == "MuonBack":
     return np.array(muons_stats)
  muons_stats = process_file(os.path.join(options.outputDir,"ship.MuonBack-TGeant4.root"), apply_acceptance_cut=True, debug=False)
  if len(muons_stats) == 0:
-        veto_points, muon_kinematics = np.array([]), np.array([])
+        muon_kinematics = np.array([])
  else:
-        veto_points = muons_stats[:, -2:]
-        muon_kinematics = muons_stats[:, :-2]
+        muon_kinematics = muons_stats
  returned_params = {
         "w": m,
-        "params": [float(strip(par))for par in options.optParams.split(',')],
+        "params": [float(str.strip(par))for par in options.optParams.split(',')],
         "kinematics": muon_kinematics.tolist()
     }
  with open(os.path.join(options.outputDir, "optimise_input.json"), "w") as f:
