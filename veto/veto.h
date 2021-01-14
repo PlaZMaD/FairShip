@@ -94,6 +94,10 @@ class veto: public FairDetector
     inline void SetLiquidVeto(Int_t liquid=1) {fLiquidVeto=liquid;}
     inline Int_t GetLiquidVeto() const {return fLiquidVeto;}
 
+    inline void SetSensePlaneZ(Float_t _sens_z) {
+        sens_z = _sens_z;
+    }
+
   private:
 
     /** Track information to be stored until the track leaves the
@@ -153,6 +157,8 @@ class veto: public FairDetector
     Int_t fLiquidVeto;
     /** container for data points */
     TClonesArray*  fvetoPointCollection;
+
+    Float_t sens_z;
 
     veto(const veto&);
     veto& operator=(const veto&);

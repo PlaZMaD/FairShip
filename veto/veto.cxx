@@ -1162,81 +1162,90 @@ void veto::ConstructGeometry()
      therefore, incorporate here the previously external defined ShipChamber
      and make the walls sensitive
  */
-          floorHeightA=floorHeightA*0.5;
+//          floorHeightA=floorHeightA*0.5;
  
     TGeoVolume *top=gGeoManager->GetTopVolume();
-    InitMedium("Concrete");
-    TGeoMedium *concrete  =gGeoManager->GetMedium("Concrete");
-    InitMedium("steel");
-    TGeoMedium *polypropylene = gGeoManager->GetMedium("polypropylene");
-    InitMedium("polypropylene");
-    TGeoMedium *St =gGeoManager->GetMedium("steel");
-    InitMedium("vacuums");
-    TGeoMedium *vac =gGeoManager->GetMedium("vacuums");
-    InitMedium("Aluminum");
-    TGeoMedium *Al =gGeoManager->GetMedium("Aluminum");
+//    InitMedium("Concrete");
+//    TGeoMedium *concrete  =gGeoManager->GetMedium("Concrete");
+//    InitMedium("steel");
+//    TGeoMedium *polypropylene = gGeoManager->GetMedium("polypropylene");
+//    InitMedium("polypropylene");
+//    TGeoMedium *St =gGeoManager->GetMedium("steel");
+//    InitMedium("vacuums");
+//    TGeoMedium *vac =gGeoManager->GetMedium("vacuums");
+//    InitMedium("Aluminum");
+//    TGeoMedium *Al =gGeoManager->GetMedium("Aluminum");
     InitMedium("ShipSens");
     TGeoMedium *Sens =gGeoManager->GetMedium("ShipSens");
-    InitMedium("Scintillator");
-    TGeoMedium *Se =gGeoManager->GetMedium("Scintillator");
-    gGeoManager->SetNsegments(100);
-    vetoMed        = gGeoManager->GetMedium(vetoMed_name);      //! medium of veto counter, liquid or plastic scintillator
-    supportMedIn   = gGeoManager->GetMedium(supportMedIn_name); //! medium of support structure, iron, balloon
-    supportMedOut  = gGeoManager->GetMedium(supportMedOut_name); //! medium of support structure, aluminium, balloon
-    decayVolumeMed = gGeoManager->GetMedium(decayVolumeMed_name);  // decay volume, air/helium/vacuum
+//    InitMedium("Scintillator");
+//    TGeoMedium *Se =gGeoManager->GetMedium("Scintillator");
+//    gGeoManager->SetNsegments(100);
+//    vetoMed        = gGeoManager->GetMedium(vetoMed_name);      //! medium of veto counter, liquid or plastic scintillator
+//    supportMedIn   = gGeoManager->GetMedium(supportMedIn_name); //! medium of support structure, iron, balloon
+//    supportMedOut  = gGeoManager->GetMedium(supportMedOut_name); //! medium of support structure, aluminium, balloon
+//    decayVolumeMed = gGeoManager->GetMedium(decayVolumeMed_name);  // decay volume, air/helium/vacuum
     // put everything in an assembly
-    TGeoVolume *tDecayVol = new TGeoVolumeAssembly("DecayVolume");
-    TGeoVolume *tMaGVol   = new TGeoVolumeAssembly("MagVolume");
-    Double_t zStartDecayVol = fTub1z-fTub1length-f_InnerSupportThickness;
-    Double_t zStartMagVol = fTub3z+fTub3length-f_InnerSupportThickness; //? is this needed, -f_InnerSupportThickness
-    
-      Double_t d = f_VetoThickness+2*f_RibThickness+f_OuterSupportThickness;
-      Double_t slopex = (2.5*m + d)/(fTub6z-fTub6length - zFocusX);
-      Double_t slopey = (fBtube + d) /(fTub6z-fTub6length - zFocusY);
-      Double_t zpos = fTub1z -fTub1length -f_LidThickness;
-      Double_t dx1 = slopex*(zpos - zFocusX);
-      Double_t dy  = slopey*(zpos - zFocusY);
-   // make the entrance window
-      // add floor:
-      Double_t Length = zStartMagVol - zStartDecayVol - 2.2*m;
-      TGeoBBox *box = new TGeoBBox("box1",  10 * m, floorHeightA/2., Length/2.);
-      TGeoVolume *floor = new TGeoVolume("floor1",box,concrete);
-      floor->SetLineColor(11);
-      tDecayVol->AddNode(floor, 0, new TGeoTranslation(0, -10*m+floorHeightA/2.,Length/2.));
-      //entrance lid
-      TGeoVolume* T1Lid = MakeLidSegments(1,dx1,dy);
-      tDecayVol->AddNode(T1Lid, 1, new TGeoTranslation(0, 0, zpos - zStartDecayVol+f_LidThickness/2.1));
+//    TGeoVolume *tDecayVol = new TGeoVolumeAssembly("DecayVolume");
+//    TGeoVolume *tMaGVol   = new TGeoVolumeAssembly("MagVolume");
+//    Double_t zStartDecayVol = fTub1z-fTub1length-f_InnerSupportThickness;
+//    Double_t zStartMagVol = fTub3z+fTub3length-f_InnerSupportThickness; //? is this needed, -f_InnerSupportThickness
+//
+//      Double_t d = f_VetoThickness+2*f_RibThickness+f_OuterSupportThickness;
+//      Double_t slopex = (2.5*m + d)/(fTub6z-fTub6length - zFocusX);
+//      Double_t slopey = (fBtube + d) /(fTub6z-fTub6length - zFocusY);
+//      Double_t zpos = fTub1z -fTub1length -f_LidThickness;
+//      Double_t dx1 = slopex*(zpos - zFocusX);
+//      Double_t dy  = slopey*(zpos - zFocusY);
+//   // make the entrance window
+//      // add floor:
+//      Double_t Length = zStartMagVol - zStartDecayVol - 2.2*m;
+//      TGeoBBox *box = new TGeoBBox("box1",  10 * m, floorHeightA/2., Length/2.);
+//      TGeoVolume *floor = new TGeoVolume("floor1",box,concrete);
+//      floor->SetLineColor(11);
+//      //tDecayVol->AddNode(floor, 0, new TGeoTranslation(0, -10*m+floorHeightA/2.,Length/2.));
+//      //entrance lid
+//      TGeoVolume* T1Lid = MakeLidSegments(1,dx1,dy);
+//      //tDecayVol->AddNode(T1Lid, 1, new TGeoTranslation(0, 0, zpos - zStartDecayVol+f_LidThickness/2.1));
+//
+//      //without segment1, recalculate the z and (half)length of segment 2:
+//      //Take into account to remove the between seg1 and seg2 due to straw-veto station.
+//      //and add this gap to the total length.
+//      Double_t tgap=fTub2z-fTub1z-fTub2length-fTub1length;
+//      fTub2z=fTub1z+fTub2length+tgap/2.;
+//      fTub2length=fTub2length+fTub1length+tgap/2.;
+//      TGeoVolume* seg2 = MakeSegments(fTub2length,dx1,dy,slopex,slopey,floorHeightA);
+//      //tDecayVol->AddNode(seg2, 1, new TGeoTranslation(0, 0, fTub2z-zStartDecayVol));
+////////////////?????
+//      Length = fTub6length+fTub2length+3*m; // extend under ecal and muon detectors
+//      box = new TGeoBBox("box2",  10 * m, floorHeightB/2., Length/2.);
+//      floor = new TGeoVolume("floor2",box,concrete);
+//      floor->SetLineColor(11);
+//      //tMaGVol->AddNode(floor, 0, new TGeoTranslation(0, -10*m+floorHeightB/2., Length/2.-2*fTub3length - 0.5*m));
+//
+//      //TGeoVolume*  magnetInnerWalls = MakeMagnetSegment(3);
+//      //tMaGVol->AddNode(magnetInnerWalls, 1, new TGeoTranslation(0, 0, fTub4z - zStartMagVol));
+//
+//
+//   // make the exit window
+//      Double_t dx2 = slopex*(fTub6z +fTub6length - zFocusX);
+//      TGeoVolume *T6Lid = gGeoManager->MakeBox("T6Lid",supportMedOut,dx2,dy,f_LidThickness/2.);
+//      T6Lid->SetLineColor(18);
+//      T6Lid->SetLineColor(2);
+//      T6Lid->SetFillColor(2);
+//      tMaGVol->AddNode(T6Lid, 1, new TGeoTranslation(0, 0,fTub6z+fTub6length+f_LidThickness/2.+0.1*cm - zStartMagVol));
+//      //finisMakeSegments assembly and position
+//      //top->AddNode(tDecayVol, 1, new TGeoTranslation(0, 0,zStartDecayVol));
+//      //top->AddNode(tMaGVol, 1, new TGeoTranslation(0, 0,zStartMagVol));
 
-      //without segment1, recalculate the z and (half)length of segment 2:
-      //Take into account to remove the between seg1 and seg2 due to straw-veto station.
-      //and add this gap to the total length.
-      Double_t tgap=fTub2z-fTub1z-fTub2length-fTub1length;
-      fTub2z=fTub1z+fTub2length+tgap/2.;
-      fTub2length=fTub2length+fTub1length+tgap/2.;
-      TGeoVolume* seg2 = MakeSegments(fTub2length,dx1,dy,slopex,slopey,floorHeightA);
-      tDecayVol->AddNode(seg2, 1, new TGeoTranslation(0, 0, fTub2z-zStartDecayVol));
-//////////////?????
-      Length = fTub6length+fTub2length+3*m; // extend under ecal and muon detectors
-      box = new TGeoBBox("box2",  10 * m, floorHeightB/2., Length/2.);
-      floor = new TGeoVolume("floor2",box,concrete);
-      floor->SetLineColor(11);
-      tMaGVol->AddNode(floor, 0, new TGeoTranslation(0, -10*m+floorHeightB/2., Length/2.-2*fTub3length - 0.5*m));
 
-      //TGeoVolume*  magnetInnerWalls = MakeMagnetSegment(3);
-      //tMaGVol->AddNode(magnetInnerWalls, 1, new TGeoTranslation(0, 0, fTub4z - zStartMagVol));      
-      
-      
-   // make the exit window
-      Double_t dx2 = slopex*(fTub6z +fTub6length - zFocusX);
-      TGeoVolume *T6Lid = gGeoManager->MakeBox("T6Lid",supportMedOut,dx2,dy,f_LidThickness/2.);
-      T6Lid->SetLineColor(18);
-      T6Lid->SetLineColor(2);
-      T6Lid->SetFillColor(2);
-      tMaGVol->AddNode(T6Lid, 1, new TGeoTranslation(0, 0,fTub6z+fTub6length+f_LidThickness/2.+0.1*cm - zStartMagVol));
-      //finisMakeSegments assembly and position
-      top->AddNode(tDecayVol, 1, new TGeoTranslation(0, 0,zStartDecayVol));
-      top->AddNode(tMaGVol, 1, new TGeoTranslation(0, 0,zStartMagVol));
+// Adding new veto after shield
+//     InitMedium("vacuum");
+//     TGeoMedium* dummy = gGeoManager->GetMedium("vacuum");
 
+     TGeoVolume* after_shield = gGeoManager->MakeBox("sensitive_plane", Sens, 1*m, 1*m, 1*cm);
+     after_shield->SetLineColor(kRed);
+     top->AddNode(after_shield, 0, new TGeoTranslation(0, 0, sens_z));
+     AddSensitiveVolume(after_shield);
 
 // only for fastMuon simulation, otherwise output becomes too big
      if (fFastMuon && fFollowMuon){

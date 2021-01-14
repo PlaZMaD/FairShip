@@ -26,7 +26,7 @@ Double_t tesla = 10 * kilogauss;
 ShipMuonShield::~ShipMuonShield() {}
 ShipMuonShield::ShipMuonShield() : FairModule("ShipMuonShield", "") {}
 
-ShipMuonShield::ShipMuonShield(TString geofile,
+ShipMuonShield::ShipMuonShield(Double_t Z, TString geofile,
                                const Int_t withCoMagnet, const Bool_t StepGeo,
                                const Bool_t WithConstAbsorberField, const Bool_t WithConstShieldField)
   : FairModule("MuonShield", "ShipMuonShield")
@@ -39,12 +39,12 @@ ShipMuonShield::ShipMuonShield(TString geofile,
   auto f = TFile::Open(geofile, "read");
   TVectorT<Double_t> params;
   params.Read("params");
-  Double_t LE = 10. * m, floor = 5. * m;
+  Double_t LE = 0. * m, floor = 5. * m;
   fDesign = 8;
   fField = 1.7;
   dZ0 = 1 * m;
-  dZ1 = 0.4 * m;
-  dZ2 = 2.31 * m;
+  dZ1 = 0. * m;
+  dZ2 = 0. * m;
   dZ3 = params[2];
   dZ4 = params[3];
   dZ5 = params[4];
@@ -56,7 +56,7 @@ ShipMuonShield::ShipMuonShield(TString geofile,
   fFloor = floor;
   fSupport = true;
 
-  Double_t Z = -25 * m - fMuonShieldLength / 2.;
+  //Double_t Z = -25 * m - fMuonShieldLength / 2.;
 
   zEndOfAbsorb = Z + dZ0 - fMuonShieldLength / 2.;
   zEndOfAbsorb -= dZ0;
@@ -248,6 +248,8 @@ void ShipMuonShield::CreateMagnet(TString magnetName,TGeoMedium* medium,TGeoVolu
     } else if (fDesign > 7) {
        // Assuming 0.5A/mm^2 and 10000At needed, about 200cm^2 gaps are necessary
        // Current design safely above this. Will consult with MISiS to get a better minimum.
+       std::cout << "GAPS SET:" << gap << "," << gap2 << std::endl;
+       std::cout << "GAPS LIM:" << 100. / dY << "," << 100. / dY2 << std::endl;
        gap = std::ceil(std::max(100. / dY, gap));
        gap2 = std::ceil(std::max(100. / dY2, gap2));
        coil_gap = gap;
@@ -428,7 +430,7 @@ Int_t ShipMuonShield::Initialize(std::vector<TString> &magnetName,
     i->reserve(nMagnets);
   }
 
-  Double_t zgap = (fDesign > 6) ? 10 : 0;  // fixed distance between magnets in Z-axis
+  Double_t zgap = (fDesign > 6) ? 1 : 0;  // fixed distance between magnets in Z-axis
 
   if (fDesign == 8) {
 
@@ -772,21 +774,21 @@ void ShipMuonShield::ConstructGeometry()
         TGeoVolume* passivAbsorber = new TGeoVolume("passiveAbsorberStop-1",Tc, iron);
         tShield->AddNode(passivAbsorber, 1, new TGeoTranslation(0,0,zEndOfAbsorb - 5.*dZ0/3.));
       } else if (fDesign >= 7) {
-        float mField = 1.6 * tesla;
-	TGeoUniformMagField *fieldsAbsorber[4] = {
-	    new TGeoUniformMagField(0., mField, 0.),
-	    new TGeoUniformMagField(0., -mField, 0.),
-	    new TGeoUniformMagField(-mField, 0., 0.),
-	    new TGeoUniformMagField(mField, 0., 0.)
-	};
+//        float mField = 1.6 * tesla;
+//	TGeoUniformMagField *fieldsAbsorber[4] = {
+//	    new TGeoUniformMagField(0., mField, 0.),
+//	    new TGeoUniformMagField(0., -mField, 0.),
+//	    new TGeoUniformMagField(-mField, 0., 0.),
+//	    new TGeoUniformMagField(mField, 0., 0.)
+//	};
 
-	for (Int_t nM = (fDesign == 7) ? 0 : 1; nM < 2; nM++) {
-	  CreateMagnet(magnetName[nM], iron, tShield, fieldsAbsorber,
-		       fieldDirection[nM], dXIn[nM], dYIn[nM], dXOut[nM],
-		       dYOut[nM], dZf[nM], midGapIn[nM], midGapOut[nM],
-		       HmainSideMagIn[nM], HmainSideMagOut[nM], gapIn[nM],
-		       gapOut[nM], Z[nM], true, false);
-	}
+//	for (Int_t nM = (fDesign == 7) ? 0 : 1; nM < 2; nM++) {
+//	  CreateMagnet(magnetName[nM], iron, tShield, fieldsAbsorber,
+//		       fieldDirection[nM], dXIn[nM], dYIn[nM], dXOut[nM],
+//		       dYOut[nM], dZf[nM], midGapIn[nM], midGapOut[nM],
+//		       HmainSideMagIn[nM], HmainSideMagOut[nM], gapIn[nM],
+//		       gapOut[nM], Z[nM], true, false);
+//	}
 
       std::vector<TGeoTranslation*> mag_trans;
 
@@ -800,11 +802,11 @@ void ShipMuonShield::ConstructGeometry()
       mag_trans.push_back(mag2);
 
       Double_t zgap = 10;
-      Double_t absorber_offset = zgap;
-      Double_t absorber_half_length = (dZf[0] + dZf[1]) + zgap / 2.;
-      auto abs = new TGeoBBox("absorber", 3.95 * m, 3.4 * m, absorber_half_length);
-      const std::vector<TString> absorber_magnets =
-         (fDesign == 7) ? std::vector<TString>{"MagnAbsorb1", "MagnAbsorb2"} : std::vector<TString>{"MagnAbsorb2"};
+//      Double_t absorber_offset = zgap;
+//      Double_t absorber_half_length = (dZf[0] + dZf[1]) + zgap / 2.;
+//      auto abs = new TGeoBBox("absorber", 3.95 * m, 3.4 * m, absorber_half_length);
+//      const std::vector<TString> absorber_magnets =
+//         (fDesign == 7) ? std::vector<TString>{"MagnAbsorb1", "MagnAbsorb2"} : std::vector<TString>{"MagnAbsorb2"};
       const std::vector<TString> magnet_components = fDesign == 7 ? std::vector<TString>{
 	  "_MiddleMagL", "_MiddleMagR",  "_MagRetL",    "_MagRetR",
 	  "_MagCLB",     "_MagCLT",      "_MagCRT",     "_MagCRB",
@@ -813,56 +815,58 @@ void ShipMuonShield::ConstructGeometry()
 	  "_MiddleMagL", "_MiddleMagR",  "_MagRetL",    "_MagRetR",
 	  "_MagTopLeft", "_MagTopRight", "_MagBotLeft", "_MagBotRight",
       };
-      TString absorber_magnet_components;
-      for (auto &&magnet_component : magnet_components) {
-	// format: "-<magnetName>_<magnet_component>:<translation>"
-	absorber_magnet_components +=
-	    ("-" + absorber_magnets[0] + magnet_component + ":" +
-	     mag_trans[0]->GetName());
-	if (fDesign == 7) {
-	absorber_magnet_components +=
-	    ("-" + absorber_magnets[1] + magnet_component + ":" +
-	     mag_trans[1]->GetName());
-	}
-      }
-      TGeoCompositeShape *absorberShape = new TGeoCompositeShape(
-	  "Absorber", "absorber" + absorber_magnet_components); // cutting out
-								// magnet parts
-								// from absorber
-      TGeoVolume *absorber = new TGeoVolume("AbsorberVol", absorberShape, iron);
-      absorber->SetLineColor(42); // brown / light red
-      tShield->AddNode(absorber, 1, new TGeoTranslation(0, 0, zEndOfAbsorb + absorber_half_length + absorber_offset));
+//      TString absorber_magnet_components;
+//      for (auto &&magnet_component : magnet_components) {
+//	// format: "-<magnetName>_<magnet_component>:<translation>"
+//	absorber_magnet_components +=
+//	    ("-" + absorber_magnets[0] + magnet_component + ":" +
+//	     mag_trans[0]->GetName());
+//	if (fDesign == 7) {
+//	absorber_magnet_components +=
+//	    ("-" + absorber_magnets[1] + magnet_component + ":" +
+//	     mag_trans[1]->GetName());
+//	}
+//      }
+//      TGeoCompositeShape *absorberShape = new TGeoCompositeShape(
+//	  "Absorber", "absorber" + absorber_magnet_components); // cutting out
+//								// magnet parts
+//								// from absorber
+//      TGeoVolume *absorber = new TGeoVolume("AbsorberVol", absorberShape, iron);
+//      absorber->SetLineColor(42); // brown / light red
+//      tShield->AddNode(absorber, 1, new TGeoTranslation(0, 0, zEndOfAbsorb + absorber_half_length + absorber_offset));
 
-      if (fDesign > 7) {
-         auto coatBox = new TGeoBBox("coat", 10 * m - 1 * mm, 10 * m - 1 * mm, absorber_half_length);
-         auto coatShape = new TGeoCompositeShape("CoatShape", "coat-absorber");
-         auto coat = new TGeoVolume("CoatVol", coatShape, concrete);
-         tShield->AddNode(coat, 1, new TGeoTranslation(0, 0, zEndOfAbsorb + absorber_half_length + absorber_offset ));
-         TGeoVolume *coatWall = gGeoManager->MakeBox("CoatWall",concrete,10 * m - 1 * mm, 10 * m - 1 * mm, 7 * cm - 1 * mm);
-         coatWall->SetLineColor(kRed);
-         tShield->AddNode(coatWall, 1, new TGeoTranslation(0, 0, zEndOfAbsorb + 2*absorber_half_length + absorber_offset+7 * cm));
+//      if (fDesign > 7) {
+//         auto coatBox = new TGeoBBox("coat", 10 * m - 1 * mm, 10 * m - 1 * mm, absorber_half_length);
+//         auto coatShape = new TGeoCompositeShape("CoatShape", "coat-absorber");
+//         auto coat = new TGeoVolume("CoatVol", coatShape, concrete);
+//         tShield->AddNode(coat, 1, new TGeoTranslation(0, 0, zEndOfAbsorb + absorber_half_length + absorber_offset ));
+//         TGeoVolume *coatWall = gGeoManager->MakeBox("CoatWall",concrete,10 * m - 1 * mm, 10 * m - 1 * mm, 7 * cm - 1 * mm);
+//         coatWall->SetLineColor(kRed);
+//         tShield->AddNode(coatWall, 1, new TGeoTranslation(0, 0, zEndOfAbsorb + 2*absorber_half_length + absorber_offset+7 * cm));
+//
+//      }
 
-      }
+//      if (fWithCoMagnet > 0)
+//      {
+//        Double_t lengthSum = 0.;
+//        for (int i = 2; i < 9; ++i)
+//        {
+//          lengthSum += dZf[i];
+//        }
+//        fieldScale.fill((fField * lengthSum -  2.2 * dZf[fWithCoMagnet])/fField/(lengthSum - dZf[fWithCoMagnet]));
+//        fieldScale[0] = 1.;
+//        fieldScale[1] = 1.;
+//        try
+//        {
+//         fieldScale.at(fWithCoMagnet) = 2.2 / fField;
+//        }
+//        catch(const std::out_of_range& e)
+//        {
+//           Fatal( "ShipMuonShield", "Exception out of range for --coMuonShield occurred \n");
+//        }
+//      }
+
       std::array<double, 9> fieldScale = {{1., 1., 1., 1., 1., 1., 1., 1., 1.}};
-      if (fWithCoMagnet > 0)
-      {
-        Double_t lengthSum = 0.;
-        for (int i = 2; i < 9; ++i)
-        {
-          lengthSum += dZf[i];
-        }
-        fieldScale.fill((fField * lengthSum -  2.2 * dZf[fWithCoMagnet])/fField/(lengthSum - dZf[fWithCoMagnet]));
-        fieldScale[0] = 1.;
-        fieldScale[1] = 1.;
-        try
-        {
-         fieldScale.at(fWithCoMagnet) = 2.2 / fField;
-        }
-        catch(const std::out_of_range& e)
-        {
-           Fatal( "ShipMuonShield", "Exception out of range for --coMuonShield occurred \n");
-        }
-      }
       for (Int_t nM = 2; nM <= (nMagnets - 1); nM++) {
   Double_t ironField_s = fField * fieldScale[nM] * tesla;
   TGeoUniformMagField *magFieldIron_s = new TGeoUniformMagField(0.,ironField_s,0.);
@@ -875,56 +879,56 @@ void ShipMuonShield::ConstructGeometry()
 		     midGapIn[nM], midGapOut[nM], HmainSideMagIn[nM],
 		     HmainSideMagOut[nM], gapIn[nM], gapOut[nM], Z[nM], nM==8, fStepGeo);
 
-	if (nM==8 || !fSupport) continue;
-	Double_t dymax = std::max(dYIn[nM] + dXIn[nM], dYOut[nM] + dXOut[nM]);
-	Double_t dymin = std::min(dYIn[nM] + dXIn[nM], dYOut[nM] + dXOut[nM]);
-	Double_t slope =
-	    (dYIn[nM] + dXIn[nM] - dYOut[nM] - dXOut[nM]) / (2 * dZf[nM]);
-	Double_t w1 = 2 * dXIn[nM] + std::max(20., gapIn[nM]);
-	Double_t w2 = 2 * dXOut[nM] + std::max(20., gapOut[nM]);
-	Double_t anti_overlap = 0.1;
-	Double_t h1 = 0.5 * (dYIn[nM] + dXIn[nM] + anti_overlap - 10 * m + fFloor);
-	Double_t h2 = 0.5 * (dYOut[nM] + dXOut[nM] + anti_overlap - 10 * m + fFloor);
-	Double_t length = std::min(0.5 * m, std::abs(dZf[nM]/2. - 5 * cm));
-	std::array<Double_t, 16> verticesIn = {
-	    -w1, -h1,
-	    +w1, -h1,
-	    +w1, +h1,
-	    -w1, +h1,
-	    -w1, -h1 + slope * 2. * length,
-	    +w1, -h1 + slope * 2. * length,
-	    +w1, +h1,
-	    -w1, +h1,
-	};
-	std::array<Double_t, 16> verticesOut = {
-	    -w2, -h2 - slope * 2. * length,
-	    +w2, -h2 - slope * 2. * length,
-	    +w2, +h2,
-	    -w2, +h2,
-	    -w2, -h2,
-	    +w2, -h2,
-	    +w2, +h2,
-	    -w2, +h2,
-	};
-  if (!fStepGeo)
-  {
-
-
-  	TGeoVolume *pillar1 =
-  	    gGeoManager->MakeArb8(TString::Format("pillar_%d", 2 * nM - 1),
-  				  steel, length, verticesIn.data());
-  	TGeoVolume *pillar2 =
-  	    gGeoManager->MakeArb8(TString::Format("pillar_%d", 2 * nM), steel,
-  				  length, verticesOut.data());
-  	pillar1->SetLineColor(kGreen-5);
-  	pillar2->SetLineColor(kGreen-5);
-  	tShield->AddNode(pillar1, 1, new TGeoTranslation(
-  				     0, -0.5 * (dYIn[nM] + dXIn[nM] + 10 * m - fFloor),
-  				     Z[nM] - dZf[nM] + length));
-  	tShield->AddNode(pillar2, 1, new TGeoTranslation(
-  				     0, -0.5 * (dYOut[nM] + dXOut[nM] + 10 * m - fFloor),
-  				     Z[nM] + dZf[nM] - length));
-  }
+//	if (nM==8 || !fSupport) continue;
+//	Double_t dymax = std::max(dYIn[nM] + dXIn[nM], dYOut[nM] + dXOut[nM]);
+//	Double_t dymin = std::min(dYIn[nM] + dXIn[nM], dYOut[nM] + dXOut[nM]);
+//	Double_t slope =
+//	    (dYIn[nM] + dXIn[nM] - dYOut[nM] - dXOut[nM]) / (2 * dZf[nM]);
+//	Double_t w1 = 2 * dXIn[nM] + std::max(20., gapIn[nM]);
+//	Double_t w2 = 2 * dXOut[nM] + std::max(20., gapOut[nM]);
+//	Double_t anti_overlap = 0.1;
+//	Double_t h1 = 0.5 * (dYIn[nM] + dXIn[nM] + anti_overlap - 10 * m + fFloor);
+//	Double_t h2 = 0.5 * (dYOut[nM] + dXOut[nM] + anti_overlap - 10 * m + fFloor);
+//	Double_t length = std::min(0.5 * m, std::abs(dZf[nM]/2. - 5 * cm));
+//	std::array<Double_t, 16> verticesIn = {
+//	    -w1, -h1,
+//	    +w1, -h1,
+//	    +w1, +h1,
+//	    -w1, +h1,
+//	    -w1, -h1 + slope * 2. * length,
+//	    +w1, -h1 + slope * 2. * length,
+//	    +w1, +h1,
+//	    -w1, +h1,
+//	};
+//	std::array<Double_t, 16> verticesOut = {
+//	    -w2, -h2 - slope * 2. * length,
+//	    +w2, -h2 - slope * 2. * length,
+//	    +w2, +h2,
+//	    -w2, +h2,
+//	    -w2, -h2,
+//	    +w2, -h2,
+//	    +w2, +h2,
+//	    -w2, +h2,
+//	};
+//  if (!fStepGeo)
+//  {
+//
+//
+//  	TGeoVolume *pillar1 =
+//  	    gGeoManager->MakeArb8(TString::Format("pillar_%d", 2 * nM - 1),
+//  				  steel, length, verticesIn.data());
+//  	TGeoVolume *pillar2 =
+//  	    gGeoManager->MakeArb8(TString::Format("pillar_%d", 2 * nM), steel,
+//  				  length, verticesOut.data());
+//  	pillar1->SetLineColor(kGreen-5);
+//  	pillar2->SetLineColor(kGreen-5);
+//  	tShield->AddNode(pillar1, 1, new TGeoTranslation(
+//  				     0, -0.5 * (dYIn[nM] + dXIn[nM] + 10 * m - fFloor),
+//  				     Z[nM] - dZf[nM] + length));
+//  	tShield->AddNode(pillar2, 1, new TGeoTranslation(
+//  				     0, -0.5 * (dYOut[nM] + dXOut[nM] + 10 * m - fFloor),
+//  				     Z[nM] + dZf[nM] - length));
+//  }
       }
           
       } else {
@@ -945,36 +949,36 @@ void ShipMuonShield::ConstructGeometry()
       top->AddNode(tShield, 1);
 
 // Concrete around first magnets. i.e. Tunnel
-      Double_t dZ = dZ1 + dZ2;
-      Double_t ZT  = zEndOfAbsorb + dZ;
-      TGeoBBox *box1    = new TGeoBBox("box1", 10*m,10*m,dZ);
-      TGeoBBox *box2    = new TGeoBBox("box2", 15*m,15*m,dZ);
-      TGeoCompositeShape *compRockS = new TGeoCompositeShape("compRockS", "box2-box1");
-      TGeoVolume *rockS   = new TGeoVolume("rockS", compRockS, concrete);
-      rockS->SetLineColor(11);  // grey
-      rockS->SetTransparency(50);
-      top->AddNode(rockS, 1, new TGeoTranslation(0, 0, ZT ));
-// Concrete around decay tunnel
-      Double_t dZD =  100*m + fMuonShieldLength;
-      TGeoBBox *box3    = new TGeoBBox("box3", 15*m, 15*m,dZD/2.);
-      TGeoBBox *box4    = new TGeoBBox("box4", 10*m, 10*m,dZD/2.);
-
-      if (fDesign >= 7 && fFloor > 0) {
-	// Only add floor for new shield
-	TGeoBBox *box5 = new TGeoBBox("shield_floor", 10 * m, fFloor / 2.,
-				      fMuonShieldLength / 2. - dZ - 14.2 * cm); // substract CoatWall
-	TGeoVolume *floor = new TGeoVolume("floorM", box5, concrete);
-	floor->SetLineColor(11); // grey
-	top->AddNode(floor, 1, new TGeoTranslation(0, -10 * m + fFloor / 2.,
-						   zEndOfAbsorb +
-						       fMuonShieldLength / 2. +dZ + 14.2 * cm)); // avoiding overlap with CoatWall
-      }
-      TGeoCompositeShape *compRockD =
-	  new TGeoCompositeShape("compRockD", "(box3-box4)");
-      TGeoVolume *rockD   = new TGeoVolume("rockD", compRockD, concrete);
-      rockD->SetLineColor(11);  // grey
-      rockD->SetTransparency(50);
-      top->AddNode(rockD, 1, new TGeoTranslation(0, 0, zEndOfAbsorb + 2*dZ + dZD/2.));
+//      Double_t dZ = dZ1 + dZ2;
+//      Double_t ZT  = zEndOfAbsorb + dZ;
+//      TGeoBBox *box1    = new TGeoBBox("box1", 10*m,10*m,dZ);
+//      TGeoBBox *box2    = new TGeoBBox("box2", 15*m,15*m,dZ);
+//      TGeoCompositeShape *compRockS = new TGeoCompositeShape("compRockS", "box2-box1");
+//      TGeoVolume *rockS   = new TGeoVolume("rockS", compRockS, concrete);
+//      rockS->SetLineColor(11);  // grey
+//      rockS->SetTransparency(50);
+//      top->AddNode(rockS, 1, new TGeoTranslation(0, 0, ZT ));
+//// Concrete around decay tunnel
+//      Double_t dZD =  100*m + fMuonShieldLength;
+//      TGeoBBox *box3    = new TGeoBBox("box3", 15*m, 15*m,dZD/2.);
+//      TGeoBBox *box4    = new TGeoBBox("box4", 10*m, 10*m,dZD/2.);
+//
+//      if (fDesign >= 7 && fFloor > 0) {
+//	// Only add floor for new shield
+//	TGeoBBox *box5 = new TGeoBBox("shield_floor", 10 * m, fFloor / 2.,
+//				      fMuonShieldLength / 2. - dZ - 14.2 * cm); // substract CoatWall
+//	TGeoVolume *floor = new TGeoVolume("floorM", box5, concrete);
+//	floor->SetLineColor(11); // grey
+//	top->AddNode(floor, 1, new TGeoTranslation(0, -10 * m + fFloor / 2.,
+//						   zEndOfAbsorb +
+//						       fMuonShieldLength / 2. +dZ + 14.2 * cm)); // avoiding overlap with CoatWall
+//      }
+//      TGeoCompositeShape *compRockD =
+//	  new TGeoCompositeShape("compRockD", "(box3-box4)");
+//      TGeoVolume *rockD   = new TGeoVolume("rockD", compRockD, concrete);
+//      rockD->SetLineColor(11);  // grey
+//      rockD->SetTransparency(50);
+//      top->AddNode(rockD, 1, new TGeoTranslation(0, 0, zEndOfAbsorb + 2*dZ + dZD/2.));
 //
     } else {
      Fatal("ShipMuonShield","Design %i does not match implemented designs",fDesign);

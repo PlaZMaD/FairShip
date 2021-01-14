@@ -190,19 +190,21 @@ class DrawTracks(ROOT.FairTask):
    T1Lid = ns.FindObject("T1Lid_1").GetMatrix()
    self.z_start = T1Lid.GetTranslation()[2]
   else: self.z_start = 0
-  muonDet = top.GetNode('MuonDetector_1')
-  if muonDet: self.z_end = muonDet.GetMatrix().GetTranslation()[2]+muonDet.GetVolume().GetShape().GetDZ()
-  elif hasattr(ShipGeo,'MuonStation3'):   self.z_end = ShipGeo['MuonStation3'].z
-  elif top.GetNode("VMuonBox_1"): 
-     xx =  top.GetNode("VMuonBox_1")
-     self.z_end = xx.GetMatrix().GetTranslation()[2]+xx.GetVolume().GetShape().GetDZ()
-  magNode = top.GetNode('MCoil_1')
-  if magNode: self.z_mag = magNode.GetMatrix().GetTranslation()[2]
-  else:       self.z_mag = ShipGeo['Bfield'].z
-  ecalDet = top.GetNode('Ecal_1')
-  self.z_ecal = self.z_end
-  if ecalDet: self.z_ecal = ecalDet.GetMatrix().GetTranslation()[2]
-  elif hasattr(ShipGeo,'ecal'):  self.z_ecal = ShipGeo['ecal'].z
+  veto_det = top.GetNode("sensitive_plane_0")
+  self.z_end = veto_det.GetMatrix().GetTranslation()[2]+veto_det.GetVolume().GetShape().GetDZ()
+  # muonDet = top.GetNode('MuonDetector_1')
+  # if muonDet: self.z_end = muonDet.GetMatrix().GetTranslation()[2]+muonDet.GetVolume().GetShape().GetDZ()
+  # elif hasattr(ShipGeo,'MuonStation3'):   self.z_end = ShipGeo['MuonStation3'].z
+  # elif top.GetNode("VMuonBox_1"):
+  #    xx =  top.GetNode("VMuonBox_1")
+  #    self.z_end = xx.GetMatrix().GetTranslation()[2]+xx.GetVolume().GetShape().GetDZ()
+  # magNode = top.GetNode('MCoil_1')
+  # if magNode: self.z_mag = magNode.GetMatrix().GetTranslation()[2]
+  # else:       self.z_mag = ShipGeo['Bfield'].z
+  # ecalDet = top.GetNode('Ecal_1')
+  # self.z_ecal = self.z_end
+  # if ecalDet: self.z_ecal = ecalDet.GetMatrix().GetTranslation()[2]
+  # elif hasattr(ShipGeo,'ecal'):  self.z_ecal = ShipGeo['ecal'].z
   self.niter = 100
   self.dz = (self.z_end - self.z_start) / float(self.niter)
   self.parallelToZ = ROOT.TVector3(0., 0., 1.) 
@@ -1019,11 +1021,12 @@ else:
    mcHits['SplitCalPoints']  = ROOT.FairMCPointDraw("splitcalPoint", ROOT.kRed, ROOT.kFullSquare)
  if not hasattr(mcHits,'SplitCalPoints'):
   mcHits['EcalPoints']  = ROOT.FairMCPointDraw("EcalPoint", ROOT.kRed, ROOT.kFullSquare)
-  if ShipGeo.HcalOption!=2: mcHits['HcalPoints']  = ROOT.FairMCPointDraw("HcalPoint", ROOT.kMagenta, ROOT.kFullSquare)
+  if hasattr(ShipGeo,"HcalOption") and ShipGeo.HcalOption!=2: mcHits['HcalPoints']  = ROOT.FairMCPointDraw("HcalPoint", ROOT.kMagenta, ROOT.kFullSquare)
  mcHits['MuonPoints']  = ROOT.FairMCPointDraw("muonPoint", ROOT.kYellow, ROOT.kFullSquare)
  mcHits['RpcPoints']   = ROOT.FairMCPointDraw("ShipRpcPoint", ROOT.kOrange, ROOT.kFullSquare)
  mcHits['TargetPoints']   = ROOT.FairMCPointDraw("TargetPoint", ROOT.kRed, ROOT.kFullSquare)
- ecalGeoFile = ShipGeo.ecal.File
+ if hasattr(ShipGeo,"ecal"):
+    ecalGeoFile = ShipGeo.ecal.File
 
  if hasattr(ShipGeo,'preshowerOption'): 
   if ShipGeo.preshowerOption >0: 
@@ -1048,19 +1051,19 @@ top   = sGeo.GetTopVolume()
 speedUp()
 gEve  = ROOT.gEve
 
-if hasattr(ShipGeo.Bfield,"fieldMap"):
-  ROOT.gSystem.Load('libG4clhep.so')
-  ROOT.gSystem.Load('libgeant4vmc.so')
-  import geomGeant4
-  fieldMaker = geomGeant4.addVMCFields(ShipGeo, '', True, withVirtualMC = False)
-  bfield = ROOT.genfit.FairShipFields()
-  bfield.setField(fieldMaker.getGlobalField())
-else:
-  bfield = ROOT.genfit.BellField(ShipGeo.Bfield.max ,ShipGeo.Bfield.z,2, ShipGeo.Bfield.y/2.*u.m)
+# if hasattr(ShipGeo.Bfield,"fieldMap"):
+#   ROOT.gSystem.Load('libG4clhep.so')
+#   ROOT.gSystem.Load('libgeant4vmc.so')
+#   import geomGeant4
+#   fieldMaker = geomGeant4.addVMCFields(ShipGeo, '', True, withVirtualMC = False)
+#   bfield = ROOT.genfit.FairShipFields()
+#   bfield.setField(fieldMaker.getGlobalField())
+# else:
+#   bfield = ROOT.genfit.BellField(ShipGeo.Bfield.max ,ShipGeo.Bfield.z,2, ShipGeo.Bfield.y/2.*u.m)
 geoMat =  ROOT.genfit.TGeoMaterialInterface()
 ROOT.genfit.MaterialEffects.getInstance().init(geoMat)
 fM = ROOT.genfit.FieldManager.getInstance()
-fM.init(bfield)
+# fM.init(bfield)
 
 import TrackExtrapolateTool
 br = gEve.GetBrowser()

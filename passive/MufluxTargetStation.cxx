@@ -235,8 +235,8 @@ void MufluxTargetStation::ConstructGeometry()
     TGeoVolume *abovetargetshield;
     TGeoVolume *aboveabovetargetshield; 
     TGeoVolume *floor; 
-    TGeoVolume *floorT34; 
-    TGeoVolume *floorRPC;     
+    //TGeoVolume *floorT34;
+    //TGeoVolume *floorRPC;
     
     zPos =  fTargetZ - fTargetLength/2.;
     // Absorber made of iron 
@@ -249,14 +249,14 @@ void MufluxTargetStation::ConstructGeometry()
     aboveabsorbershield = gGeoManager->MakeBox("AboveBsorberShield", concrete, faboveabsorbershield_x, faboveabsorbershield_y, faboveabsorbershield_z); 
     aboveabovetargetshield = gGeoManager->MakeBox("AboveAboveTargetShield", concrete, fAbsorberLength, faboveabovetargetshield_y, fAbsorberLength); 
     floor = gGeoManager->MakeBox("Floor", concrete, ffloor_x, ffloor_y, ffloor_z);
-    floorT34 = gGeoManager->MakeBox("FloorT34", concrete, ffloorT34_x, ffloorT34_y, ffloorT34_z);
-    floorRPC = gGeoManager->MakeBox("FloorRPC", concrete, ffloorRPC_x, ffloorRPC_y, ffloorRPC_z);
+    //floorT34 = gGeoManager->MakeBox("FloorT34", concrete, ffloorT34_x, ffloorT34_y, ffloorT34_z);
+    //floorRPC = gGeoManager->MakeBox("FloorRPC", concrete, ffloorRPC_x, ffloorRPC_y, ffloorRPC_z);
     
     ironshield->SetLineColor(42); // brown / light red	
     concreteshield->SetLineColor(kGray); // gray
     floor->SetLineColor(kGray); // gray
-    floorT34->SetLineColor(kGray); // gray
-    floorRPC->SetLineColor(kGray); // gray
+    //floorT34->SetLineColor(kGray); // gray
+    //floorRPC->SetLineColor(kGray); // gray
     aboveabsorbershield->SetLineColor(kGray); // gray
     abovetargetshield->SetLineColor(kGray); // gray
     aboveabovetargetshield->SetLineColor(kGray); // gray
@@ -270,9 +270,9 @@ void MufluxTargetStation::ConstructGeometry()
     //TGeoNode *node = GetNode("Absorber");    
     //tTarget->ReplaceNode(node,new TGeoTube(1.,2.,10.),new TGeoTranslation(0,-100.2,12),iron); //
         
-    tTarget->AddNode(floor, 7, new TGeoTranslation(0., -217., 500.)); 
-    tTarget->AddNode(floorT34, 8, new TGeoTranslation(0., -120., fAbsorberZ-zPos+771.125)); 
-    tTarget->AddNode(floorRPC, 9, new TGeoTranslation(0., -94.49, fAbsorberZ-zPos+1075.));
+    //tTarget->AddNode(floor, 7, new TGeoTranslation(0., -217., 500.));
+    //tTarget->AddNode(floorT34, 8, new TGeoTranslation(0., -120., fAbsorberZ-zPos+771.125));
+    //tTarget->AddNode(floorRPC, 9, new TGeoTranslation(0., -94.49, fAbsorberZ-zPos+1075.));
     
     TGeoShapeAssembly* asmb = dynamic_cast<TGeoShapeAssembly*>(tTarget->GetShape());
     Double_t totLength = asmb->GetDZ();
