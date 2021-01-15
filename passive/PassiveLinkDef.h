@@ -12,6 +12,7 @@
 #pragma link C++ class  ShipTargetStation+;
 #pragma link C++ class  MufluxTargetStation+;
 #pragma link C++ class  ShipMuonShield+;
+#pragma link C++ class  MiniShield+;
 #pragma link C++ class  ShipGeoCave;
 #pragma link C++ class  ShipPassiveContFact;
 #pragma link C++ class  ShipTAUMagneticSpectrometer+;

@@ -9,7 +9,8 @@ with ConfigRegistry.register_config("basic") as c:
     # c.Bfield.max = 0 # 1.4361*u.kilogauss  # was 1.15 in EOI
     # c.Bfield.y   = 0.
     # c.Bfield.x   = 0.
-
+    
+    c.optParams = ""
     c.MufluxSpectrometer = AttrDict(z = 0*u.cm)  
     # False = charm cross-section; True = muon flux measurement 
     

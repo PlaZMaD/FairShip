@@ -37,6 +37,7 @@ if sys.platform == 'darwin':
    ROOT.gSystem.Load("libpythia8")
    ROOT.gSystem.Load('libShipGen')
    ROOT.gSystem.Load('libShipData')
+   ROOT.gSystem.Load('libfluxDet')
 else:
     ROOT.gSystem.Load("libPythia6")
     ROOT.gSystem.Load("libpythia8")
@@ -60,7 +61,7 @@ def pyExit():
             if hasattr(x,'fMan'): del x.fMan
             if hasattr(x,'fRun'): del x.fRun
             return
-    print("Genfit is not used. Exit normally")
+    print("Exit normally")
 
 def configure(darkphoton=None):
    ROOT.gROOT.ProcessLine('#include "'+os.environ["FAIRSHIP"]+'/shipdata/ShipGlobals.h"')

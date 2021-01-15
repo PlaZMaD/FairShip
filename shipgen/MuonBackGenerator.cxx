@@ -23,12 +23,12 @@ MuonBackGenerator::MuonBackGenerator() {
 // -------------------------------------------------------------------------
 // -----   Default constructor   -------------------------------------------
 Bool_t MuonBackGenerator::Init(const char* fileName) {
-  return Init(fileName, 0, false);
+  return Init(fileName, 0, 1.0, false);
 }
 // -----   Default constructor   -------------------------------------------
-Bool_t MuonBackGenerator::Init(const char* fileName, const int firstEvent, const Bool_t fl = false ) {
-  fLogger = FairLogger::GetLogger();
-  fLogger->Info(MESSAGE_ORIGIN,"Opening input file %s",fileName);
+Bool_t MuonBackGenerator::Init(const char* fileName, const int firstEvent, const Double_t mFact, const Bool_t fl = false ) {
+  factor = mFact;
+  LOGF(info, "Opening input file %s", fileName);
   if (0 == strncmp("/eos",fileName,4) ) {
      TString tmp = gSystem->Getenv("EOSSHIP");
      tmp+=fileName;
@@ -37,7 +37,7 @@ Bool_t MuonBackGenerator::Init(const char* fileName, const int firstEvent, const
   fInputFile  = new TFile(fileName);
   }
   if (fInputFile->IsZombie()) {
-    fLogger->Fatal(MESSAGE_ORIGIN, "Error opening the Signal file:",fInputFile);
+     LOGF(fatal, "Error opening the Signal file:%s", fileName);
   }
   fn = firstEvent;
   fPhiRandomize = fl;
@@ -113,9 +113,14 @@ Bool_t MuonBackGenerator::ReadEvent(FairPrimaryGenerator* cpg)
    muList.clear(); 
    moList.clear(); 
    fn++;
-   if (fn%100000==0)  {fLogger->Info(MESSAGE_ORIGIN,"reading event %i",fn);}
+   if (fn%100000==0) {
+       LOGF(info, "Reading event %i", fn);
+   }
 // test if we have a muon, don't look at neutrinos:
    if (TMath::Abs(int(id))==13) {
+        px = px*factor;
+        py = py*factor;
+        pz = pz*factor;
         mass = pdgBase->GetParticle(id)->Mass();
         e = TMath::Sqrt( px*px+py*py+pz*pz+mass*mass );
         tof = 0;
@@ -153,17 +158,19 @@ Bool_t MuonBackGenerator::ReadEvent(FairPrimaryGenerator* cpg)
         }
        it++;
       }
-     if (!found) {fLogger->Warning(MESSAGE_ORIGIN, "no muon found %i",fn-1);}
+      if (!found) {
+          LOGF(warn, "No muon found %i", fn-1);
+      }
      if (found) {break;}
    }
   }
   if (fn>fNevents-1){ 
-     fLogger->Info(MESSAGE_ORIGIN,"End of file reached %i",fNevents);
+     LOGF(info, "End of file reached %i", fNevents);
      return kFALSE;
   } 
   if (fSameSeed) {
     Int_t theSeed = fn + fSameSeed * fNevents;
-    fLogger->Debug(MESSAGE_ORIGIN, TString::Format("Seed: %d", theSeed));
+    LOGF(debug, "Seed: %d", theSeed);
     gRandom->SetSeed(theSeed);
   }
   if (fPhiRandomize){phi = gRandom->Uniform(0.,2.) * TMath::Pi();}
@@ -177,9 +184,9 @@ Bool_t MuonBackGenerator::ReadEvent(FairPrimaryGenerator* cpg)
      for (unsigned i = 0; i< MCTrack->GetEntries();  i++ ){
        ShipMCTrack* track = (ShipMCTrack*)MCTrack->At(i);
        Int_t abspid = TMath::Abs(track->GetPdgCode());
-       px = track->GetPx();
-       py = track->GetPy();
-       pz = track->GetPz();
+       px = track->GetPx()*factor;
+       py = track->GetPy()*factor;
+       pz = track->GetPz()*factor;
        if (fPhiRandomize){
         Double_t phi0 = TMath::ATan2(py,px);
         Double_t pt  = track->GetPt();
@@ -201,9 +208,9 @@ Bool_t MuonBackGenerator::ReadEvent(FairPrimaryGenerator* cpg)
            TVector3 lmv = v->LastMom();
            if (abspid == 22){ e=lmv.Mag();}
            else{ e = TMath::Sqrt(lmv.Mag2()+(track->GetMass())*(track->GetMass()));}
-           px = lmv[0];
-           py = lmv[1];
-           pz = lmv[2];
+           px = lmv[0]*factor;
+           py = lmv[1]*factor;
+           pz = lmv[2]*factor;
            vx = lpv[0];
            vy = lpv[1];
            vz = lpv[2];
