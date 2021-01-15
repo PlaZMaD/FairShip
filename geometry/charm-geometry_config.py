@@ -208,7 +208,7 @@ with ConfigRegistry.register_config("basic") as c:
         ) + c.muShield.LE
         c.muShield.z = c.hadronAbsorber.z + c.hadronAbsorber.length / 2 + c.muShield.length / 2 + 0 * u.m
         c.SensPlane = AttrDict(z=0 * u.cm)
-        c.SensPlane.z = c.muShield.z + c.muShield.length / 2 + 0.5 * u.m
+        c.SensPlane.z = 6.0 * u.m
 
     c.hadronAbsorber.WithConstField = True
     c.muShield.WithConstField = True

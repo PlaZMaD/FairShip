@@ -29,27 +29,41 @@ def configure(run,ship_geo,Gfield=''):
  cave.SetGeometryFileName("caveWithAir.geo")
  detectorList.append(cave)
 
- if ship_geo.muShieldDesign in [3, 4, 5, 6, 7, 9]:
-  MuonShield = ROOT.ShipMuonShield(
-     "MuonShield", ship_geo.muShieldDesign, "ShipMuonShield",
-     ship_geo.muShield.z, ship_geo.muShield.dZ0, ship_geo.muShield.dZ1,
-     ship_geo.muShield.dZ2, ship_geo.muShield.dZ3,
-     ship_geo.muShield.dZ4, ship_geo.muShield.dZ5,
-     ship_geo.muShield.dZ6, ship_geo.muShield.dZ7,
-     ship_geo.muShield.dZ8, ship_geo.muShield.dXgap,
-     ship_geo.muShield.LE, ship_geo.Yheight * 4. / 10.,
-     ship_geo.cave.floorHeightMuonShield, ship_geo.muShield.Field,
-     ship_geo.muShieldWithCobaltMagnet, ship_geo.muShieldStepGeo,
-     ship_geo.hadronAbsorber.WithConstField, ship_geo.muShield.WithConstField)
+ if ship_geo.optParams:
+    MiniShield = ROOT.MiniShield(
+        ship_geo.optParams, "MiniShield", ship_geo.muShieldDesign, "MiniMuonShield",
+        ship_geo.muShield.z, ship_geo.muShield.dZ0, ship_geo.muShield.dZ1,
+        ship_geo.muShield.dZ2, ship_geo.muShield.dZ3,
+        ship_geo.muShield.dZ4, ship_geo.muShield.dZ5,
+        ship_geo.muShield.dZ6, ship_geo.muShield.dZ7,
+        ship_geo.muShield.dZ8, ship_geo.muShield.dXgap,
+        ship_geo.muShield.LE, ship_geo.Yheight * 4. / 10.,
+        ship_geo.cave.floorHeightMuonShield,ship_geo.muShield.Field,
+        ship_geo.muShieldWithCobaltMagnet, ship_geo.muShieldStepGeo,
+        ship_geo.hadronAbsorber.WithConstField, ship_geo.muShield.WithConstField)
+    detectorList.append(MiniShield)
+  else:
+   if ship_geo.muShieldDesign in [3, 4, 5, 6, 7, 9]:
+    MuonShield = ROOT.ShipMuonShield(
+       "MuonShield", ship_geo.muShieldDesign, "ShipMuonShield",
+       ship_geo.muShield.z, ship_geo.muShield.dZ0, ship_geo.muShield.dZ1,
+       ship_geo.muShield.dZ2, ship_geo.muShield.dZ3,
+       ship_geo.muShield.dZ4, ship_geo.muShield.dZ5,
+       ship_geo.muShield.dZ6, ship_geo.muShield.dZ7,
+       ship_geo.muShield.dZ8, ship_geo.muShield.dXgap,
+       ship_geo.muShield.LE, ship_geo.Yheight * 4. / 10.,
+       ship_geo.cave.floorHeightMuonShield, ship_geo.muShield.Field,
+       ship_geo.muShieldWithCobaltMagnet, ship_geo.muShieldStepGeo,
+       ship_geo.hadronAbsorber.WithConstField, ship_geo.muShield.WithConstField)
 
- elif ship_geo.muShieldDesign == 8:
-  MuonShield = ROOT.ShipMuonShield(ship_geo.muShield.z, ship_geo.muShieldGeo,
-                                 ship_geo.muShieldWithCobaltMagnet,
-                                 ship_geo.muShieldStepGeo,
-                                 ship_geo.hadronAbsorber.WithConstField,
-                                 ship_geo.muShield.WithConstField)
+   elif ship_geo.muShieldDesign == 8:
+    MuonShield = ROOT.ShipMuonShield(ship_geo.muShield.z, ship_geo.muShieldGeo,
+                                   ship_geo.muShieldWithCobaltMagnet,
+                                   ship_geo.muShieldStepGeo,
+                                   ship_geo.hadronAbsorber.WithConstField,
+                                   ship_geo.muShield.WithConstField)
 
- detectorList.append(MuonShield)
+   detectorList.append(MuonShield)
 
  TargetStation = ROOT.MufluxTargetStation("MufluxTargetStation",ship_geo.target.length,ship_geo.hadronAbsorber.length, ship_geo.target.z,ship_geo.hadronAbsorber.z,ship_geo.targetOpt,ship_geo.target.sl)
 
