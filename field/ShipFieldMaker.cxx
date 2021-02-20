@@ -31,6 +31,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <string>
 #include <cstdlib>
 
 ShipFieldMaker::ShipFieldMaker(Bool_t verbose) :
@@ -1258,22 +1259,30 @@ void ShipFieldMaker::plotField(Int_t type, const TVector3& xAxis, const TVector3
     if (dy > 0.0) {Ny = static_cast<Int_t>(((yMax - yMin)/dy) + 0.5);}
 
     // Create a 2d histogram
-    TH2D theHist("theHist", "", Nx, xMin, xMax, Ny, yMin, yMax);
-    theHist.SetDirectory(0);
-    if (type == 0) {
+    const int nhistograms = 4; //x,y,z,and magnitude
+    const int ncoordinates = 3; //x,y,z
+    
+    TH2D theHist[nhistograms]; 
+    std::string titles[nhistograms] = {"Bx (T)","By (T)","Bz (T)","B (T)"};
+    for (int icomponent = 0; icomponent< nhistograms; icomponent++){
+      theHist[icomponent] = TH2D(Form("theHist[%i]",icomponent), titles[icomponent].data(), Nx, xMin, xMax, Ny, yMin, yMax);
+      theHist[icomponent].SetDirectory(0);
+      if (type == 0) {
 	// x-y
-	theHist.SetXTitle("x (cm)"); 
-	theHist.SetYTitle("y (cm)");
-    } else if (type == 1) {
+	theHist[icomponent].SetXTitle("x (cm)"); 
+	theHist[icomponent].SetYTitle("y (cm)");
+     } 
+      else if (type == 1) {
 	// z-x
-	theHist.SetXTitle("z (cm)"); 
-	theHist.SetYTitle("x (cm)");
-    } else if (type == 2) {
+	theHist[icomponent].SetXTitle("z (cm)"); 
+	theHist[icomponent].SetYTitle("x (cm)");
+      } 
+      else if (type == 2) {
 	// z-y
-	theHist.SetXTitle("z (cm)"); 
-	theHist.SetYTitle("y (cm)");
+	theHist[icomponent].SetXTitle("z (cm)"); 
+	theHist[icomponent].SetYTitle("y (cm)");
+      }
     }
-
     // Get list of volumes (to check for local fields)
     TObjArray* theVolumes = gGeoManager->GetListOfVolumes();
     Int_t nVol(0);
@@ -1290,13 +1299,13 @@ void ShipFieldMaker::plotField(Int_t type, const TVector3& xAxis, const TVector3
 	    Double_t y = dy*iy + yMin;
 
 	    // Initialise the B field array to zero
-	    Double_t B[3] = {0.0, 0.0, 0.0};
+	    Double_t B[ncoordinates] = {0.0, 0.0, 0.0};
 
 	    // Initialise the position array to zero
-	    Double_t position[3] = {0.0, 0.0, 0.0};
+	    Double_t position[ncoordinates] = {0.0, 0.0, 0.0};
 	    if (type == 0) {
 		// x-y
-		position[0] = x, position[1] = y;
+  	        position[0] = x, position[1] = y;
 	    } else if (type == 1) {
 		// z-x
 		position[0] = y, position[2] = x;
@@ -1339,8 +1348,11 @@ void ShipFieldMaker::plotField(Int_t type, const TVector3& xAxis, const TVector3
 	    }
 		    
 	    // Divide by the Tesla_ factor, since we want to plot Tesla_ not kGauss (VMC/FairRoot units)
+	    for (int icomponent = 0; icomponent<ncoordinates; icomponent++){
+	      theHist[icomponent].Fill(x,y, B[icomponent]/Tesla_);
+	    }
 	    Double_t BMag = sqrt(B[0]*B[0] + B[1]*B[1] + B[2]*B[2])/Tesla_;
-	    theHist.Fill(x, y, BMag);
+	    theHist[3].Fill(x, y, BMag);
 
 	} // "y" axis
 
@@ -1356,13 +1368,56 @@ void ShipFieldMaker::plotField(Int_t type, const TVector3& xAxis, const TVector3
     gStyle->SetPalette(kBird);
     theCanvas.UseCurrentStyle();
 
-    theCanvas.cd();
-    theHist.Draw("colz");
+    theCanvas.Divide(2,2);
+	for (int icomponent = 0; icomponent < nhistograms; icomponent++){
+		theCanvas.cd(icomponent+1);
+		theHist[icomponent].Draw("colz");
+	}
     theCanvas.Print(plotFile.c_str());
 
     // Reset the batch boolean
     if (wasBatch == kFALSE) {gROOT->SetBatch(kFALSE);}
 
+}
+
+void ShipFieldMaker::generateFieldMap(TString fileName, const float step, const float xRange, const float yRange, const float zRange, const float zShift){
+        std::ofstream myfile;
+        myfile.open (fileName);
+        int xSteps = ceil(xRange/step) + 1;   //field map has X range from 0 to xMax
+        int ySteps = ceil(yRange/step) + 1;   //from 0 up to yMax
+        int zSteps = ceil(zRange*2./step) + 1;//from -zMax up to zMax
+        Double_t position[3] = {0.0, 0.0, 0.0};
+        myfile<<xSteps<<"    "<<ySteps<<"    "<<zSteps<<"    "<<step<<"    "<<xRange<<"    "<<yRange<<"    "<<zRange<<std::endl;
+        for (int i =0 ; i < xSteps; i++){
+                for (int k=0;  k<ySteps;k++){
+                        for (int m=0; m<zSteps; m++){
+                                Double_t B[3] = {0.0, 0.0, 0.0};
+                                Double_t x = step*i;
+                                Double_t y = step * k;
+                                Double_t z = m * step - zRange + zShift;
+                                position[0] = x;
+                                position[1] = y;
+                                position[2] = z;
+                                Bool_t inside(kFALSE);
+                                TGeoNode* theNode = gGeoManager->FindNode(position[0], position[1], position[2]);
+                                if (theNode) {
+                                        TGeoVolume* theVol = theNode->GetVolume();
+                                        if (theVol) {
+                                                TVirtualMagField* theField = dynamic_cast<TVirtualMagField*>(theVol->GetField());
+                                                if (theField) {  
+                                                    theField->Field(position, B);
+                                                    inside = kTRUE;  
+                                                }
+                                        }
+                                }
+                                if (inside == kFALSE && globalField_) {
+                                        globalField_->Field(position, B);
+                                }
+                                myfile<<x<<"    "<<y<<"    "<<z<<"    "<<B[0]/Tesla_<<"    "<<B[1]/Tesla_<<"    "<<B[2]/Tesla_<<std::endl;
+                        }
+                }
+        }
+        myfile.close();
 }
 
 ShipFieldMaker::stringVect ShipFieldMaker::splitString(std::string& theString, 

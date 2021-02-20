@@ -1,5 +1,9 @@
+from __future__ import print_function
+from __future__ import division
+from ctypes import c_double
 import ROOT
 import shipunit as u
+
 def MCPointPrintOut(x):
   p = ROOT.TDatabasePDG.Instance().GetParticle(x.PdgCode())
   n=''
@@ -50,7 +54,7 @@ def ecalClusterPrintOut(cl):
 def Dump(x):
   k=0
   for obj in x: 
-    print k,obj.__repr__()
+    print(k,obj.__repr__())
     k+=1 
   
 def TVector3PrintOut(x):
@@ -62,7 +66,7 @@ def TLorentzVectorPrintOut(x):
   return txt
 
 def TEvePointSetPrintOut(P):
- x,y,z = ROOT.Double(),ROOT.Double(),ROOT.Double()
+ x, y, z = c_double(), c_double(), c_double()
  txt = ''
  if P.GetN()==0: txt = '<ROOT.TEvePointSet object>'
  for n in range(P.GetN()):

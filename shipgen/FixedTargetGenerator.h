@@ -11,7 +11,6 @@
 
 class FairPrimaryGenerator;
 class EvtGenDecays;
-using namespace Pythia8;
 
 class FixedTargetGenerator : public FairGenerator
 {
@@ -40,6 +39,9 @@ class FixedTargetGenerator : public FairGenerator
   void SetG4only() { G4only  = true; }  // only run Geant4, no pythia primary interaction
   void SetTauOnly() { tauOnly  = true; }  // only have Ds decay to tau 
   void SetJpsiMainly() { JpsiMainly  = true; }  // let all Jpsi decay to mumu
+  void SetOnlyMuons() { OnlyMuons = true; }  // only transport muons
+  void SetDrellYan() { DrellYan  = true; }  // only generate prompt Z0* processes
+  void SetPhotonCollision() { PhotonCollision   = true; }  // only generate prompt photon processes
   void WithEvtGen() { withEvtGen = true;} // use EvtGen as external decayer to Pythia, experimental phase, only works for one Pythia instance
   void SetChibb(Double_t x) { chibb = x; }  // chibb = bbbar over mbias cross section   
   void SetChicc(Double_t x) { chicc = x; }  // chicc = ccbar over mbias cross section   
@@ -47,12 +49,14 @@ class FixedTargetGenerator : public FairGenerator
   inline void SetHeartBeat(Int_t x){heartbeat=x;}
   inline void SetEnergyCut(Float_t emax) {EMax=emax;}// min energy to be copied to Geant4
   inline void SetDebug(Bool_t x){Debug=x;}
+  inline void SetOpt4DP(TNtuple* t){withNtuple=kTRUE;  fNtuple = t ; }
   Double_t GetPotForCharm(){return nrpotspill/wspill;}
-  Pythia* GetPythia() {return fPythiaP;}
+  Pythia8::Pythia* GetPythia() {return fPythiaP;}
+  Pythia8::Pythia* GetPythiaN() {return fPythiaN;}
  private:
   
-  RndmEngine* fRandomEngine;  //!
-  
+ Pythia8::RndmEngine* fRandomEngine;  //!
+   
  protected:
 
   Double_t fMom;       // proton momentum
@@ -60,14 +64,16 @@ class FixedTargetGenerator : public FairGenerator
   Bool_t fUseRandom3;  // flag to use TRandom3 (default)
   Double_t fSeed,EMax,fBoost,chicc,chibb,wspill,nrpotspill;
   Int_t nEvents,nEntry,pot,nDsprim,ntotprim;      
-  Bool_t tauOnly,JpsiMainly,G4only,setByHand,Debug,withEvtGen;
+  Bool_t tauOnly,JpsiMainly,DrellYan,PhotonCollision,G4only,setByHand,Debug,withEvtGen,OnlyMuons;
   Bool_t fcharmtarget;
   FairLogger*  fLogger; //!   don't make it persistent, magic ROOT command
-  Pythia* fPythiaN;            //!
-  Pythia* fPythiaP;            //!
+  Pythia8::Pythia* fPythiaN;            //!
+  Pythia8::Pythia* fPythiaP;            //!
   EvtGenDecays* evtgenN;            //!
   EvtGenDecays* evtgenP;            //!
   GenieGenerator* fMaterialInvestigator;  //!
+  Bool_t withNtuple;               //! special option for Dark Photon physics studies
+  TNtuple* fNtuple;               //!  
   TString targetName,Option;
   Double_t xOff;
   Double_t yOff;
@@ -83,6 +89,6 @@ class FixedTargetGenerator : public FairGenerator
   Float_t  n_id,n_px,n_py,n_pz,n_M,n_E,n_mpx,n_mpy,n_mpz,n_mE,n_mid,ck;
   Int_t heartbeat;
 
-  ClassDef(FixedTargetGenerator,1);
+  ClassDef(FixedTargetGenerator,2);
 };
 #endif /* !FIXEDTARGETGENERATOR_H */

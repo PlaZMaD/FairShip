@@ -1,3 +1,4 @@
+from __future__ import print_function
 import shipunit as u
 import ROOT as r
 from ShipGeoConfig import AttrDict, ConfigRegistry
@@ -41,6 +42,10 @@ if "HcalGeoFile" not in globals():
         HcalGeoFile = "hcal_rect.geo"
     else:
         HcalGeoFile = "hcal.geo"
+if "muShieldStepGeo" not in globals():
+    muShieldStepGeo = False
+if "muShieldWithCobaltMagnet" not in globals():
+    muShieldWithCobaltMagnet = 0
 
 with ConfigRegistry.register_config("basic") as c:
     # global muShieldDesign, targetOpt, strawDesign, Yheight
@@ -75,7 +80,7 @@ with ConfigRegistry.register_config("basic") as c:
     # eventually, the only parameter which needs to be changed when the active shielding lenght changes.
     z4=2438.*u.cm+magnetIncrease+extraVesselLength
     if strawDesign != 4 and strawDesign != 10:
-     print "this design ",strawDesign," is not supported, use strawDesign = 4 or 10"
+     print("this design ",strawDesign," is not supported, use strawDesign = 4 or 10")
      1/0 
     else:
      c.chambers.Length = totalLength
@@ -211,7 +216,7 @@ with ConfigRegistry.register_config("basic") as c:
      c.EcalOption = 2
      c.preshowerOption = 0
     else:
-     print "CaloDesign option wrong -> ",CaloDesign
+     print("CaloDesign option wrong -> ",CaloDesign)
      1/0
 
     presShowerDeltaZ = 0.
@@ -316,6 +321,9 @@ with ConfigRegistry.register_config("basic") as c:
     c.muShield.dXgap = 0.2*u.m
     c.muShield.dZgap = 0.1*u.m
 
+    c.muShieldStepGeo = muShieldStepGeo
+    c.muShieldWithCobaltMagnet = muShieldWithCobaltMagnet
+
     # zGap to compensate automatic shortening of magnets
     zGap = 0.5 * c.muShield.dZgap  # halflengh of gap
     if muShieldDesign == 7:
@@ -328,7 +336,7 @@ with ConfigRegistry.register_config("basic") as c:
         c.muShield.dZ7 = 3.0*u.m + zGap
         c.muShield.dZ8 = 2.35*u.m + zGap
         c.muShield.dXgap = 0.*u.m
-    elif muShieldDesign == 9 or muShieldDesign == 10 or muShieldDesign == 11:
+    elif muShieldDesign == 9:
         c.muShield.Field = 1.7  # Tesla
         c.muShield.dZ1 = 0.35 * u.m + zGap
         c.muShield.dZ2 = 2.26 * u.m + zGap
@@ -339,10 +347,12 @@ with ConfigRegistry.register_config("basic") as c:
         c.muShield.dZ7 = 3.05 * u.m + zGap
         c.muShield.dZ8 = 2.42 * u.m + zGap
         c.muShield.dXgap = 0. * u.m
+        c.muShield.half_X_max = 179 * u.cm
+        c.muShield.half_Y_max = 317 * u.cm
     elif muShieldDesign == 8:
         assert muShieldGeo
         c.muShieldGeo = muShieldGeo
-        print "Load geo"
+        print("Load geo")
         f = r.TFile.Open(muShieldGeo)
         params = r.TVectorD()
         params.Read('params')
@@ -356,7 +366,23 @@ with ConfigRegistry.register_config("basic") as c:
         c.muShield.dZ7 = params[6]
         c.muShield.dZ8 = params[7]
         c.muShield.dXgap = 0.*u.m
-    if muShieldDesign in range(7, 12):
+
+        offset = 7
+        c.muShield.half_X_max = 0
+        c.muShield.half_Y_max = 0
+        for index in range(2, 8):
+            f_l = params[offset + index * 6 + 1]
+            f_r = params[offset + index * 6 + 2]
+            h_l = params[offset + index * 6 + 3]
+            h_r = params[offset + index * 6 + 4]
+            g_l = params[offset + index * 6 + 5]
+            g_r = params[offset + index * 6 + 6]
+            c.muShield.half_X_max = max(c.muShield.half_X_max, 2 * f_l + g_l, 2 * f_r + g_r)
+            c.muShield.half_Y_max = max(c.muShield.half_Y_max, h_l + f_l, h_r + f_r)
+        c.muShield.half_X_max += 15 * u.cm
+        c.muShield.half_Y_max += 15 * u.cm
+
+    if muShieldDesign in range(7, 10):
         c.muShield.length = 2 * (
               c.muShield.dZ1 + c.muShield.dZ2 +
               c.muShield.dZ3 + c.muShield.dZ4 +
@@ -404,7 +430,9 @@ with ConfigRegistry.register_config("basic") as c:
     if muShieldDesign > 6:  c.hadronAbsorber.length =     0*u.m # magnetized, counted inside muonshield 
     else:                   c.hadronAbsorber.length =  3.00*u.m
     c.hadronAbsorber.z     =  c.muShield.z - c.muShield.length/2. - c.hadronAbsorber.length/2.
-    if muShieldDesign > 9 and muShieldDesign != 11:  c.hadronAbsorber.WithConstField =  True
+
+    c.hadronAbsorber.WithConstField = True
+    c.muShield.WithConstField = True
 
     c.target               =  AttrDict(z=0*u.cm)
     c.targetOpt            =  targetOpt 
@@ -553,8 +581,8 @@ with ConfigRegistry.register_config("basic") as c:
     #Parameters for tau muon detector
     c.tauMudet = AttrDict(z=0*u.cm)
     if nuTauTargetDesign<=2:
-	c.tauMudet.NFe = 12
-    	c.tauMudet.NRpc= 11
+        c.tauMudet.NFe = 12
+        c.tauMudet.NRpc= 11
         if nuTauTargetDesign==0: #TP
             c.tauMudet.YRyoke = 90*u.cm
             c.tauMudet.YRyoke_s = c.tauMudet.YRyoke-30*u.cm
@@ -595,37 +623,61 @@ with ConfigRegistry.register_config("basic") as c:
         c.tauMudet.B = 1.5 * u.tesla
     if nuTauTargetDesign==3:
         scaleMudet=1.
-	c.tauMudet.NFethick = 4 #upstream slabs, more thick
+        c.tauMudet.NFethick = 4 #upstream slabs, more thick
         c.tauMudet.NFethin = 4 #downstream slabs, less thick
-    	c.tauMudet.NRpc= 8
-        c.tauMudet.NmuRpc = 3
+        c.tauMudet.NRpc= 8
         
-        c.tauMudet.XFe = scaleMudet*1.900*u.m #layer dimensions, excluded supports
-        c.tauMudet.YFe = scaleMudet*3.600*u.m
+        c.tauMudet.XFe = scaleMudet*1.950*u.m #layer dimensions, excluded supports
+        c.tauMudet.YFe = scaleMudet*3.850*u.m
+
         c.tauMudet.ZFethick = 15.*u.cm
         c.tauMudet.ZFethin = 10.* u.cm
 
         c.tauMudet.XRpc = c.tauMudet.XFe
         c.tauMudet.YRpc = c.tauMudet.YFe
-        c.tauMudet.ZRpc = 7.*u.cm
+        c.tauMudet.ZRpc = 8.*u.cm
         #support structure
-        c.tauMudet.UpperSupportX = 34 * u.cm
-        c.tauMudet.UpperSupportY = 34 * u.cm
-        c.tauMudet.LowerSupportX = 34 * u.cm
-        c.tauMudet.LowerSupportY = 34 * u.cm
-        c.tauMudet.LateralSupportX = 34 * u.cm
-        c.tauMudet.LateralSupportY = 34 * u.cm
+        c.tauMudet.UpperSupportX = 30 * u.cm
+        c.tauMudet.UpperSupportY = 32 * u.cm
+        c.tauMudet.LowerSupportX = 30 * u.cm
+        c.tauMudet.LowerSupportY = 40 * u.cm
+        c.tauMudet.LateralSupportX = 30.5 * u.cm
+        c.tauMudet.LateralSupportY = 32 * u.cm
 
         c.tauMudet.Xtot = c.tauMudet.XFe + 2 * c.tauMudet.LateralSupportX#now we need to include also supports.
         c.tauMudet.Ytot = c.tauMudet.YFe + c.tauMudet.UpperSupportY + c.tauMudet.LowerSupportY 
-        c.tauMudet.deltax = 0* u.cm #size differences between MuonFilter and VetoTagger layers
-        c.tauMudet.deltay = 80* u.cm
-        c.tauMudet.Ztot = (c.tauMudet.NRpc+c.tauMudet.NmuRpc)*c.tauMudet.ZRpc+c.tauMudet.NFethick*c.tauMudet.ZFethick + c.tauMudet.NFethin*c.tauMudet.ZFethin
+        c.tauMudet.Ztot = c.tauMudet.NRpc*c.tauMudet.ZRpc+c.tauMudet.NFethick*c.tauMudet.ZFethick + c.tauMudet.NFethin*c.tauMudet.ZFethin
         #c.tauMudet.zMudetC = -c.decayVolume.length/2. - c.tauMudet.Ztot/2
-        c.tauMudet.zMudetC = c.Chamber1.z -c.chambers.Tub1length-10*u.cm - c.tauMudet.Ztot/2
+        c.tauMudet.zMudetC = c.Chamber1.z -c.chambers.Tub1length - c.tauMudet.Ztot/2 -31*u.cm;
         #lateral cuts
-        c.tauMudet.CutHeight = 100 * u.cm
-        c.tauMudet.CutLength = 25 * u.cm
+        c.tauMudet.CutHeight = 78.548 * u.cm
+        c.tauMudet.CutLength = (c.tauMudet.CutHeight / 2) / (r.TMath.Tan(r.TMath.DegToRad() * 55))
+        #upper cover
+        c.tauMudet.XCov = c.tauMudet.XFe
+        c.tauMudet.YCov = 6*u.cm
+        c.tauMudet.ZCov = c.tauMudet.NFethick*c.tauMudet.ZFethick+c.tauMudet.NRpc*c.tauMudet.ZRpc+c.tauMudet.NFethin*c.tauMudet.ZFethin
+        
+        c.tauMudet.YSpacing = 28.5*u.cm
+        #lateral cover
+        c.tauMudet.XLateral = 7*u.cm
+        c.tauMudet.YLateral = c.tauMudet.LateralSupportY
+        c.tauMudet.ZLateral = c.tauMudet.ZCov
+        #lateral cross
+        c.tauMudet.XCross = 2*u.cm
+        c.tauMudet.YCross = c.tauMudet.YFe-2*c.tauMudet.YLateral-2*c.tauMudet.YSpacing - 8*u.cm
+        c.tauMudet.ZCross = c.tauMudet.ZCov
+        c.tauMudet.WidthArm = 2* u.cm
+        #RPC frame
+        c.tauMudet.XRpc_outer = 284.5*u.cm
+        c.tauMudet.YRpc_outer = 428.2*u.cm
+        c.tauMudet.ZRpc_outer = 2.2*u.cm
+        c.tauMudet.XRpc_inner = 190*u.cm
+        c.tauMudet.YRpc_inner = 372*u.cm
+        c.tauMudet.ZRpc_inner = 1.7*u.cm
+        #RPC Gap
+        c.tauMudet.XRpcGap = c.tauMudet.XRpc_inner
+        c.tauMudet.YRpcGap = 120*u.cm
+        c.tauMudet.ZRpcGap = 0.2*u.cm
         
         c.tauMudet.PillarX = 40*u.cm
         c.tauMudet.PillarZ = 50*u.cm
@@ -635,7 +687,7 @@ with ConfigRegistry.register_config("basic") as c:
     c.tauMudet.ZGas = 1*u.mm
     c.tauMudet.XStrip =  c.tauMudet.XRpc
     c.tauMudet.YStrip =  c.tauMudet.YRpc
-    c.tauMudet.ZStrip = 0.05*u.mm
+    c.tauMudet.ZStrip = 0.02*u.mm
     c.tauMudet.XPet =  c.tauMudet.XRpc
     c.tauMudet.YPet =  c.tauMudet.YRpc
     c.tauMudet.ZPet = 0.1*u.mm
@@ -656,8 +708,6 @@ with ConfigRegistry.register_config("basic") as c:
         c.NuTauTarget.zC = c.EmuMagnet.zC
     if nuTauTargetDesign==2:
         c.NuTauTarget.zC = -c.decayVolume.length/2. - c.tauMudet.GapD - c.tauMudet.Ztot -2.5*u.m
-  
-
 
     if c.NuTauTarget.Design == 0: #TP                         
         c.NuTauTarget.row=7
@@ -672,46 +722,70 @@ with ConfigRegistry.register_config("basic") as c:
         c.NuTauTarget.col=9
         c.NuTauTarget.wall=20
     if c.NuTauTarget.Design == 3: #One unique magnet, eventually more than one target volume 
-        c.NuTauTarget.row=7
-        c.NuTauTarget.col=7
-        c.NuTauTarget.wall=19
-        #c.NuTauTarget.wall=10
-        c.NuTauTarget.target=1 #number of neutrino target volumes
+        #c.NuTauTarget.n_plates = 56 
+        c.NuTauTarget.row = 2
+        c.NuTauTarget.col = 2
+        c.NuTauTarget.wall = 19
+    c.NuTauTarget.n_plates = 56
+     
+    c.NuTauTarget.target = 1  #number of neutrino target volumes
 
-        
     c.NuTauTarget.nuTargetPassive = nuTargetPassive
 
-    c.NuTauTarget.Ydist = 0.2*u.cm
-    
+    # space for the structure that holds the brick
+    c.NuTauTarget.Ydist = 0.0*u.cm
     c.NuTauTarget.SingleEmFilm = True
     c.NuTauTarget.EmTh = 0.0070 * u.cm
-    c.NuTauTarget.EmX = 12.5 * u.cm
-    c.NuTauTarget.EmY = 9.9 * u.cm
+    c.NuTauTarget.EmX = 40.0 * u.cm
+    c.NuTauTarget.EmY = 40.0 * u.cm
     c.NuTauTarget.PBTh = 0.0175 * u.cm
     c.NuTauTarget.LeadTh = 0.1 * u.cm
     c.NuTauTarget.EPlW = 2* c.NuTauTarget.EmTh + c.NuTauTarget.PBTh
     c.NuTauTarget.AllPW = c.NuTauTarget.LeadTh + c.NuTauTarget.EPlW
-    c.NuTauTarget.BrX = 12.9 *u.cm
-    c.NuTauTarget.BrY = 10.5 *u.cm
-    c.NuTauTarget.xdim = c.NuTauTarget.col*c.NuTauTarget.BrX
-    c.NuTauTarget.ydim = c.NuTauTarget.row*c.NuTauTarget.BrY+(c.NuTauTarget.row-1)*c.NuTauTarget.Ydist    
-
-    c.NuTauTarget.BrPackZ = 0.1 * u.cm
+    c.NuTauTarget.BrX = 41.0 * u.cm
+    c.NuTauTarget.BrY = 41.0 * u.cm
+    c.NuTauTarget.BrPackZ = 0.1045 * u.cm
     c.NuTauTarget.BrPackX = c.NuTauTarget.BrX - c.NuTauTarget.EmX
     c.NuTauTarget.BrPackY = c.NuTauTarget.BrY - c.NuTauTarget.EmY
-    c.NuTauTarget.BrZ = 56 * c.NuTauTarget.AllPW + c.NuTauTarget.EPlW +c.NuTauTarget.BrPackZ
+    c.NuTauTarget.BrZ = c.NuTauTarget.n_plates * c.NuTauTarget.AllPW + c.NuTauTarget.EPlW + c.NuTauTarget.BrPackZ
 
  #TargetTrackers!
     c.NuTauTT = AttrDict(z=0*u.cm)
     c.NuTauTT.design = nuTauTargetDesign
-    c.NuTauTT.TTX = c.NuTauTarget.xdim
-    c.NuTauTT.TTY = c.NuTauTarget.ydim
-    c.NuTauTT.TTZ= 6.0*u.cm
-    c.NuTauTT.n = c.NuTauTarget.wall+1
+    c.NuTauTT.n_hor_planes = 11
+    c.NuTauTT.n_vert_planes = 7
+    c.NuTauTT.scifimat_width = 13.06 * u.cm # old value 13.045
+    c.NuTauTT.scifimat_hor = 94.315 * u.cm #13.045 * 7 + endpieces = length of hor. mats
+    c.NuTauTT.scifimat_vert = 146.495 * u.cm #13.045 * 11 + endpieces = length of vert. mats
+    c.NuTauTT.scifimat_z = 0.145 * u.cm   # Scintillating fiber mat
+    c.NuTauTT.support_z = 0.02 * u.cm     # Support carbon composite
+    c.NuTauTT.honeycomb_z = 2 * u.cm      # Airex (or Nomex)
+    c.NuTauTT.TTX = c.NuTauTT.scifimat_hor
+    c.NuTauTT.TTY = c.NuTauTT.scifimat_vert
+    c.NuTauTT.TTZ = 2 * c.NuTauTT.support_z + 2 * c.NuTauTT.scifimat_z + c.NuTauTT.honeycomb_z 
+    c.NuTauTT.n = c.NuTauTarget.wall
+    # should be called after TTX, TTY
+    c.NuTauTarget.xdim = c.NuTauTT.TTX 
+    c.NuTauTarget.ydim = c.NuTauTT.TTY 
+    c.NuTauTarget.WallXDim = c.NuTauTarget.col*c.NuTauTarget.BrX
+    c.NuTauTarget.WallYDim = c.NuTauTarget.row*c.NuTauTarget.BrY+(c.NuTauTarget.row-1)*c.NuTauTarget.Ydist
+    c.NuTauTarget.WallZDim = c.NuTauTarget.BrZ
 
- #HPT!
+ #HPT
     c.tauHPT = AttrDict(z=0*u.cm)
     c.tauHPT.design = nuTauTargetDesign
+    c.tauHPT.n_hor_planes = 11
+    c.tauHPT.n_vert_planes = 7
+    c.tauHPT.scifimat_width = c.NuTauTT.scifimat_width
+    c.tauHPT.scifimat_hor = c.NuTauTT.scifimat_hor
+    c.tauHPT.scifimat_vert = c.NuTauTT.scifimat_vert
+    c.tauHPT.scifimat_z = c.NuTauTT.scifimat_z
+    c.tauHPT.support_z = c.NuTauTT.support_z
+    c.tauHPT.honeycomb_z = c.NuTauTT.honeycomb_z
+    c.tauHPT.TX = c.tauHPT.scifimat_hor
+    c.tauHPT.TY = c.tauHPT.scifimat_vert
+    c.tauHPT.TZ = 2 * c.tauHPT.support_z + 2 * c.tauHPT.scifimat_z + c.tauHPT.honeycomb_z 
+
     if nuTauTargetDesign<3:
         c.tauHPT.DZ = 15*u.cm
         c.tauHPT.DX = c.tauMudet.XFe
@@ -720,24 +794,25 @@ with ConfigRegistry.register_config("basic") as c:
         c.tauHPT.ConcreteY = c.tauMudet.Ytot/2 - c.tauHPT.DY/2
         c.tauHPT.ConcreteZ = c.tauHPT.DZ
     if nuTauTargetDesign==3:
-        c.tauHPT.SRDY = 10 *u.cm  #additional detectors for improving acceptance
-        c.tauHPT.DX = c.NuTauTarget.xdim
-        c.tauHPT.DY = c.EmuMagnet.Height2 - 2 *c.tauHPT.SRDY
-        c.tauHPT.DZ = c.NuTauTT.TTZ        
-        c.tauHPT.nHPT = 3 #n.d.r. number after each neutrino target
-        c.tauHPT.distHPT = 50*u.cm
-    
+        c.tauHPT.SRDY = 10 * u.cm  #additional detectors for improving acceptance
+        c.tauHPT.DX = c.tauHPT.TX
+        c.tauHPT.DY = c.tauHPT.TY
+        c.tauHPT.DZ = c.tauHPT.TZ
+        c.tauHPT.nHPT = 5 # number of downstream trackers after neutrino target
+
     if nuTauTargetDesign!=2: #TP or NEW with magnet
         c.NuTauTarget.RohG = 1.5 * u.cm
         c.NuTauTarget.LayerCESW = c.NuTauTarget.RohG + c.NuTauTarget.EPlW
-        c.NuTauTarget.CESPack = 0.1 * u.cm
+        c.NuTauTarget.CESPack = 0.3055 * u.cm
         c.NuTauTarget.CESW = 2 * c.NuTauTarget.LayerCESW + c.NuTauTarget.EPlW + c.NuTauTarget.CESPack
         c.NuTauTarget.CellW = c.NuTauTarget.BrZ + c.NuTauTarget.CESW
         if nuTauTargetDesign!=3:
             c.NuTauTarget.zdim = c.NuTauTarget.wall* c.NuTauTarget.CellW + (c.NuTauTarget.wall+1)*c.NuTauTT.TTZ
         if nuTauTargetDesign ==3:
-            c.NuTauTarget.zdim = c.NuTauTarget.wall* c.NuTauTarget.CellW + (c.NuTauTarget.wall+1)*c.NuTauTT.TTZ
-            c.NuTauTarget.zC = c.EmuMagnet.zC - c.NuTauTarget.zdim/2.                    
+            c.NuTauTarget.zdim = c.NuTauTarget.wall* c.NuTauTarget.CellW + c.NuTauTarget.wall*c.NuTauTT.TTZ
+            c.NuTauTarget.zC = c.EmuMagnet.zC - c.NuTauTarget.zdim/2.
+            c.tauHPT.TotalDZ = (c.EmuMagnet.Z - c.EmuMagnet.Height1) - c.NuTauTarget.zdim # MagRegion-Target 
+            c.tauHPT.distHPT = (c.tauHPT.TotalDZ - c.tauHPT.nHPT * c.tauHPT.DZ) / (c.tauHPT.nHPT - 1)                    
 
     if nuTauTargetDesign == 2:  #NEW with NO magnet
         c.NuTauTarget.RohG = 0 * u.cm
@@ -753,3 +828,42 @@ with ConfigRegistry.register_config("basic") as c:
     c.NuTauTarget.PillarX = 0.5*u.m
     c.NuTauTarget.PillarZ = 0.5*u.m
     c.NuTauTarget.PillarY = 10*u.m - c.NuTauTarget.ydim/2 -c.NuTauTarget.BaseY- 0.1*u.mm - c.cave.floorHeightMuonShield
+
+    #Upstream Tagger
+    c.UpstreamTagger = AttrDict(z=0)
+    c.UpstreamTagger.Z_Glass = 0.2 * u.cm
+    c.UpstreamTagger.Y_Glass = 105 * u.cm   
+    c.UpstreamTagger.X_Glass = 223 * u.cm   
+    c.UpstreamTagger.Z_Glass_Border = 0.2 * u.cm
+    c.UpstreamTagger.Y_Glass_Border = 1.0 * u.cm
+    c.UpstreamTagger.X_Glass_Border = 1.0 * u.cm
+    c.UpstreamTagger.Z_PMMA = 0.8 * u.cm
+    c.UpstreamTagger.Y_PMMA = 108 * u.cm
+    c.UpstreamTagger.X_PMMA = 226 * u.cm
+    c.UpstreamTagger.DY_PMMA = 1.5 * u.cm
+    c.UpstreamTagger.DX_PMMA = 1.5 * u.cm
+    c.UpstreamTagger.DZ_PMMA = 0.1 * u.cm
+    c.UpstreamTagger.Z_FreonSF6 = 0.1 * u.cm
+    c.UpstreamTagger.Y_FreonSF6 = 107 * u.cm
+    c.UpstreamTagger.X_FreonSF6 = 225 * u.cm
+    c.UpstreamTagger.Z_FreonSF6_2 = 0.8 * u.cm
+    c.UpstreamTagger.Y_FreonSF6_2 = 0.5 * u.cm
+    c.UpstreamTagger.X_FreonSF6_2 = 0.5 * u.cm
+    c.UpstreamTagger.Z_FR4 = 0.15 * u.cm
+    c.UpstreamTagger.Y_FR4 = 111 * u.cm
+    c.UpstreamTagger.X_FR4 = 229 * u.cm
+    c.UpstreamTagger.Z_Aluminium = 1.1503 * u.cm
+    c.UpstreamTagger.Y_Aluminium = 111 * u.cm
+    c.UpstreamTagger.X_Aluminium = 233 * u.cm
+    c.UpstreamTagger.DZ_Aluminium = 0.1 * u.cm
+    c.UpstreamTagger.DY_Aluminium = 1 * u.cm
+    c.UpstreamTagger.DX_Aluminium = 0.2 * u.cm
+    c.UpstreamTagger.Z_Air = 1.1503 * u.cm
+    c.UpstreamTagger.Y_Air = 0 * u.cm
+    c.UpstreamTagger.X_Air = 2 * u.cm
+    c.UpstreamTagger.Z_Strip = 0.0003 * u.cm
+    c.UpstreamTagger.Y_Strip = 3.1 * u.cm
+    c.UpstreamTagger.X_Strip = 229 * u.cm
+    c.UpstreamTagger.X_Strip64 = 3.3 * u.cm
+    c.UpstreamTagger.Y_Strip64 = 111 * u.cm
+    c.UpstreamTagger.Z_Position = c.tauMudet.zMudetC + (c.tauMudet.Ztot)/2 + 12.0*u.cm
