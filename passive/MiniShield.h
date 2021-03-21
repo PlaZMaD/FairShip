@@ -12,14 +12,21 @@
 #include "TString.h"
 #include <vector>
 #include <array>
+#include "TGeoManager.h"
 
 enum class FieldDirectionM : bool { up, down };
 
 class MiniShield : public FairModule
 {
   public:
+   
+   MiniShield(TString params, const char* name, const Int_t Design=1,  const char* Title="ShipMiniShield",
+                               Double_t Z=0, Double_t L0=0, Double_t L1=0, Double_t L2=0, Double_t L3=0, Double_t L4=0, Double_t L5=0, Double_t L6=0, 
+                               Double_t L7=0, Double_t L8=0,Double_t gap=0,Double_t LE=0,Double_t y=400, Double_t floor=500, Double_t field=1.7, 
+                               const Int_t withCoMagnet=0, const Bool_t StepGeo=false,
+                               const Bool_t WithConstAbsorberField=true, const Bool_t WithConstShieldField=true);
 
-   MiniShield(const char* name, const Int_t Design=1,  const char* Title="ShipMuonShield",
+   MiniShield(const char* name, const Int_t Design=1,  const char* Title="ShipMiniShield",
                                Double_t Z=0, Double_t L0=0, Double_t L1=0, Double_t L2=0, Double_t L3=0, Double_t L4=0, Double_t L5=0, Double_t L6=0, 
                                Double_t L7=0, Double_t L8=0,Double_t gap=0,Double_t LE=0,Double_t y=400, Double_t floor=500, Double_t field=1.7, 
                                const Int_t withCoMagnet=0, const Bool_t StepGeo=false,
@@ -29,9 +36,12 @@ class MiniShield : public FairModule
    const Bool_t WithConstAbsorberField=true, const Bool_t WithConstShieldField=true);
    MiniShield(TString)
    MiniShield();
+   MiniShield(TString params, TString adg);
+   MiniShield(Double_t* params);
    virtual ~MiniShield();
    void ConstructGeometry();
-   ClassDef(MiniShield,4)
+   virtual void PreTrack();
+   ClassDef(MiniShield, 5)
 
   // void SetSupports(Bool_t supports) { 
   //   fSupport = supports;
@@ -39,7 +49,9 @@ class MiniShield : public FairModule
   // }
     
  protected:
-  Bool_t cube = false;
+  // Int_t nParts=0;
+  // Double_t* dParams;
+  TString optParams = "";
   Double_t cm = 1;
   Double_t m = 100 * cm;
   Double_t mm = 0.1 * cm;
@@ -86,7 +98,16 @@ class MiniShield : public FairModule
       std::vector<Double_t> &HmainSideMagOut,
       std::vector<Double_t> &gapIn, std::vector<Double_t> &gapOut,
       std::vector<Double_t> &Z);
-
+  Int_t mini_Initialize(std::vector<TString> &magnetName,
+      std::vector<FieldDirectionM> &fieldDirection,
+      std::vector<Double_t> &dXIn, std::vector<Double_t> &dYIn,
+      std::vector<Double_t> &dXOut, std::vector<Double_t> &dYOut,
+      std::vector<Double_t> &dZ, std::vector<Double_t> &midGapIn,
+      std::vector<Double_t> &midGapOut,
+      std::vector<Double_t> &HmainSideMagIn,
+      std::vector<Double_t> &HmainSideMagOut,
+      std::vector<Double_t> &gapIn, std::vector<Double_t> &gapOut,
+      std::vector<Double_t> &Z);
   void CreateMagnet(TString magnetName, TGeoMedium *medium, TGeoVolume *tShield,
 		    TGeoUniformMagField *field,
 		    Double_t dX, Double_t dY,

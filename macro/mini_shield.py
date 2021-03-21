@@ -12,6 +12,9 @@ import shipRoot_conf
 import rootUtils as ut
 from ShipGeoConfig import ConfigRegistry
 from argparse import ArgumentParser
+from collections import defaultdict
+import numpy as np
+import json
 
 debug = 0  # 1 print weights and field
            # 2 make overlap check
@@ -75,7 +78,7 @@ parser.add_argument("--pID",     dest="pID",     help="id of particle used by th
 parser.add_argument("--factor",     dest="factor", required=False, default=1.0, type=float)
 parser.add_argument("--Estart",  dest="Estart",  help="start of energy range of particle gun for muflux detector (default=10 GeV)", required=False, default=10, type=float)
 parser.add_argument("--Eend",    dest="Eend",    help="end of energy range of particle gun for muflux detector (default=10 GeV)", required=False, default=10, type=float)
-
+parser.add_argument("--optParams", dest='optParams', required=False, default=False)
 
 options = parser.parse_args()
 
@@ -100,10 +103,10 @@ shipRoot_conf.configure(0)     # load basic libraries, prepare atexit for python
 ship_geo = ConfigRegistry.loadpy("$FAIRSHIP/geometry/geometry_config.py",
                                                 muShieldDesign = 9, 
                                                 muShieldGeo=options.geofile,
-                                                muShieldStepGeo=False, muShieldWithCobaltMagnet=False)
+                                                muShieldStepGeo=False, muShieldWithCobaltMagnet=False, optParams=options.optParams)
 
 # Output file name, add dy to be able to setup geometry with ambiguities.
-
+ship_geo.optParams = options.optParams
 tag = simEngine+"-"+mcEngine
 if not os.path.exists(options.outputDir):
   os.makedirs(options.outputDir)
@@ -257,12 +260,12 @@ if inactivateMuonProcesses :
 run.Run(options.nEvents)
 # -----Runtime database---------------------------------------------
 kParameterMerged = ROOT.kTRUE
-parOut = ROOT.FairParRootFileIo(kParameterMerged)
-parOut.open(parFile)
-rtdb.setOutput(parOut)
-rtdb.saveOutput()
-rtdb.printParamContexts()
-getattr(rtdb,"print")()
+# parOut = ROOT.FairParRootFileIo(kParameterMerged)
+# parOut.open(parFile)
+# rtdb.setOutput(parOut)
+# rtdb.saveOutput()
+# rtdb.printParamContexts()
+# getattr(rtdb,"print")()
 # ------------------------------------------------------------------------
 run.CreateGeometryFile("%s/geofile_full.%s.root" % (options.outputDir, tag))
 # save ShipGeo dictionary in geofile
@@ -270,6 +273,15 @@ import saveBasicParameters
 saveBasicParameters.execute("%s/geofile_full.%s.root" % (options.outputDir, tag),ship_geo)
 
 # checking for overlaps
+lGeo = ROOT.gGeoManager
+miniShield = lGeo.GetVolume('MiniShieldArea')
+nodes = miniShield.GetNodes()
+m = 0.
+for node in nodes:
+  volume = node.GetVolume()
+  if 'mini' in volume.GetName():
+    m += volume.Weight(0.01, 'a')
+
 if checking4overlaps:
  fGeo = ROOT.gGeoManager
  fGeo.SetNmeshPoints(10000)
@@ -327,6 +339,90 @@ if simEngine == "MuonBack":
  rc1 = os.system("rm  "+outFile)
  rc2 = os.system("mv "+tmpFile+" "+outFile)
  fin.SetWritable(False) # bpyass flush error
+
+ def check_acceptance(hit, bound=(330, 530)):
+    """
+    :param hit:
+    :param bound: acceptance bounds (X,Y) in cm
+    :return:
+    """
+    return abs(hit.GetX()) <= bound[0] and abs(hit.GetY()) <= bound[1]
+
+ def process_file(filename,  muons_output_name = "muons_output", epsilon=1e-9, debug=True,
+                 apply_acceptance_cut=False):
+    directory = os.path.dirname(os.path.abspath(filename))
+    file = ROOT.TFile(filename)
+
+    tree = file.Get("cbmsim")
+    print("Total events:{}".format(tree.GetEntries()))
+
+    MUON = 13
+    muons_stats = []
+    events_with_more_than_two_hits_per_mc = 0
+    empty_hits = "Not implemented"
+
+    for index, event in enumerate(tree):
+        if index % 5000 == 0:
+            print("N events processed: {}".format(index))
+        mc_pdgs = []
+
+        for hit in event.MCTrack:
+            mc_pdgs.append(hit.GetPdgCode())
+
+        muon_veto_points = defaultdict(list)
+        for hit in event.fluxDetPoint:
+            if hit.GetTrackID() >= 0 and\
+               abs(mc_pdgs[hit.GetTrackID()]):
+                if apply_acceptance_cut:
+                    if check_acceptance(hit):
+                        # Middle or inital stats??
+                        pos_begin = ROOT.TVector3()
+                        hit.Position(pos_begin)
+                        # Extracting only XY coordinates
+                        muon_veto_points[hit.GetTrackID()].append([pos_begin.X(), pos_begin.Y()])
+                else:
+                    pos_begin = ROOT.TVector3()
+                    hit.Position(pos_begin)
+                    # Extracting only XY coordinates
+                    muon_veto_points[hit.GetTrackID()].append([pos_begin.X(), pos_begin.Y()])
+
+        for index, hit in enumerate(event.MCTrack):
+            if index in muon_veto_points:
+                if debug:
+                    print("PDG: {}, mID: {}".format(hit.GetPdgCode(), hit.GetMotherId()))
+                    assert abs(hit.GetPdgCode()) == MUON
+                muon = [
+                    hit.GetPx(),
+                    hit.GetPy(),
+                    hit.GetPz(),
+                    hit.GetStartX(),
+                    hit.GetStartY(),
+                    hit.GetStartZ(),
+                    hit.GetPdgCode(),
+                    hit.GetWeight()
+                ]
+                if abs(muon[-2]) == 13:
+                  muons_stats.append(muon)
+                if len(muon_veto_points[index]) > 1:
+                    events_with_more_than_two_hits_per_mc += 1
+                    continue
+
+    print("events_with_more_than_two_hits_per_mc: {}".format(events_with_more_than_two_hits_per_mc))
+    print("Stopped muons: {}".format(empty_hits))
+    print("Total events returned: {}".format(len(muons_stats)))
+    return np.array(muons_stats)
+ muons_stats = process_file(os.path.join(options.outputDir,"ship.MuonBack-TGeant4.root"), apply_acceptance_cut=True, debug=False)
+ if len(muons_stats) == 0:
+        muon_kinematics = np.array([])
+ else:
+        muon_kinematics = muons_stats
+ returned_params = {
+        "w": m,
+        "params": [float(str.strip(par))for par in options.optParams.split(',')],
+        "kinematics": muon_kinematics.tolist()
+    }
+ with open(os.path.join(options.outputDir, "optimise_input.json"), "w") as f:
+        json.dump(returned_params, f)
 # ------------------------------------------------------------------------
 import checkMagFields
 def visualizeMagFields():

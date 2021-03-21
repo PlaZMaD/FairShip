@@ -65,7 +65,7 @@ fluxDet::fluxDet()
 
 }
 
-fluxDet::fluxDet(const char* name,Bool_t Active)
+fluxDet::fluxDet(const char* name, Bool_t Active)
 	: FairDetector(name, Active, kfluxDet),
 	  fTrackID(-1),
       fVolumeID(-1),
@@ -167,12 +167,12 @@ void fluxDet::ConstructGeometry()
   fDetector = gGeoManager->MakeBox("fluxDet", vacuums, fxSize, fySize, fzSize);
   fDetector->SetLineColor(kBlue);
   AddSensitiveVolume(fDetector);
-  top->AddNode(fDetector, 1, new TGeoTranslation(0,0,fzPos));
+  top->AddNode(fDetector, 1, new TGeoTranslation(0, 0, fzPos));
 
-  fpDetector = gGeoManager->MakeBox("pre_fluxDet", vacuums, fxSize, fySize, fzSize);
-  fpDetector->SetLineColor(kBlue);
-  AddSensitiveVolume(fpDetector);
-  top->AddNode(fpDetector, 1, new TGeoTranslation(0,0, -6455));
+  // fpDetector = gGeoManager->MakeBox("pre_fluxDet", vacuums, fxSize, fySize, fzSize);
+  // fpDetector->SetLineColor(kBlue);
+  // AddSensitiveVolume(fpDetector);
+  // top->AddNode(fpDetector, 1, new TGeoTranslation(0,0, -6455));
   ///////////////////////////////////////////////////////
 
   return;
