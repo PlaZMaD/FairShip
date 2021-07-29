@@ -234,7 +234,8 @@ class veto: public FairDetector
         Double_t HmainSideMag2, Double_t gap, Double_t gap2,
         Double_t Z, Bool_t NotMagnet, Bool_t stepGeo);
 
-
+  void SetMagneticFieldInMagnet(TString magnetName, TGeoUniformMagField *fields[4], FieldDirection fieldDirection);
+  void SetMagneticField(Double_t newFiedlValue);
     ClassDef(veto, 9)
 };
 

@@ -55,8 +55,7 @@ class ShipMuonShield : public FairModule
     return (H_steel * H_zone + H_steel * W_zone + 625000. / M_PI * B_avg * _delta) * 1.5 /
            (0.25 * J * H_zone - H_steel) * 100;
   }
-  void SetMagneticFieldInMagnet(TString magnetName, TGeoUniformMagField *fields[4], , FieldDirection fieldDirection);
-  void SetMagneticField(Double_t newFiedlValue);
+
  protected:
   
   TString optParams = "";
@@ -107,6 +106,25 @@ class ShipMuonShield : public FairModule
 		  std::vector<Double_t> &HmainSideMagOut,
 		  std::vector<Double_t> &gapIn, std::vector<Double_t> &gapOut,
 		  std::vector<Double_t> &Z);
+
+  Int_t mini_Initialize(std::vector<TString> &magnetName,
+      std::vector<FieldDirection> &fieldDirection,
+      std::vector<Double_t> &dXIn, std::vector<Double_t> &dYIn,
+      std::vector<Double_t> &dXOut, std::vector<Double_t> &dYOut,
+      std::vector<Double_t> &dZ, std::vector<Double_t> &midGapIn,
+      std::vector<Double_t> &midGapOut,
+      std::vector<Double_t> &HmainSideMagIn,
+      std::vector<Double_t> &HmainSideMagOut,
+      std::vector<Double_t> &gapIn, std::vector<Double_t> &gapOut,
+      std::vector<Double_t> &Z);
+
+  void CreateMagnet(TString magnetName, TGeoMedium *medium, TGeoVolume *tShield,
+		    TGeoUniformMagField *fields[4],
+		    FieldDirection fieldDirection, Double_t dX, Double_t dY,
+		    Double_t dX2, Double_t dY2, Double_t dZ, Double_t middleGap,
+		    Double_t middleGap2, Double_t HmainSideMag,
+		    Double_t HmainSideMag2, Double_t gap, Double_t gap2,
+		    Double_t Z, Bool_t NotMagnet, Bool_t stepGeo);
 
 };
 
