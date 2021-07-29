@@ -5,7 +5,8 @@
 #include "TVector3.h"
 #include "TLorentzVector.h"
 #include "TGeoVolume.h"
-#include "TShipMuonShield.h"
+#include "TGeoUniformMagField.h"
+#include "Rtypes.h" 
 
 #include <map>
 #include<cstdarg>
@@ -13,6 +14,8 @@
 class vetoPoint;
 class FairVolume;
 class TClonesArray;
+
+enum class FieldDirection : bool { up, down };
 
 class veto: public FairDetector
 {

@@ -41,6 +41,9 @@ using std::endl;
 Double_t cm  = 1;       // cm
 Double_t m   = 100*cm;  //  m
 Double_t mm  = 0.1*cm;  //  mm
+Double_t kilogauss = 1.;
+Double_t tesla = 10 * kilogauss;
+
 
 veto::veto()
   : FairDetector("veto", kTRUE, kVETO),
@@ -1110,7 +1113,7 @@ Bool_t  veto::ProcessHits(FairVolume* vol)
 
 void veto::EndOfEvent()
 {
-
+  SetMagneticField(0.5);
   fvetoPointCollection->Clear();
 
 }
@@ -1317,7 +1320,7 @@ void veto::InnerAddToMap(Int_t ncpy, Double_t x, Double_t y, Double_t z, Double_
   fCenters[ncpy]=TVector3(x, y, z);
 }
 
-veto::SetMagneticFieldInMagnet(TString magnetName, TGeoUniformMagField *fields[4], FieldDirection fieldDirection){
+void veto::SetMagneticFieldInMagnet(TString magnetName, TGeoUniformMagField *fields[4], FieldDirection fieldDirection){
   TString str1L = "_MiddleMagL";
   TString str1R = "_MiddleMagR";
   TString str2 = "_MagRetL";
@@ -1333,30 +1336,31 @@ veto::SetMagneticFieldInMagnet(TString magnetName, TGeoUniformMagField *fields[4
   
   switch (fieldDirection){
   case FieldDirection::up:
-    gGeoManager->GetTopVolume()->GetNode("MuonShieldArea")->GetNode(magnetName + str1L)->SetField(fields[0]); 
-    gGeoManager->GetTopVolume()->GetNode("MuonShieldArea")->GetNode(magnetName + str1R)->SetField(fields[0]);
-    gGeoManager->GetTopVolume()->GetNode("MuonShieldArea")->GetNode(magnetName + str2)->SetField(fields[1]); 
-    gGeoManager->GetTopVolume()->GetNode("MuonShieldArea")->GetNode(magnetName + str3)->SetField(fields[1]);
-    gGeoManager->GetTopVolume()->GetNode("MuonShieldArea")->GetNode(magnetName + str8)->SetField(fields[3]); 
-    gGeoManager->GetTopVolume()->GetNode("MuonShieldArea")->GetNode(magnetName + str9)->SetField(fields[2]);
-    gGeoManager->GetTopVolume()->GetNode("MuonShieldArea")->GetNode(magnetName + str10)->SetField(fields[2]); 
-    gGeoManager->GetTopVolume()->GetNode("MuonShieldArea")->GetNode(magnetName + str11)->SetField(fields[3]);
+    gGeoManager->GetTopVolume()->GetNode("MuonShieldArea")->GetVolume()->GetNode(magnetName + str1L)->GetVolume()->SetField(fields[0]); 
+    gGeoManager->GetTopVolume()->GetNode("MuonShieldArea")->GetVolume()->GetNode(magnetName + str1R)->GetVolume()->SetField(fields[0]);
+    gGeoManager->GetTopVolume()->GetNode("MuonShieldArea")->GetVolume()->GetNode(magnetName + str2)->GetVolume()->SetField(fields[1]); 
+    gGeoManager->GetTopVolume()->GetNode("MuonShieldArea")->GetVolume()->GetNode(magnetName + str3)->GetVolume()->SetField(fields[1]);
+    gGeoManager->GetTopVolume()->GetNode("MuonShieldArea")->GetVolume()->GetNode(magnetName + str8)->GetVolume()->SetField(fields[3]); 
+    gGeoManager->GetTopVolume()->GetNode("MuonShieldArea")->GetVolume()->GetNode(magnetName + str9)->GetVolume()->SetField(fields[2]);
+    gGeoManager->GetTopVolume()->GetNode("MuonShieldArea")->GetVolume()->GetNode(magnetName + str10)->GetVolume()->SetField(fields[2]); 
+    gGeoManager->GetTopVolume()->GetNode("MuonShieldArea")->GetVolume()->GetNode(magnetName + str11)->GetVolume()->SetField(fields[3]);
     break;
 
   case FieldDirection::down:
-    gGeoManager->GetTopVolume()->GetNode("MuonShieldArea")->GetNode(magnetName + str1L)->SetField(fields[1]); 
-    gGeoManager->GetTopVolume()->GetNode("MuonShieldArea")->GetNode(magnetName + str1R)->SetField(fields[1]);
-    gGeoManager->GetTopVolume()->GetNode("MuonShieldArea")->GetNode(magnetName + str2)->SetField(fields[0]); 
-    gGeoManager->GetTopVolume()->GetNode("MuonShieldArea")->GetNode(magnetName + str3)->SetField(fields[0]);
-    gGeoManager->GetTopVolume()->GetNode("MuonShieldArea")->GetNode(magnetName + str8)->SetField(fields[2]); 
-    gGeoManager->GetTopVolume()->GetNode("MuonShieldArea")->GetNode(magnetName + str9)->SetField(fields[3]);
-    gGeoManager->GetTopVolume()->GetNode("MuonShieldArea")->GetNode(magnetName + str10)->SetField(fields[3]); 
-    gGeoManager->GetTopVolume()->GetNode("MuonShieldArea")->GetNode(magnetName + str11)->SetField(fields[2]);
+    gGeoManager->GetTopVolume()->GetNode("MuonShieldArea")->GetVolume()->GetNode(magnetName + str1L)->GetVolume()->SetField(fields[1]); 
+    gGeoManager->GetTopVolume()->GetNode("MuonShieldArea")->GetVolume()->GetNode(magnetName + str1R)->GetVolume()->SetField(fields[1]);
+    gGeoManager->GetTopVolume()->GetNode("MuonShieldArea")->GetVolume()->GetNode(magnetName + str2)->GetVolume()->SetField(fields[0]); 
+    gGeoManager->GetTopVolume()->GetNode("MuonShieldArea")->GetVolume()->GetNode(magnetName + str3)->GetVolume()->SetField(fields[0]);
+    gGeoManager->GetTopVolume()->GetNode("MuonShieldArea")->GetVolume()->GetNode(magnetName + str8)->GetVolume()->SetField(fields[2]); 
+    gGeoManager->GetTopVolume()->GetNode("MuonShieldArea")->GetVolume()->GetNode(magnetName + str9)->GetVolume()->SetField(fields[3]);
+    gGeoManager->GetTopVolume()->GetNode("MuonShieldArea")->GetVolume()->GetNode(magnetName + str10)->GetVolume()->SetField(fields[3]); 
+    gGeoManager->GetTopVolume()->GetNode("MuonShieldArea")->GetVolume()->GetNode(magnetName + str11)->GetVolume()->SetField(fields[2]);
     break;
 
+  }
 }
 
-veto::SetMagneticField(Double_t newFiedlValue){
+void veto::SetMagneticField(Double_t newFiedlValue){
   if (fDesign==20){
     Double_t ironField = newFiedlValue*tesla;
     TGeoUniformMagField *magFieldIron = new TGeoUniformMagField(0.,ironField,0.);
@@ -1370,7 +1374,7 @@ veto::SetMagneticField(Double_t newFiedlValue){
         FieldDirection::up
      };
     std::vector<TString> magnetName =  {"Magn1", "Magn2", "Magn3", "Magn4"};
-    const Int_t nParts = 4
+    const Int_t nParts = 4;
     for (unsigned int i = 0; i<nParts; i++){
       SetMagneticFieldInMagnet(magnetName[i], fields,fieldDirection[i]);
     }
