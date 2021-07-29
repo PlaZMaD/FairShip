@@ -5,6 +5,7 @@
 #include "TVector3.h"
 #include "TLorentzVector.h"
 #include "TGeoVolume.h"
+#include "TShipMuonShield.h"
 
 #include <map>
 #include<cstdarg>
@@ -214,6 +215,24 @@ class veto: public FairDetector
 
     // Add center of volume and its dx, dy and dz (currently dummy) to a map for futher export 
     void InnerAddToMap(Int_t ncpy, Double_t x, Double_t y, Double_t z, Double_t dx=-1111, Double_t dy=-1111, Double_t dz=-1111);
+    Int_t mini_Initialize(std::vector<TString> &magnetName,
+      std::vector<FieldDirection> &fieldDirection,
+      std::vector<Double_t> &dXIn, std::vector<Double_t> &dYIn,
+      std::vector<Double_t> &dXOut, std::vector<Double_t> &dYOut,
+      std::vector<Double_t> &dZ, std::vector<Double_t> &midGapIn,
+      std::vector<Double_t> &midGapOut,
+      std::vector<Double_t> &HmainSideMagIn,
+      std::vector<Double_t> &HmainSideMagOut,
+      std::vector<Double_t> &gapIn, std::vector<Double_t> &gapOut,
+      std::vector<Double_t> &Z);
+
+  void CreateMagnet(TString magnetName, TGeoMedium *medium, TGeoVolume *tShield,
+        TGeoUniformMagField *fields[4],
+        FieldDirection fieldDirection, Double_t dX, Double_t dY,
+        Double_t dX2, Double_t dY2, Double_t dZ, Double_t middleGap,
+        Double_t middleGap2, Double_t HmainSideMag,
+        Double_t HmainSideMag2, Double_t gap, Double_t gap2,
+        Double_t Z, Bool_t NotMagnet, Bool_t stepGeo);
 
 
     ClassDef(veto, 9)

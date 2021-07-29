@@ -1086,4 +1086,5 @@ void ShipMuonShield::ConstructGeometry()
      Fatal("ShipMuonShield","Design %i does not match implemented designs",fDesign);
     }
 }
+
 ClassImp(ShipMuonShield)
