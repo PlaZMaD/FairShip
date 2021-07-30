@@ -7,6 +7,8 @@
 #include "TGeoVolume.h"
 #include "TGeoUniformMagField.h"
 #include "Rtypes.h" 
+#include "ShipMuonShield.h"
+#include "TRandom3.h"
 
 #include <map>
 #include<cstdarg>
@@ -14,8 +16,6 @@
 class vetoPoint;
 class FairVolume;
 class TClonesArray;
-
-enum class FieldDirection : bool { up, down };
 
 class veto: public FairDetector
 {
@@ -73,7 +73,7 @@ class veto: public FairDetector
     vetoPoint* AddHit(Int_t trackID, Int_t detID,
                              TVector3 pos, TVector3 mom,
                              Double_t time, Double_t length,
-                             Double_t eLoss,Int_t pdgcode,TVector3 Lpos, TVector3 Lmom);
+                             Double_t eLoss,Int_t pdgcode,TVector3 Lpos, TVector3 Lmom, Float_t currentField);
 
     /** The following methods can be implemented if you need to make
      *  any optional action in your detector during the transport.
@@ -176,6 +176,8 @@ class veto: public FairDetector
     TClonesArray*  fvetoPointCollection;
 
     Float_t sens_z_1, sens_z_2, sens_z_3, sens_z_4, sens_z_5, sens_z_6, sens_z_7,  sens_z_8 = 0.;
+    TRandom3 *rng;//!
+    Float_t fieldValue;
 
     veto(const veto&);
     veto& operator=(const veto&);

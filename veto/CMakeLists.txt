@@ -5,6 +5,7 @@
 set(INCLUDE_DIRECTORIES
 ${CMAKE_SOURCE_DIR}/shipdata
 ${CMAKE_SOURCE_DIR}/veto
+${CMAKE_SOURCE_DIR}/passive
 )
 
 include_directories( ${INCLUDE_DIRECTORIES})

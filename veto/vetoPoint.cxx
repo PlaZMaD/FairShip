@@ -9,6 +9,7 @@ using std::endl;
 vetoPoint::vetoPoint()
   : FairMCPoint()
 {
+     Double_t currentField;
 }
 // -------------------------------------------------------------------------
 
@@ -16,9 +17,10 @@ vetoPoint::vetoPoint()
 vetoPoint::vetoPoint(Int_t trackID, Int_t detID,
                                    TVector3 pos, TVector3 mom,
                                    Double_t tof, Double_t length,
-                                   Double_t eLoss, Int_t pdgcode,TVector3 Lpos, TVector3 Lmom)
+                                   Double_t eLoss, Int_t pdgcode,TVector3 Lpos, TVector3 Lmom, Float_t field)
   : FairMCPoint(trackID, detID, pos, mom, tof, length, eLoss), fPdgCode(pdgcode),fLpos(Lpos),fLmom(Lmom)
 {
+     currentField = field;
 }
 // -------------------------------------------------------------------------
 

@@ -59,6 +59,8 @@ veto::veto()
   fUseSupport=1;
   fPlasticVeto=0;
   fLiquidVeto=1;
+  rng  = new TRandom3(gRandom->GetSeed());
+  fieldValue = 1.8;
 }
 
 veto::veto(const char* name, Bool_t active)
@@ -97,6 +99,8 @@ veto::veto(const char* name, Bool_t active)
   fUseSupport=1;
   fPlasticVeto=0;
   fLiquidVeto=1;
+  rng  = new TRandom3(gRandom->GetSeed());
+  fieldValue = 1.8;
 }
 
 veto::~veto()
@@ -1069,7 +1073,7 @@ Bool_t  veto::ProcessHits(FairVolume* vol)
   if ( gMC->IsTrackEntering() ) {
     fELoss  = 0.;
     fTime   = gMC->TrackTime() * 1.0e09;
-    fLength = Fmuon->TrackLength();
+    fLength = gMC->TrackLength();
     gMC->TrackPosition(fPos);
     gMC->TrackMomentum(fMom);
   }
@@ -1101,7 +1105,7 @@ Bool_t  veto::ProcessHits(FairVolume* vol)
 //    cout << veto_uniqueId << " :(" << xmean << ", " << ymean << ", " << zmean << "): " << gMC->CurrentVolName() << endl;
     AddHit(fTrackID, veto_uniqueId, TVector3(xmean, ymean,  zmean),
            TVector3(fMom.Px(), fMom.Py(), fMom.Pz()), fTime, fLength,
-           fELoss,pdgCode,TVector3(Pos.X(), Pos.Y(), Pos.Z()),TVector3(Mom.Px(), Mom.Py(), Mom.Pz()) );
+           fELoss,pdgCode,TVector3(Pos.X(), Pos.Y(), Pos.Z()),TVector3(Mom.Px(), Mom.Py(), Mom.Pz()), fieldValue);
 
     // Increment number of veto det points in TParticle
     ShipStack* stack = (ShipStack*) gMC->GetStack();
@@ -1113,7 +1117,8 @@ Bool_t  veto::ProcessHits(FairVolume* vol)
 
 void veto::EndOfEvent()
 {
-  SetMagneticField(0.5);
+  fieldValue = rng->Uniform(1.7, 1.9);
+  SetMagneticField(fieldValue);
   fvetoPointCollection->Clear();
 
 }
@@ -1301,13 +1306,13 @@ void veto::ConstructGeometry()
 vetoPoint* veto::AddHit(Int_t trackID, Int_t detID,
                                       TVector3 pos, TVector3 mom,
                                       Double_t time, Double_t length,
-                                      Double_t eLoss, Int_t pdgCode,TVector3 Lpos, TVector3 Lmom)
+                                      Double_t eLoss, Int_t pdgCode,TVector3 Lpos, TVector3 Lmom, Float_t currentField)
 {
   TClonesArray& clref = *fvetoPointCollection;
   Int_t size = clref.GetEntriesFast();
   // cout << "veto hit called "<< pos.z()<<endl;
   return new(clref[size]) vetoPoint(trackID, detID, pos, mom,
-         time, length, eLoss, pdgCode,Lpos,Lmom);
+         time, length, eLoss, pdgCode,Lpos,Lmom, currentField);
 }
 
 void veto::InnerAddToMap(Int_t ncpy, Double_t x, Double_t y, Double_t z, Double_t dx, Double_t dy, Double_t dz)
@@ -1333,35 +1338,38 @@ void veto::SetMagneticFieldInMagnet(TString magnetName, TGeoUniformMagField *fie
   TString str9 = "_MagTopRight";
   TString str10 = "_MagBotLeft";
   TString str11 = "_MagBotRight";
-  
+  TString suffix = "_0_1";
+  TGeoVolume *top=gGeoManager->GetTopVolume();
+  TGeoVolume *muShield = top->GetNode("MuonShieldArea_1")->GetVolume()  
+
   switch (fieldDirection){
   case FieldDirection::up:
-    gGeoManager->GetTopVolume()->GetNode("MuonShieldArea")->GetVolume()->GetNode(magnetName + str1L)->GetVolume()->SetField(fields[0]); 
-    gGeoManager->GetTopVolume()->GetNode("MuonShieldArea")->GetVolume()->GetNode(magnetName + str1R)->GetVolume()->SetField(fields[0]);
-    gGeoManager->GetTopVolume()->GetNode("MuonShieldArea")->GetVolume()->GetNode(magnetName + str2)->GetVolume()->SetField(fields[1]); 
-    gGeoManager->GetTopVolume()->GetNode("MuonShieldArea")->GetVolume()->GetNode(magnetName + str3)->GetVolume()->SetField(fields[1]);
-    gGeoManager->GetTopVolume()->GetNode("MuonShieldArea")->GetVolume()->GetNode(magnetName + str8)->GetVolume()->SetField(fields[3]); 
-    gGeoManager->GetTopVolume()->GetNode("MuonShieldArea")->GetVolume()->GetNode(magnetName + str9)->GetVolume()->SetField(fields[2]);
-    gGeoManager->GetTopVolume()->GetNode("MuonShieldArea")->GetVolume()->GetNode(magnetName + str10)->GetVolume()->SetField(fields[2]); 
-    gGeoManager->GetTopVolume()->GetNode("MuonShieldArea")->GetVolume()->GetNode(magnetName + str11)->GetVolume()->SetField(fields[3]);
+    muShield->GetNode(magnetName + str1L + suffix)->GetVolume()->SetField(fields[0]);
+    muShield->GetNode(magnetName + str1R + suffix)->GetVolume()->SetField(fields[0]);
+    muShield->GetNode(magnetName + str2 + suffix)->GetVolume()->SetField(fields[1]);
+    muShield->GetNode(magnetName + str3 + suffix)->GetVolume()->SetField(fields[1]);
+    muShield->GetNode(magnetName + str8 + suffix)->GetVolume()->SetField(fields[3]);
+    muShield->GetNode(magnetName + str9 + suffix)->GetVolume()->SetField(fields[2]);
+    muShield->GetNode(magnetName + str10 + suffix)->GetVolume()->SetField(fields[2]);
+    muShield->GetNode(magnetName + str11 + suffix)->GetVolume()->SetField(fields[3]);
     break;
 
   case FieldDirection::down:
-    gGeoManager->GetTopVolume()->GetNode("MuonShieldArea")->GetVolume()->GetNode(magnetName + str1L)->GetVolume()->SetField(fields[1]); 
-    gGeoManager->GetTopVolume()->GetNode("MuonShieldArea")->GetVolume()->GetNode(magnetName + str1R)->GetVolume()->SetField(fields[1]);
-    gGeoManager->GetTopVolume()->GetNode("MuonShieldArea")->GetVolume()->GetNode(magnetName + str2)->GetVolume()->SetField(fields[0]); 
-    gGeoManager->GetTopVolume()->GetNode("MuonShieldArea")->GetVolume()->GetNode(magnetName + str3)->GetVolume()->SetField(fields[0]);
-    gGeoManager->GetTopVolume()->GetNode("MuonShieldArea")->GetVolume()->GetNode(magnetName + str8)->GetVolume()->SetField(fields[2]); 
-    gGeoManager->GetTopVolume()->GetNode("MuonShieldArea")->GetVolume()->GetNode(magnetName + str9)->GetVolume()->SetField(fields[3]);
-    gGeoManager->GetTopVolume()->GetNode("MuonShieldArea")->GetVolume()->GetNode(magnetName + str10)->GetVolume()->SetField(fields[3]); 
-    gGeoManager->GetTopVolume()->GetNode("MuonShieldArea")->GetVolume()->GetNode(magnetName + str11)->GetVolume()->SetField(fields[2]);
+    muShield->GetVolume()->GetNode(magnetName + str1L + suffix)->GetVolume()->SetField(fields[1]);
+    muShield->GetNode(magnetName + str1R + suffix)->GetVolume()->SetField(fields[1]);
+    muShield->GetNode(magnetName + str2 + suffix)->GetVolume()->SetField(fields[0]);
+    muShield->GetNode(magnetName + str3 + suffix)->GetVolume()->SetField(fields[0]);
+    muShield->GetNode(magnetName + str8 + suffix)->GetVolume()->SetField(fields[2]);
+    muShield->GetNode(magnetName + str9 + suffix)->GetVolume()->SetField(fields[3]);
+    muShield->GetNode(magnetName + str10 + suffix)->GetVolume()->SetField(fields[3]);
+    muShield->GetNode(magnetName + str11 + suffix)->GetVolume()->SetField(fields[2]);
     break;
 
   }
 }
 
 void veto::SetMagneticField(Double_t newFiedlValue){
-  if (fDesign==20){
+  // if (fDesign==20){
     Double_t ironField = newFiedlValue*tesla;
     TGeoUniformMagField *magFieldIron = new TGeoUniformMagField(0.,ironField,0.);
     TGeoUniformMagField *RetField     = new TGeoUniformMagField(0.,-ironField,0.);
@@ -1378,10 +1386,10 @@ void veto::SetMagneticField(Double_t newFiedlValue){
     for (unsigned int i = 0; i<nParts; i++){
       SetMagneticFieldInMagnet(magnetName[i], fields,fieldDirection[i]);
     }
-  }
-  else{
-    std::cout<<"This method doesn't do anything for shield design != 20\n";
-  }
+  // }
+  // else{
+  //   std::cout<<"This method doesn't do anything for shield design != 20\n";
+  // }
 }
 
 ClassImp(veto)
