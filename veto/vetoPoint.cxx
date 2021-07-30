@@ -9,7 +9,6 @@ using std::endl;
 vetoPoint::vetoPoint()
   : FairMCPoint()
 {
-     Double_t currentField;
 }
 // -------------------------------------------------------------------------
 
