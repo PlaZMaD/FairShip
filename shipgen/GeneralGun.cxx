@@ -83,9 +83,9 @@ Bool_t GeneralGun::ReadEvent(FairPrimaryGenerator* cpg){
 // 			py = 0. * GeV;
 // 			pz = 30*GeV;//energy * GeV;
 // 		case 1:
-			px = rng->Uniform(-1.0 * GeV, 1.0 * GeV);
-			py = rng->Uniform(-1.0 * GeV, 1.0 * GeV);
-			pz = rng->Uniform(28.* GeV, 32. * GeV);
+			px = 0. * GeV;// rng->Uniform(-1.0 * GeV, 1.0 * GeV);
+			py = 0. * GeV;// rng->Uniform(-1.0 * GeV, 1.0 * GeV);
+			pz =  30. * GeV;//rng->Uniform(28.* GeV, 32. * GeV);
 // 	}
 	z = z0;
 	TDatabasePDG* pdgBase = TDatabasePDG::Instance();
