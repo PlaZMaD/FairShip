@@ -871,3 +871,10 @@ with ConfigRegistry.register_config("basic") as c:
     c.UpstreamTagger.X_Strip64 = 3.3 * u.cm
     c.UpstreamTagger.Y_Strip64 = 111 * u.cm
     c.UpstreamTagger.Z_Position = c.tauMudet.zMudetC + (c.tauMudet.Ztot)/2 + 12.0*u.cm
+
+    c.SensPlane = AttrDict(z=0 * u.cm)
+    # c.SensPlane.z_1 = c.Goliath.goliathcentre - c.Goliath.LS / 2 - 10 * u.cm
+    # c.SensPlane.z_2 = c.Goliath.goliathcentre + c.Goliath.LS / 2 + 10 * u.cm
+
+    # c.muShield.z = c.SensPlane.z_2 + 1*u.m + c.muShield.length / 2
+    c.SensPlane.z_1 = c.muShield.z + 1*u.m + c.muShield.length / 2

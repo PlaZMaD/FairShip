@@ -91,6 +91,8 @@ def configure(run,ship_geo,Gfield=''):
     ship_geo.muShield.Start_Z + 2.*3.*ship_geo.muShield.Z + 5.*ship_geo.muShield.Gap, 
     ship_geo.muShield.Start_Z + 2.*4.*ship_geo.muShield.Z + 7.*ship_geo.muShield.Gap,
     ship_geo.muShield.Start_Z + 2.*4.*ship_geo.muShield.Z + 9.*ship_geo.muShield.Gap + 100*u.cm)
+ elif ship_geo.muShieldDesign == 8:
+  Veto.SetSensePlaneZ(ship_geo.SensPlane.z_1, 2000000, 3000000)
  else:
   Veto.SetSensePlaneZ(ship_geo.SensPlane.z_1, ship_geo.SensPlane.z_2, ship_geo.SensPlane.z_3)
  detectorList.append(Veto)
@@ -117,7 +119,7 @@ def configure(run,ship_geo,Gfield=''):
    magnet = ROOT.ShipMagnet("Magnet","SHiP Magnet",ship_geo.Bfield.z, ship_geo.magnetDesign, ship_geo.Bfield.x, ship_geo.Bfield.y, ship_geo.cave.floorHeightTankB)
  else: magnet = ROOT.ShipMagnet("Magnet","SHiP Magnet",ship_geo.Bfield.z)
  detectorList.append(magnet)
- 
+
 
  for x in detectorList:
   run.AddModule(x)
