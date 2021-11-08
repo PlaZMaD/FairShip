@@ -32,6 +32,10 @@ def generate_magnet_geofile(geofile, params):
         f.Close()
         print('Geofile constructed at ' + geofile)
         return geofile
+globalDesigns = {'2016':{'dy':10.,'dv':5,'ds':7,'nud':1,'caloDesign':0,'strawDesign':4},\
+                 '2018':{'dy':10.,'dv':6,'ds':9,'nud':3,'caloDesign':3,'strawDesign':10}}
+default = '2018'
+
 
 parser = ArgumentParser()
 group = parser.add_mutually_exclusive_group()
@@ -70,6 +74,15 @@ parser.add_argument("--energyScaleFactor", dest='energyScaleFactor', default=1, 
 parser.add_argument("--GPG",      dest="gpg",      help="Use General Particle Gun", required=False, action="store_true")
 parser.add_argument("--MuonBack",dest="muonback",  help="Generate events from muon background file, --Cosmics=0 for cosmic generator data", required=False, action="store_true")
 parser.add_argument("--shieldField", dest="muField", help="Field value for muon shield", required=False, default=1.7, type=float)
+parser.add_argument("-Y",        dest="dy",  help="max height of vacuum tank", required=False, default=globalDesigns[default]['dy'])
+parser.add_argument("--tankDesign", dest="dv",      help="4=TP elliptical tank design, 5 = optimized conical rectangular design, 6=5 without segment-1"\
+                                            ,required=False, default=globalDesigns[default]['dv'], type=int)
+parser.add_argument("--nuTauTargetDesign", dest="nud", help="0=TP, 1=new magnet option for short muon shield, 2= no magnet surrounding neutrino detector"\
+                                            ,required=False, default=globalDesigns[default]['nud'], type=int)
+parser.add_argument("--caloDesign", dest="caloDesign",   help="0=ECAL/HCAL TP  1=ECAL/HCAL TP + preshower 2=splitCal  3=ECAL/ passive HCAL"\
+                                            ,required=False, default=globalDesigns[default]['caloDesign'], type=int)
+parser.add_argument("--strawDesign", dest="strawDesign", help="simplistic tracker design,  4=sophisticated straw tube design, horizontal wires (default), 10=2cm straw"
+                                            ,required=False, default=globalDesigns[default]['strawDesign'], type=int)
 
 options = parser.parse_args()
 if options.ds == 8:
@@ -92,7 +105,10 @@ ship_geo = ConfigRegistry.loadpy("$FAIRSHIP/geometry/opt_geometry_config.py",
                                  muShieldDesign=options.ds,
                                  muShieldGeo=options.geofile,
                                  muShieldStepGeo=options.muShieldStepGeo,
-                                 muShieldWithCobaltMagnet=options.muShieldWithCobaltMagnet)
+                                 muShieldWithCobaltMagnet=options.muShieldWithCobaltMagnet,
+                                 Yheight = options.dy, tankDesign = options.dv, \
+                                 nuTauTargetDesign=options.nud, CaloDesign=options.caloDesign, \
+                                 strawDesign=options.strawDesign)
 ship_geo.muShieldGeo = options.geofile
 ship_geo.optParams = options.optParams
 ship_geo.muShield.Field = options.muField
