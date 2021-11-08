@@ -93,6 +93,7 @@ ship_geo = ConfigRegistry.loadpy("$FAIRSHIP/geometry/charm-geometry_config.py",
                                  muShieldGeo=options.geofile,
                                  muShieldStepGeo=options.muShieldStepGeo,
                                  muShieldWithCobaltMagnet=options.muShieldWithCobaltMagnet)
+ship_geo.muShieldGeo = options.geofile
 ship_geo.optParams = options.optParams
 ship_geo.muShield.Field = options.muField
 

@@ -29,7 +29,7 @@ def configure(run,ship_geo,Gfield=''):
  cave.SetGeometryFileName("caveWithAir.geo")
  detectorList.append(cave)
 
- if ship_geo.optParams:
+ if ship_geo.optParams and ship_geo.muShieldDesign !=8:
     MiniShield = ROOT.ShipMuonShield(
         ship_geo.optParams, "MuonShield", ship_geo.muShieldDesign, "ShipMuonShield",
         ship_geo.muShield.z, ship_geo.muShield.dZ0, ship_geo.muShield.dZ1,
@@ -91,7 +91,8 @@ def configure(run,ship_geo,Gfield=''):
  Goliath.SetGoliathCentre(ship_geo.Goliath.goliathcentre_to_beam)
  Goliath.SetGoliathCentreZ(ship_geo.Goliath.goliathcentre)
 
- detectorList.append(Goliath)
+ if ship_geo.muShieldDesign!=8:
+  detectorList.append(Goliath)
 
  for x in detectorList:
   run.AddModule(x)
