@@ -107,6 +107,7 @@ with ConfigRegistry.register_config("basic") as c:
             c.muShield.half_Y_max = max(c.muShield.half_Y_max, h_l + f_l, h_r + f_r)
         c.muShield.half_X_max += 15 * u.cm
         c.muShield.half_Y_max += 15 * u.cm
+        
     elif muShieldDesign == 20:
         c.muShield.Gap = 0.05*u.m
         c.muShield.Field = 1.7  # Tesla

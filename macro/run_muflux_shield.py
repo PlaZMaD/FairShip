@@ -23,6 +23,14 @@ from collections import defaultdict
 import numpy as np
 import json
 
+def generate_magnet_geofile(geofile, params):
+        f = r.TFile.Open(geofile, 'recreate')
+        parray = r.TVectorD(len(params), array('d', params))
+        parray.Write('params')
+        f.Close()
+        print('Geofile constructed at ' + geofile)
+        return geofile
+
 parser = ArgumentParser()
 group = parser.add_mutually_exclusive_group()
 
@@ -62,6 +70,8 @@ parser.add_argument("--MuonBack",dest="muonback",  help="Generate events from mu
 parser.add_argument("--shieldField", dest="muField", help="Field value for muon shield", required=False, default=1.7, type=float)
 
 options = parser.parse_args()
+options.ds == 8:
+    generate_magnet_geofile(options.geofile, options.optParams)
 if options.gpg:  simEngine = "GPG"
 elif options.muonback: simEngine = "MuonBack"
 else: simEngine="MuonBack"
@@ -160,7 +170,7 @@ if options.processMiniShield:
     nodes = miniShield.GetNodes()
     for node in nodes:
       volume = node.GetVolume()
-      if 'mini' in volume.GetName():
+      if 'mini' in volume.GetName() or 'Magn' in volume.GetName()  and not 'Absorb' in volume.GetName():#if 'mini' in volume.GetName():
         m += volume.Weight(0.01, 'a')
 
     def check_acceptance(hit, bound=(330, 530)):
@@ -235,7 +245,7 @@ if options.processMiniShield:
         print("Total events returned: {}".format(len(muons_stats)))
         return np.array(muons_stats)
 
-    muons_stats = process_file(os.path.join(options.outputDir,"ship.MiniShield.MuonBack.root"), apply_acceptance_cut=True, debug=False, acceptance_size=(options.zone, options.zone))
+    muons_stats = process_file(os.path.join(options.outputDir,"ship.MiniShield.MuonBack.root"), apply_acceptance_cut=True, debug=False, acceptance_size=(options.zone, options.zone) if options.zone>0. else (330, 530))
     if len(muons_stats) == 0:
           muon_kinematics = np.array([])
     else:
