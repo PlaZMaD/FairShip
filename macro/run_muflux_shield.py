@@ -22,10 +22,11 @@ import saveBasicParameters
 from collections import defaultdict
 import numpy as np
 import json
+from array import array
 
 def generate_magnet_geofile(geofile, params):
         f = r.TFile.Open(geofile, 'recreate')
-        parray = r.TVectorD(len(params), array('d', params))
+        parray = r.TVectorD(len(params), array('d', np.array([float(x.strip()) for x in params.split(',')], dtype=float)))
         parray.Write('params')
         f.Close()
         print('Geofile constructed at ' + geofile)
@@ -70,7 +71,7 @@ parser.add_argument("--MuonBack",dest="muonback",  help="Generate events from mu
 parser.add_argument("--shieldField", dest="muField", help="Field value for muon shield", required=False, default=1.7, type=float)
 
 options = parser.parse_args()
-options.ds == 8:
+if options.ds == 8:
     generate_magnet_geofile(options.geofile, options.optParams)
 if options.gpg:  simEngine = "GPG"
 elif options.muonback: simEngine = "MuonBack"

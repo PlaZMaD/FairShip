@@ -927,7 +927,7 @@ void ShipMuonShield::ConstructGeometry()
     InitMedium("Concrete");
     TGeoMedium *concrete  =gGeoManager->GetMedium("Concrete");
     
-    if (optParams.Length() > 3){
+    if (optParams.Length() > 3 and fDesign!=8){
         Double_t ironField = fField*tesla;
         TGeoUniformMagField *magFieldIron = new TGeoUniformMagField(0.,ironField,0.);
         TGeoUniformMagField *RetField     = new TGeoUniformMagField(0.,-ironField,0.);
