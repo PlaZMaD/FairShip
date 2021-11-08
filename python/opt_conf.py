@@ -92,7 +92,7 @@ def configure(run,ship_geo,Gfield=''):
     ship_geo.muShield.Start_Z + 2.*4.*ship_geo.muShield.Z + 7.*ship_geo.muShield.Gap,
     ship_geo.muShield.Start_Z + 2.*4.*ship_geo.muShield.Z + 9.*ship_geo.muShield.Gap + 100*u.cm)
  elif ship_geo.muShieldDesign == 8:
-  Veto.SetSensePlaneZ(ship_geo.SensPlane.z_1, 20000000., 30000000.)
+  Veto.SetSensePlaneZ(ship_geo.SensPlane.z_1)
  else:
   Veto.SetSensePlaneZ(ship_geo.SensPlane.z_1, ship_geo.SensPlane.z_2, ship_geo.SensPlane.z_3)
  detectorList.append(Veto)
