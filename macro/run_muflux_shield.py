@@ -26,7 +26,8 @@ from array import array
 
 def generate_magnet_geofile(geofile, params):
         f = r.TFile.Open(geofile, 'recreate')
-        parray = r.TVectorD(len(params), array('d', np.array([float(x.strip()) for x in params.split(',')], dtype=float)))
+        params =  np.array([float(x.strip()) for x in params.split(',')], dtype=float)
+        parray = r.TVectorD(len(params), array('d',params)
         parray.Write('params')
         f.Close()
         print('Geofile constructed at ' + geofile)
