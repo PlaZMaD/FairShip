@@ -575,8 +575,8 @@ Int_t ShipMuonShield::Initialize(std::vector<TString> &magnetName,
     auto f = TFile::Open(fGeofile, "read");
     TVectorT<Double_t> params;
     params.Read("params");
-    for (auto i = params.begin(); i != params.end(); ++i)
-      std::cout << *i << ' ';
+    // for (auto i = params.begin(); i != params.end(); ++i)
+    //   std::cout << *i << ' ';
     const int offset = 7;
 
     dXIn[0] = 0.4 * m;
