@@ -1251,7 +1251,7 @@ void veto::ConstructGeometry()
     // }
 
      int nPlanes = (sens_z_7>0)?8:3;
-     if (sens_z_2>10000000){nPlanes=1}
+     if (sens_z_2>10000000){nPlanes=1;}
      std::vector<double>zPlanes {sens_z_1, sens_z_2, sens_z_3, sens_z_4, sens_z_5, sens_z_6, sens_z_7,  sens_z_8};
      for (unsigned int i=0; i < nPlanes; i++){
        TGeoVolume* goliath_sens = gGeoManager->MakeBox(("sensitive_plane_"+std::to_string(i)).c_str(), Sens, 2.*m, 2.*m, 1.*cm);
