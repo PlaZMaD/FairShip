@@ -351,7 +351,7 @@ with ConfigRegistry.register_config("basic") as c:
         c.muShield.half_X_max = 179 * u.cm
         c.muShield.half_Y_max = 317 * u.cm
     elif muShieldDesign == 8:
-        c.muShield.LE = 0 * u.m  # - 0.5 m air - Goliath: 4.5 m - 0.5 m air - nu-tau mu-det: 3 m - 0.5 m air. finally 10m asked by Giovanni
+        c.muShield.LE = 10 * u.m  # - 0.5 m air - Goliath: 4.5 m - 0.5 m air - nu-tau mu-det: 3 m - 0.5 m air. finally 10m asked by Giovanni
         c.muShield.dZ0 = 1 * u.m
         c.muShield.dZgap = 0.01 * u.m
         assert muShieldGeo

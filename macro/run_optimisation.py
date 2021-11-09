@@ -128,12 +128,12 @@ modules = shipDet_conf.configure(run, ship_geo)
 primGen = r.FairPrimaryGenerator()
 if simEngine=="MuonBack":
     fileType = ut.checkFileExists(options.inputFile)
-# if fileType == 'tree':
-#     # 2018 background production
-#     primGen.SetTarget(ship_geo.target.z0 + 70.845 * u.m, 0.)
-# else:
-#     #primGen.SetTarget(ship_geo.target.z0 + 50 * u.m, 0.)
-#     primGen.SetTarget(0 + 50 * u.m, 0.)
+if fileType == 'tree':
+    # 2018 background production
+    primGen.SetTarget(ship_geo.target.z0 + 70.845 * u.m, 0.)
+else:
+    #primGen.SetTarget(ship_geo.target.z0 + 50 * u.m, 0.)
+    primGen.SetTarget(0 + 50 * u.m, 0.)
 
     MuonBackgen = r.MuonBackGenerator()
     MuonBackgen.Init(options.inputFile, options.firstEvent, options.energyScaleFactor, options.phiRandom)
