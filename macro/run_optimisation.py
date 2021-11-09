@@ -170,9 +170,9 @@ print('Initialised run.')
 
 fieldMaker = geomGeant4.addVMCFields(ship_geo, '', True)
 
-fieldMaker.plotField(1, r.TVector3(-300.0, 1600.0, 10.0), r.TVector3(-300.0, 300.0, 6.0),
+fieldMaker.plotField(1, r.TVector3(-7000.0, -3000.0, 100.0), r.TVector3(-300.0, 300.0, 6.0),
                      os.path.join(options.outputDir, 'Bzx.png'))
-fieldMaker.plotField(2, r.TVector3(-300.0, 1600.0, 10.0), r.TVector3(-400.0, 400.0, 6.0),
+fieldMaker.plotField(2, r.TVector3(-7000.0, 3000.0, 100.0), r.TVector3(-400.0, 400.0, 6.0),
                      os.path.join(options.outputDir, 'Bzy.png'))
 print('Start run of {} events.'.format(n_events))
 run.Run(n_events)
