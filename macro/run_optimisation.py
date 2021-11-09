@@ -16,7 +16,7 @@ from ShipGeoConfig import ConfigRegistry
 from argparse import ArgumentParser
 
 import opt_conf as shipDet_conf
-import opt_geomGeant4
+import opt_geomGeant4 as geomGeant4
 import saveBasicParameters
 
 from collections import defaultdict

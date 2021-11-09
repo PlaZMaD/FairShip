@@ -43,8 +43,8 @@ ShipMuonShield::ShipMuonShield(TString geofile,
   fDesign = 8;
   fField = 1.7;
   dZ0 = 1 * m;
-  dZ1 = 0.4 * m;
-  dZ2 = 2.31 * m;
+  dZ1 = 0.35 * m;
+  dZ2 = 2.26 * m;
   dZ3 = params[2];
   dZ4 = params[3];
   dZ5 = params[4];
