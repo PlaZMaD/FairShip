@@ -133,7 +133,7 @@ if fileType == 'tree':
     primGen.SetTarget(ship_geo.target.z0 + 70.845 * u.m, 0.)
 else:
     #primGen.SetTarget(ship_geo.target.z0 + 50 * u.m, 0.)
-    primGen.SetTarget(0 + 50 * u.m, 0.)
+    primGen.SetTarget(ship_geo.target.z0 + 50 * u.m, 0.)
 
     MuonBackgen = r.MuonBackGenerator()
     MuonBackgen.Init(options.inputFile, options.firstEvent, options.energyScaleFactor, options.phiRandom)
@@ -172,7 +172,7 @@ fieldMaker = geomGeant4.addVMCFields(ship_geo, '', True)
 
 fieldMaker.plotField(1, r.TVector3(-7000.0, -3000.0, 100.0), r.TVector3(-300.0, 300.0, 6.0),
                      os.path.join(options.outputDir, 'Bzx.png'))
-fieldMaker.plotField(2, r.TVector3(-7000.0, 3000.0, 100.0), r.TVector3(-400.0, 400.0, 6.0),
+fieldMaker.plotField(2, r.TVector3(-7000.0, -3000.0, 100.0), r.TVector3(-400.0, 400.0, 6.0),
                      os.path.join(options.outputDir, 'Bzy.png'))
 print('Start run of {} events.'.format(n_events))
 run.Run(n_events)
