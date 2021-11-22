@@ -877,4 +877,4 @@ with ConfigRegistry.register_config("basic") as c:
     # c.SensPlane.z_2 = c.Goliath.goliathcentre + c.Goliath.LS / 2 + 10 * u.cm
 
     # c.muShield.z = c.SensPlane.z_2 + 1*u.m + c.muShield.length / 2
-    c.SensPlane.z_1 = c.muShield.z + 1*u.m - c.muShield.length / 2 + c.muShield.LE + 22.26 *2.*u.cm + 0.35 *2.**u.cm +  (2.*6.*300**u.cm + 2*6 * c.muShield.dZgap)
+    c.SensPlane.z_1 = -(c.decayVolume.length) #c.muShield.z + 1*u.m - c.muShield.length / 2 + c.muShield.LE + 22.26 *2.*u.cm + 0.35 *2.**u.cm +  (2.*6.*300**u.cm + 2*6 * c.muShield.dZgap)
