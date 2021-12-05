@@ -1049,21 +1049,3 @@ void ShipMuonShield::ConstructGeometry()
     }
 }
 ClassImp(ShipMuonShield)
-
-
-  //     }
-  // else{
-  //   nMagnets = 
-  //   for (Int_t nM = 2; nM <= (nMagnets - 1); nM++) {
-  //     Double_t ironField_s = fField * fieldScale[nM] * tesla;
-  //     TGeoUniformMagField *magFieldIron_s = new TGeoUniformMagField(0.,ironField_s,0.);
-  //     TGeoUniformMagField *RetField_s     = new TGeoUniformMagField(0.,-ironField_s,0.);
-  //     TGeoUniformMagField *ConRField_s    = new TGeoUniformMagField(-ironField_s,0.,0.);
-  //     TGeoUniformMagField *ConLField_s    = new TGeoUniformMagField(ironField_s,0.,0.);
-  //     TGeoUniformMagField *fields_s[4] = {magFieldIron_s,RetField_s,ConRField_s,ConLField_s};      
-  //     CreateMagnet(magnetName[nM], iron, tShield, fields_s, fieldDirection[nM],
-  //            dXIn[nM], dYIn[nM], dXOut[nM], dYOut[nM], dZf[nM],
-  //            midGapIn[nM], midGapOut[nM], HmainSideMagIn[nM],
-  //            HmainSideMagOut[nM], gapIn[nM], gapOut[nM], Z[nM], nM==8, fStepGeo);
-  //   }
-  // }
