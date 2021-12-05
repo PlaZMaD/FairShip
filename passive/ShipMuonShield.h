@@ -13,6 +13,11 @@
 #include <vector>
 #include <array>
 
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
+#include <string>
+#include <boost/foreach.hpp>
+
 enum class FieldDirection : bool { up, down };
 
 class ShipMuonShield : public FairModule
@@ -25,8 +30,8 @@ class ShipMuonShield : public FairModule
                                const Int_t withCoMagnet=0, const Bool_t StepGeo=false,
                                const Bool_t WithConstAbsorberField=true, const Bool_t WithConstShieldField=true);
 
-   ShipMuonShield(TString geofile, const Int_t withCoMagnet=0, const Bool_t StepGeo=false,
-   const Bool_t WithConstAbsorberField=true, const Bool_t WithConstShieldField=true);
+   ShipMuonShield(TString geofile, const Int_t Design = 0, Doble_t Z_shift = 25.*100., const Int_t withCoMagnet=0, const Bool_t StepGeo=false,
+   const Bool_t WithConstAbsorberField=true, const Bool_t WithConstShieldField=true, const Bool_t json=false);
    ShipMuonShield();
    virtual ~ShipMuonShield();
    void ConstructGeometry();
@@ -51,6 +56,8 @@ class ShipMuonShield : public FairModule
   Bool_t fStepGeo;
   Bool_t fWithConstAbsorberField;
   Bool_t fWithConstShieldField;
+  Bool_t fJson;
+  boost::property_tree::ptree MuShieldConfig;
 
   void CreateArb8(TString arbName, TGeoMedium *medium, Double_t dZ,
 		  std::array<Double_t, 16> corners, Int_t color,

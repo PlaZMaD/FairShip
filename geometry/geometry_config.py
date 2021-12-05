@@ -2,6 +2,7 @@ from __future__ import print_function
 import shipunit as u
 import ROOT as r
 from ShipGeoConfig import AttrDict, ConfigRegistry
+import json
 # the following params should be passed through 'ConfigRegistry.loadpy' method
 # muShieldDesign = 5  # 1=passive 2=active 5=TP design 6=magnetized hadron absorber 9=optimised with T4 as constraint, 8=requires config file
 #                      10=with field map for hadron absorber, 11=9 with field map for muon shield
@@ -46,6 +47,8 @@ if "muShieldStepGeo" not in globals():
     muShieldStepGeo = False
 if "muShieldWithCobaltMagnet" not in globals():
     muShieldWithCobaltMagnet = 0
+if "muShieldWithJSON" not in globals():
+    muShieldWithJSON = 0
 
 with ConfigRegistry.register_config("basic") as c:
     # global muShieldDesign, targetOpt, strawDesign, Yheight
@@ -323,6 +326,7 @@ with ConfigRegistry.register_config("basic") as c:
 
     c.muShieldStepGeo = muShieldStepGeo
     c.muShieldWithCobaltMagnet = muShieldWithCobaltMagnet
+    c.muShieldWithJSON = muShieldWithJSON
 
     # zGap to compensate automatic shortening of magnets
     zGap = 0.5 * c.muShield.dZgap  # halflengh of gap
@@ -424,6 +428,10 @@ with ConfigRegistry.register_config("basic") as c:
      c.muShield.length = 2*(c.muShield.dZ1+c.muShield.dZ2+c.muShield.dZ3+c.muShield.dZ4+c.muShield.dZ5+c.muShield.dZ6
                          +c.muShield.dZ7+c.muShield.dZ8 ) + c.muShield.LE  # leave some space for nu-tau 
      c.muShield.z  =  -c.decayVolume.length/2.-c.muShield.length/2.
+    if muShieldWithJSON:
+        shieldParams = json.loads(muShieldGeo)
+        c.muShield.length = np.sum([shieldParams[key]['length'] for key in shieldParams.keys()]) + c.muShield.dZ1 + c.muShield.dZ2 + c.muShield.LE
+        c.muShield.z  =  -c.decayVolume.length/2.-c.muShield.length/2.
 
     c.hadronAbsorber              =  AttrDict(z=0*u.cm)
     if muShieldDesign > 5:  c.hadronAbsorber.length =  5.00*u.m
