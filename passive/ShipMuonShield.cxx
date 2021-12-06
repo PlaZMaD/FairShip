@@ -769,7 +769,7 @@ Int_t ShipMuonShield::Initialize(std::vector<TString> &magnetName,
     for (auto node : MuShieldConfig){
       magnetName.push_back(node.first);
       fieldDirection.push_back(node.second.get<int>('field_direction'));
-      fieldDirection.push_back(dXIn.push_back(double(node.second.get<double>('dXIn'))*cm));
+      // fieldDirection.push_back(double(node.second.get<double>('dXIn'))*cm);
       dXIn.push_back(double(node.second.get<double>('dXIn'))*cm);
       dXOut.push_back(double(node.second.get<double>('dXOut'))*cm);
       dYIn.push_back(double(node.second.get<double>('dYIn'))*cm);
