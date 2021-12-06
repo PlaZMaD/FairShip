@@ -30,7 +30,7 @@ class ShipMuonShield : public FairModule
                                const Int_t withCoMagnet=0, const Bool_t StepGeo=false,
                                const Bool_t WithConstAbsorberField=true, const Bool_t WithConstShieldField=true);
 
-   ShipMuonShield(TString geofile, const Int_t Design = 0, Doble_t Z_shift = 25.*100., const Int_t withCoMagnet=0, const Bool_t StepGeo=false,
+   ShipMuonShield(TString geofile, const Int_t Design = 0, Double_t Z_shift = 25.*100., const Int_t withCoMagnet=0, const Bool_t StepGeo=false,
    const Bool_t WithConstAbsorberField=true, const Bool_t WithConstShieldField=true, const Bool_t json=false);
    ShipMuonShield();
    virtual ~ShipMuonShield();

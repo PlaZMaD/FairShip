@@ -30,7 +30,7 @@ ShipMuonShield::ShipMuonShield() : FairModule("ShipMuonShield", "") {}
 
 ShipMuonShield::ShipMuonShield(TString geofile,
                                const Int_t Design,
-                               Doble_t Z_shift,
+                               Double_t Z_shift,
                                const Int_t withCoMagnet, const Bool_t StepGeo,
                                const Bool_t WithConstAbsorberField, const Bool_t WithConstShieldField, const Bool_t json)
   : FairModule("MuonShield", "ShipMuonShield")
@@ -767,17 +767,17 @@ Int_t ShipMuonShield::Initialize(std::vector<TString> &magnetName,
     i->erase(i->begin()+2, i->end());
   }
     for (auto node : MuShieldConfig){
-      magnetName.append(node.first);
-      fieldDirection.append(node.second.get<int>('field_direction'));
-      fieldDirection.append(dXIn.append(double(node.second.get<double>('dXIn'))*cm));
-      dXIn.append(double(node.second.get<double>('dXIn'))*cm);
-      dXOut.append(double(node.second.get<double>('dXOut'))*cm);
-      dYIn.append(double(node.second.get<double>('dYIn'))*cm);
-      dYOut.append(double(node.second.get<double>('dYOut'))*cm);
-      gapIn.append(double(node.second.get<double>('gapIn'))*cm);
-      gapOut.append(double(node.second.get<double>('gapOut'))*cm);
-      Z.append(Z.back() + dZ.back() + (double(node.second.get<double>('length'))*cm - zgap / 2) +  zgap);
-      dZ.append(double(node.second.get<double>('length'))*cm - zgap / 2);
+      magnetName.push_back(node.first);
+      fieldDirection.push_back(node.second.get<int>('field_direction'));
+      fieldDirection.push_back(dXIn.push_back(double(node.second.get<double>('dXIn'))*cm));
+      dXIn.push_back(double(node.second.get<double>('dXIn'))*cm);
+      dXOut.push_back(double(node.second.get<double>('dXOut'))*cm);
+      dYIn.push_back(double(node.second.get<double>('dYIn'))*cm);
+      dYOut.push_back(double(node.second.get<double>('dYOut'))*cm);
+      gapIn.push_back(double(node.second.get<double>('gapIn'))*cm);
+      gapOut.push_back(double(node.second.get<double>('gapOut'))*cm);
+      Z.push_back(Z.back() + dZ.back() + (double(node.second.get<double>('length'))*cm - zgap / 2) +  zgap);
+      dZ.push_back(double(node.second.get<double>('length'))*cm - zgap / 2);
       
     }
     Z[2] = Z[2]+zgap;
