@@ -75,8 +75,10 @@ ShipMuonShield::ShipMuonShield(TString geofile,
     dZ1 = 0.4 * m; //absorber size for #9 baseline
     dZ2 = 2.31 * m;//absorber size for #9 baseline
     Double_t LE = 10. * m, floor = 5. * m;
-    MuShieldConfig = new boost::property_tree::ptree();
-    boost::property_tree::read_json(std::string(geofile.Data()), &MuShieldConfig);
+    // MuShieldConfig = new boost::property_tree::ptree();
+    std::stringstream ss;
+    ss << geofile.Data();
+    boost::property_tree::read_json(ss, &MuShieldConfig);
     fFloor = floor;
     fSupport = false;
     fMuonShieldLength = 2.*(dZ1 + dZ2) + LE;

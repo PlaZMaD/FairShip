@@ -115,6 +115,8 @@ parser.add_argument("-D", "--display", dest="eventDisplay", help="store trajecto
 parser.add_argument("--stepMuonShield", dest="muShieldStepGeo", help="activate steps geometry for the muon shield", required=False, action="store_true", default=False)
 parser.add_argument("--coMuonShield", dest="muShieldWithCobaltMagnet", help="replace one of the magnets in the shield with 2.2T cobalt one, downscales other fields, works only for muShieldDesign >2", required=False, type=int, default=0)
 parser.add_argument("--MesonMother",   dest="MM",  help="Choose DP production meson source", required=False,  default=True)
+parser.add_argument("--jsonMuonShield", dest="muShieldWithJSON", help="activate json input(-g 'json_string_here') for the muon shield", required=False, action="store_true", default=False)
+
 
 options = parser.parse_args()
 
@@ -193,7 +195,8 @@ if options.muShieldWithCobaltMagnet and options.ds < 3:
 if options.charm == 0: ship_geo = ConfigRegistry.loadpy("$FAIRSHIP/geometry/geometry_config.py", Yheight = options.dy, tankDesign = options.dv, \
                                                 muShieldDesign = options.ds, nuTauTargetDesign=options.nud, CaloDesign=options.caloDesign, \
                                                 strawDesign=options.strawDesign, muShieldGeo=options.geofile,
-                                                muShieldStepGeo=options.muShieldStepGeo, muShieldWithCobaltMagnet=options.muShieldWithCobaltMagnet)
+                                                muShieldStepGeo=options.muShieldStepGeo, muShieldWithCobaltMagnet=options.muShieldWithCobaltMagnet,
+                                                muShieldWithJSON=options.muShieldWithJSON)
 else: 
  ship_geo = ConfigRegistry.loadpy("$FAIRSHIP/geometry/charm-geometry_config.py", Setup = options.CharmdetSetup, cTarget = options.CharmTarget)
  if options.CharmdetSetup == 0: print("Setup for muon flux measurement has been set")

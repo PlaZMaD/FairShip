@@ -15,7 +15,7 @@
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
-#include <string>
+#include <sstream>
 #include <boost/foreach.hpp>
 
 enum class FieldDirection : bool { up, down };
