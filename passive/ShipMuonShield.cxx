@@ -78,12 +78,12 @@ ShipMuonShield::ShipMuonShield(TString geofile,
     // MuShieldConfig = new boost::property_tree::ptree();
     std::stringstream ss;
     ss << geofile.Data();
-    boost::property_tree::read_json(ss, &MuShieldConfig);
+    boost::property_tree::read_json(ss, MuShieldConfig);
     fFloor = floor;
     fSupport = false;
     fMuonShieldLength = 2.*(dZ1 + dZ2) + LE;
     for (auto node : MuShieldConfig){
-      fMuonShieldLength += 2. * double(node.second.get<double>('length')) * cm;
+      fMuonShieldLength += 2. * double(node.second.get<double>("length")) * cm;
     }
     Double_t Z = -Z_shift - fMuonShieldLength / 2.;
     zEndOfAbsorb = Z + dZ0 - fMuonShieldLength / 2.;
@@ -770,16 +770,16 @@ Int_t ShipMuonShield::Initialize(std::vector<TString> &magnetName,
   }
     for (auto node : MuShieldConfig){
       magnetName.push_back(node.first);
-      fieldDirection.push_back(node.second.get<int>('field_direction'));
-      // fieldDirection.push_back(double(node.second.get<double>('dXIn'))*cm);
-      dXIn.push_back(double(node.second.get<double>('dXIn'))*cm);
-      dXOut.push_back(double(node.second.get<double>('dXOut'))*cm);
-      dYIn.push_back(double(node.second.get<double>('dYIn'))*cm);
-      dYOut.push_back(double(node.second.get<double>('dYOut'))*cm);
-      gapIn.push_back(double(node.second.get<double>('gapIn'))*cm);
-      gapOut.push_back(double(node.second.get<double>('gapOut'))*cm);
-      Z.push_back(Z.back() + dZ.back() + (double(node.second.get<double>('length'))*cm - zgap / 2) +  zgap);
-      dZ.push_back(double(node.second.get<double>('length'))*cm - zgap / 2);
+      fieldDirection.push_back(static_cast<FieldDirection> node.second.get<int>("field_direction"));
+      // fieldDirection.push_back(double(node.second.get<double>("dXIn"))*cm);
+      dXIn.push_back(double(node.second.get<double>("dXIn"))*cm);
+      dXOut.push_back(double(node.second.get<double>("dXOut"))*cm);
+      dYIn.push_back(double(node.second.get<double>("dYIn"))*cm);
+      dYOut.push_back(double(node.second.get<double>("dYOut"))*cm);
+      gapIn.push_back(double(node.second.get<double>("gapIn"))*cm);
+      gapOut.push_back(double(node.second.get<double>("gapOut"))*cm);
+      Z.push_back(Z.back() + dZ.back() + (double(node.second.get<double>("length"))*cm - zgap / 2) +  zgap);
+      dZ.push_back(double(node.second.get<double>("length"))*cm - zgap / 2);
       
     }
     Z[2] = Z[2]+zgap;
