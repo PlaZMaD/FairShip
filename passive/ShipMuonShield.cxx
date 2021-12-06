@@ -763,14 +763,16 @@ Int_t ShipMuonShield::Initialize(std::vector<TString> &magnetName,
   dZ[6] = dZ8-zgap/2;			Z[6] = Z[5] + dZ[5] + dZ[6]+zgap;
   }
   if (fJson){
+    magnetName.erase(magnetName.begin()+2, magnetName.end());
+    fieldDirection.erase(fieldDirection.begin()+2, fieldDirection.end());
     for (auto i :
-       {&magnetName, &fieldDirection, &dXIn, &dXOut, &dYIn, &dYOut, &dZ, &midGapIn, &midGapOut,
+       {&dXIn, &dXOut, &dYIn, &dYOut, &dZ, &midGapIn, &midGapOut,
         &HmainSideMagIn, &HmainSideMagOut, &gapIn, &gapOut, &Z}) {
     i->erase(i->begin()+2, i->end());
   }
     for (auto node : MuShieldConfig){
       magnetName.push_back(node.first);
-      fieldDirection.push_back(static_cast<FieldDirection> node.second.get<int>("field_direction"));
+      fieldDirection.push_back(static_cast<FieldDirection> (node.second.get<int>("field_direction")));
       // fieldDirection.push_back(double(node.second.get<double>("dXIn"))*cm);
       dXIn.push_back(double(node.second.get<double>("dXIn"))*cm);
       dXOut.push_back(double(node.second.get<double>("dXOut"))*cm);
@@ -933,7 +935,7 @@ void ShipMuonShield::ConstructGeometry()
 
           Double_t ironField_s = fField * fieldScale[nM] * tesla;
           if (fJson){
-            ironField_s = (MuShieldConfig.get<double>(magnetName[nM]+".field"))* fieldScale[nM] * tesla;
+            ironField_s = (MuShieldConfig.get<double>(std::string(magnetName[nM].Data())+".field"))* fieldScale[nM] * tesla;
           }
           TGeoUniformMagField *magFieldIron_s = new TGeoUniformMagField(0.,ironField_s,0.);
           TGeoUniformMagField *RetField_s     = new TGeoUniformMagField(0.,-ironField_s,0.);
