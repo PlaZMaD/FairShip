@@ -134,7 +134,7 @@ def configure(run,ship_geo):
  elif ship_geo.muShieldDesign == 8 or ship_geo.muShieldWithJSON:
   MuonShield = ROOT.ShipMuonShield(ship_geo.muShieldGeo,
                                    ship_geo.muShieldDesign,
-                                   shio_geo.decayVolume.length/2.,
+                                   ship_geo.decayVolume.length/2.,
                                    ship_geo.muShieldWithCobaltMagnet,
                                    ship_geo.muShieldStepGeo,
                                    ship_geo.hadronAbsorber.WithConstField,

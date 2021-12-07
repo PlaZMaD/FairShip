@@ -120,6 +120,10 @@ parser.add_argument("--jsonMuonShield", dest="muShieldWithJSON", help="activate 
 
 options = parser.parse_args()
 
+if options.muShieldWithJSON:
+  with open('tmp.json', 'r') as f:
+    options.geofile = json.dumps(json.load(f))
+
 if options.pythia6:  simEngine = "Pythia6"
 if options.pythia8:  simEngine = "Pythia8"
 if options.pg:       simEngine = "PG"
@@ -572,7 +576,8 @@ getattr(rtdb,"print")()
 run.CreateGeometryFile("%s/geofile_full.%s.root" % (options.outputDir, tag))
 # save ShipGeo dictionary in geofile
 import saveBasicParameters
-saveBasicParameters.execute("%s/geofile_full.%s.root" % (options.outputDir, tag),ship_geo)
+if not options.muShieldWithJSON:
+  saveBasicParameters.execute("%s/geofile_full.%s.root" % (options.outputDir, tag),ship_geo)
 
 # checking for overlaps
 if checking4overlaps:

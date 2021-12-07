@@ -763,12 +763,13 @@ Int_t ShipMuonShield::Initialize(std::vector<TString> &magnetName,
   dZ[6] = dZ8-zgap/2;			Z[6] = Z[5] + dZ[5] + dZ[6]+zgap;
   }
   if (fJson){
-    magnetName.erase(magnetName.begin()+2, magnetName.end());
-    fieldDirection.erase(fieldDirection.begin()+2, fieldDirection.end());
+    int absorberMagnets = (fDesign >= 7) ? 3 : 2
+    magnetName.erase(magnetName.begin()+absorberMagnets, magnetName.end());
+    fieldDirection.erase(fieldDirection.begin()+absorberMagnets, fieldDirection.end());
     for (auto i :
        {&dXIn, &dXOut, &dYIn, &dYOut, &dZ, &midGapIn, &midGapOut,
         &HmainSideMagIn, &HmainSideMagOut, &gapIn, &gapOut, &Z}) {
-    i->erase(i->begin()+2, i->end());
+    i->erase(i->begin()+absorberMagnets, i->end());
   }
     for (auto node : MuShieldConfig){
       magnetName.push_back(node.first);
