@@ -3,6 +3,7 @@ import shipunit as u
 import ROOT as r
 from ShipGeoConfig import AttrDict, ConfigRegistry
 import json
+import numpy as np
 # the following params should be passed through 'ConfigRegistry.loadpy' method
 # muShieldDesign = 5  # 1=passive 2=active 5=TP design 6=magnetized hadron absorber 9=optimised with T4 as constraint, 8=requires config file
 #                      10=with field map for hadron absorber, 11=9 with field map for muon shield
