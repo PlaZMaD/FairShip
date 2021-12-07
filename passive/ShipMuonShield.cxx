@@ -451,7 +451,7 @@ Int_t ShipMuonShield::Initialize(std::vector<TString> &magnetName,
 
   Int_t nMagnets = (fDesign >= 7) ? 9 : 8;
   if (fJson){
-    nMagnets = MuShieldConfig.size();
+    nMagnets = MuShieldConfig.size() + 2;
   }
   magnetName.reserve(nMagnets);
   fieldDirection.reserve(nMagnets);
