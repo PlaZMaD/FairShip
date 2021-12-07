@@ -769,7 +769,7 @@ Int_t ShipMuonShield::Initialize(std::vector<TString> &magnetName,
     for (auto i :
        {&dXIn, &dXOut, &dYIn, &dYOut, &dZ, &midGapIn, &midGapOut,
         &HmainSideMagIn, &HmainSideMagOut, &gapIn, &gapOut, &Z}) {
-    i->erase(i->begin()+absorberMagnets, i->end());
+    i->erase(i->begin()+absorberMagnets-1, i->end());
   }
     for (auto node : MuShieldConfig){
       magnetName.push_back(node.first);
