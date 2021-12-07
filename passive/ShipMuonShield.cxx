@@ -764,8 +764,8 @@ Int_t ShipMuonShield::Initialize(std::vector<TString> &magnetName,
   }
   if (fJson){
     int absorberMagnets = (fDesign >= 7) ? 3 : 2;
-    magnetName.erase(magnetName.begin()+absorberMagnets, magnetName.end());
-    fieldDirection.erase(fieldDirection.begin()+absorberMagnets, fieldDirection.end());
+    magnetName.erase(magnetName.begin()+absorberMagnets-1, magnetName.end());
+    fieldDirection.erase(fieldDirection.begin()+absorberMagnets-1, fieldDirection.end());
     for (auto i :
        {&dXIn, &dXOut, &dYIn, &dYOut, &dZ, &midGapIn, &midGapOut,
         &HmainSideMagIn, &HmainSideMagOut, &gapIn, &gapOut, &Z}) {

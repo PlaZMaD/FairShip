@@ -430,6 +430,7 @@ with ConfigRegistry.register_config("basic") as c:
                          +c.muShield.dZ7+c.muShield.dZ8 ) + c.muShield.LE  # leave some space for nu-tau 
      c.muShield.z  =  -c.decayVolume.length/2.-c.muShield.length/2.
     if muShieldWithJSON:
+        c.muShieldGeo = muShieldGeo
         shieldParams = json.loads(muShieldGeo)
         c.muShield.length = np.sum([shieldParams[key]['length'] for key in shieldParams.keys()]) + c.muShield.dZ1 + c.muShield.dZ2 + c.muShield.LE
         c.muShield.z  =  -c.decayVolume.length/2.-c.muShield.length/2.
