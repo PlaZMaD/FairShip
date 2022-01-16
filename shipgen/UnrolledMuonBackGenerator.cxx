@@ -18,6 +18,14 @@
 
 // read events from Pythia8/Geant4 base simulation (only target + hadron absorber
 using boost::property_tree::ptree;
+template <typename T>
+std::vector<T> as_vector(ptree const& pt, ptree::key_type const& key)
+{
+    std::vector<T> r;
+    for (auto& item : pt.get_child(key))
+        r.push_back(item.second.get_value<T>());
+    return r;
+}
 
 // -----   Default constructor   -------------------------------------------
 UnrolledMuonBackGenerator::UnrolledMuonBackGenerator() {

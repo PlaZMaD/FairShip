@@ -6,7 +6,7 @@
 #include "TTree.h"                      // for TTree
 #include "TClonesArray.h"               
 #include "FairLogger.h"                 // for FairLogger, MESSAGE_ORIGIN
-#include <strting>
+#include <string>
 #include <vector>
 #include <array>
 #include <boost/property_tree/ptree.hpp>
@@ -58,8 +58,8 @@ protected:
   Int_t fSameSeed;
   Double_t fsmearBeam ;
   boost::property_tree::ptree input_config;
-  vector<int>eventList;
-  vector<double>weightsList;
+  std::vector<int>eventList;
+  std::vector<double>weightsList;
 
   ClassDef(UnrolledMuonBackGenerator,6);
 };
