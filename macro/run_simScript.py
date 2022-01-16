@@ -15,6 +15,8 @@ import shipRoot_conf
 import rootUtils as ut
 from ShipGeoConfig import ConfigRegistry
 from argparse import ArgumentParser
+import json
+import uproot4 as uproot
 
 debug = 0  # 1 print weights and field
            # 2 make overlap check
@@ -115,6 +117,8 @@ parser.add_argument("-D", "--display", dest="eventDisplay", help="store trajecto
 parser.add_argument("--stepMuonShield", dest="muShieldStepGeo", help="activate steps geometry for the muon shield", required=False, action="store_true", default=False)
 parser.add_argument("--coMuonShield", dest="muShieldWithCobaltMagnet", help="replace one of the magnets in the shield with 2.2T cobalt one, downscales other fields, works only for muShieldDesign >2", required=False, type=int, default=0)
 parser.add_argument("--MesonMother",   dest="MM",  help="Choose DP production meson source", required=False,  default=True)
+parser.add_argument("--UnrolledMuonBack",dest="unrolledmuonback",  help="Generate events from muon background file with unrolled weights", required=False, action="store_true")
+
 
 options = parser.parse_args()
 
@@ -126,6 +130,7 @@ if options.nuradio:  simEngine = "nuRadiography"
 if options.ntuple:   simEngine = "Ntuple"
 if options.ALPACA:   simEngine = "ALPACA"
 if options.muonback: simEngine = "MuonBack"
+if options.unrolledmuonback: simEngine = "UnrolledMuonBack"
 if options.nuage:    simEngine = "Nuage"
 if options.mudis:    simEngine = "muonDIS"
 if options.muflux:
@@ -178,8 +183,8 @@ if simEngine == "Nuage" and not inputFile:
  inputFile = 'Numucc.root'
 
 print("FairShip setup for",simEngine,"to produce",options.nEvents,"events")
-if (simEngine == "Ntuple" or simEngine == "MuonBack") and defaultInputFile :
-  print('input file required if simEngine = Ntuple or MuonBack')
+if (simEngine == "Ntuple" or simEngine == "MuonBack" or simEngine == "UnrolledMuonBack") and defaultInputFile :
+  print('input file required if simEngine = Ntuple or MuonBack or UnrolledMuonBack')
   print(" for example -f /eos/experiment/ship/data/Mbias/pythia8_Geant4-withCharm_onlyMuons_4magTarget.root")
   sys.exit()
 ROOT.gRandom.SetSeed(options.theSeed)  # this should be propagated via ROOT to Pythia8 and Geant4VMC
@@ -441,7 +446,7 @@ if simEngine == "Ntuple":
  options.nEvents = min(options.nEvents,Ntuplegen.GetNevents())
  print('Process ',options.nEvents,' from input file')
 #
-if simEngine == "MuonBack":
+if simEngine == "MuonBack" or simEngine == "UnrolledMuonBack":
 # reading muon tracks from previous Pythia8/Geant4 simulation with charm replaced by cascade production 
  fileType = ut.checkFileExists(inputFile)
  if fileType == 'tree':
@@ -450,9 +455,48 @@ if simEngine == "MuonBack":
  else:
   primGen.SetTarget(ship_geo.target.z0+50*u.m,0.)
  #
- MuonBackgen = ROOT.MuonBackGenerator()
+ if simEngine == "UnrolledMuonBack":
+  MuonBackgen = ROOT.UnrolledMuonBackGenerator()
+  lTree = uproot.open(inputFile)
+  if any(['cbmsim' in lName for lName in lTree.keys()]):
+     lTree = lTree[treeName]
+  else:
+     print("Bad file {}".format(lFile))
+     print(lTree.keys())
+     sys.exit(0)
+  dataBase = {'fPdgCode':uproot.AsJagged(uproot.AsDtype('>i4')),
+                 'fX':uproot.AsJagged(uproot.AsDtype('>f4')),
+                 'fY':uproot.AsJagged(uproot.AsDtype('>f4')),
+                 'fZ':uproot.AsJagged(uproot.AsDtype('>f4')),
+                 'fPx':uproot.AsJagged(uproot.AsDtype('>f4')),
+                 'fPy':uproot.AsJagged(uproot.AsDtype('>f4')),
+                 'fPz':uproot.AsJagged(uproot.AsDtype('>f4')),
+                 'fW':uproot.AsJagged(uproot.AsDtype('>f4')),
+                 'fStartX':uproot.AsJagged(uproot.AsDtype('>f4')),
+                 'fStartY':uproot.AsJagged(uproot.AsDtype('>f4')),
+                 'fStartZ':uproot.AsJagged(uproot.AsDtype('>f4')),
+                 }
+
+  for branch in branches.keys():
+  eventData = lTree['MCTrack'].arrays({'{}.{}'.format('MCTrack',item):dataBase[item] for item in ['fPdgCode', 'fW']}, cut=None, library='ak', how=dict)
+  eventData['event'] =  ak.broadcast_arrays(ak.local_index(eventData['MCTrack.fW'], axis=0), ak.zeros_like(eventData['MCTrack.fW']), axis=0)[0]
+  eventData = pd.DataFrame({key:ak.flatten(eventData[key]) for key in ['MCTrack.fPdgCode', 'MCTrack.fW', 'event']})
+  eventData =  eventData[np.absolute(eventData['MCTrack.fPdgCode'])==13]
+  eventData = eventData.groupby(by='event',as_index=False).max()
+  event_N = []
+  event_W = []
+  while (any(eventData['MCTrack.fW']>0)):
+    lEvent = eventData.sample(n=1, weights=eventData['MCTrack.fW'], random_state=13)
+    event_N.append(lEvent['event'])
+    event_W.append(np.amin([lEvent['MCTrack.fW'], 7.6875]))
+    eventData.loc[lEvent.index, 'MCTrack.fW'] = np.amax([0, lEvent['MCTrack.fW'] - 7.6875])
+  json_generator_input = {'events':event_N, 'weights':event_W}
+  print("Unrolled sample has {} events.".format(len(event_N)))
+  MuonBackgen.Init(inputFile,options.firstEvent,options.phiRandom, json.dumps(json_generator_input))
+ else:
+  MuonBackgen = ROOT.MuonBackGenerator()
  # MuonBackgen.FollowAllParticles() # will follow all particles after hadron absorber, not only muons
- MuonBackgen.Init(inputFile,options.firstEvent,options.phiRandom)
+  MuonBackgen.Init(inputFile,options.firstEvent,options.phiRandom)
  if options.charm == 0: MuonBackgen.SetSmearBeam(5 * u.cm) # radius of ring, thickness 8mm
  elif DownScaleDiMuon: 
     if inputFile[0:4] == "/eos": test = os.environ["EOSSHIP"]+inputFile

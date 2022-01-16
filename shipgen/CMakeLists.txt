@@ -41,6 +41,7 @@ GenieGenerator.cxx
 NuageGenerator.cxx
 NtupleGenerator.cxx
 MuonBackGenerator.cxx
+UnrolledMuonBackGenerator
 CosmicsGenerator.cxx
 MuDISGenerator.cxx
 FixedTargetGenerator.cxx
