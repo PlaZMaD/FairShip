@@ -484,14 +484,14 @@ if simEngine == "MuonBack" or simEngine == "UnrolledMuonBack":
   eventData = eventData.groupby(by='event',as_index=False).max()
   event_N = []
   event_W = []
-  while (any(eventData['MCTrack.fW']>0)):
+  while (any(eventData['MCTrack.fW']>0)) and  len(event_N)<options.nEvents:
     lEvent = eventData.sample(n=1, weights=eventData['MCTrack.fW'], random_state=13)
     event_N.append(lEvent['event'])
-    event_W.append(np.amin([lEvent['MCTrack.fW'], 7.6875]))
-    eventData.loc[lEvent.index, 'MCTrack.fW'] = np.amax([0, lEvent['MCTrack.fW'] - 7.6875])
+    event_W.append(np.amin([lEvent['MCTrack.fW'].to_list()[0], 7.6875]))
+    eventData.loc[lEvent.index, 'MCTrack.fW'] = np.amax([0, lEvent['MCTrack.fW'].to_list()[0] - 7.6875])
   json_generator_input = {'events':event_N, 'weights':event_W}
   print("Unrolled sample has {} events.".format(len(event_N)))
-  MuonBackgen.Init(inputFile,options.firstEvent,options.phiRandom, json.dumps(json_generator_input))
+  MuonBackgen.Init(inputFile,options.firstEvent, json.dumps(json_generator_input), options.phiRandom)
  else:
   MuonBackgen = ROOT.MuonBackGenerator()
  # MuonBackgen.FollowAllParticles() # will follow all particles after hadron absorber, not only muons

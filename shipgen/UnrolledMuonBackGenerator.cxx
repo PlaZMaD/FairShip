@@ -34,15 +34,17 @@ UnrolledMuonBackGenerator::UnrolledMuonBackGenerator() {
 // -------------------------------------------------------------------------
 // -----   Default constructor   -------------------------------------------
 Bool_t UnrolledMuonBackGenerator::Init(const char* fileName, std::string json_input) {
-  boost::property_tree::read_json(json_input, input_config);
-  eventList = as_vector<int>(input_config, "events");
-  weightsList = as_vector<double>(input_config, "weights");
+  // boost::property_tree::read_json(json_input, input_config);
+  // eventList = as_vector<int>(input_config, "events");
+  // weightsList = as_vector<double>(input_config, "weights");
   return Init(fileName, 0, json_input, false);
 }
 // -----   Default constructor   -------------------------------------------
 Bool_t UnrolledMuonBackGenerator::Init(const char* fileName, const int firstEvent, std::string json_input, const Bool_t fl = false ) {
 
-  boost::property_tree::read_json(json_input, input_config);
+  std::stringstream jsonEncodedData(json_input);
+  boost::property_tree::read_json(jsonEncodedData, input_config);
+  
   eventList = as_vector<int>(input_config, "events");
   weightsList = as_vector<double>(input_config, "weights");
   LOGF(info, "Opening input file %s", fileName);
