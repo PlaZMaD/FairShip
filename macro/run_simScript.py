@@ -477,7 +477,6 @@ if simEngine == "MuonBack" or simEngine == "UnrolledMuonBack":
                  'fStartZ':uproot.AsJagged(uproot.AsDtype('>f4')),
                  }
 
-  for branch in branches.keys():
   eventData = lTree['MCTrack'].arrays({'{}.{}'.format('MCTrack',item):dataBase[item] for item in ['fPdgCode', 'fW']}, cut=None, library='ak', how=dict)
   eventData['event'] =  ak.broadcast_arrays(ak.local_index(eventData['MCTrack.fW'], axis=0), ak.zeros_like(eventData['MCTrack.fW']), axis=0)[0]
   eventData = pd.DataFrame({key:ak.flatten(eventData[key]) for key in ['MCTrack.fPdgCode', 'MCTrack.fW', 'event']})
