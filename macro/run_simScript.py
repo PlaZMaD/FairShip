@@ -461,7 +461,7 @@ if simEngine == "MuonBack" or simEngine == "UnrolledMuonBack":
   if any(['cbmsim' in lName for lName in lTree.keys()]):
      lTree = lTree[treeName]
   else:
-     print("Bad file {}".format(lFile))
+     print("Bad file {}".format(inputFile))
      print(lTree.keys())
      sys.exit(0)
   dataBase = {'fPdgCode':uproot.AsJagged(uproot.AsDtype('>i4')),
