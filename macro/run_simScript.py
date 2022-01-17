@@ -17,6 +17,9 @@ from ShipGeoConfig import ConfigRegistry
 from argparse import ArgumentParser
 import json
 import uproot4 as uproot
+import pandas as pd
+import awkward1 as ak
+import numpy as np
 
 debug = 0  # 1 print weights and field
            # 2 make overlap check
@@ -459,7 +462,7 @@ if simEngine == "MuonBack" or simEngine == "UnrolledMuonBack":
   MuonBackgen = ROOT.UnrolledMuonBackGenerator()
   lTree = uproot.open(inputFile)
   if any(['cbmsim' in lName for lName in lTree.keys()]):
-     lTree = lTree[treeName]
+     lTree = lTree['cbmsim']
   else:
      print("Bad file {}".format(inputFile))
      print(lTree.keys())
@@ -486,7 +489,7 @@ if simEngine == "MuonBack" or simEngine == "UnrolledMuonBack":
   event_W = []
   while (any(eventData['MCTrack.fW']>0)) and  len(event_N)<options.nEvents:
     lEvent = eventData.sample(n=1, weights=eventData['MCTrack.fW'], random_state=13)
-    event_N.append(lEvent['event'])
+    event_N.append(lEvent['event'].to_list()[0])
     event_W.append(np.amin([lEvent['MCTrack.fW'].to_list()[0], 7.6875]))
     eventData.loc[lEvent.index, 'MCTrack.fW'] = np.amax([0, lEvent['MCTrack.fW'].to_list()[0] - 7.6875])
   json_generator_input = {'events':event_N, 'weights':event_W}
