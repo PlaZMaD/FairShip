@@ -614,7 +614,7 @@ print("Parameter file is ",parFile)
 print("Real time ",rtime, " s, CPU time ",ctime,"s")
 
 # remove empty events
-if simEngine == "MuonBack":
+if simEngine == "MuonBack" or simEngine == "UnrolledMuonBack":
  tmpFile = outFile+"tmp"
  xxx = outFile.split('/')
  check = xxx[len(xxx)-1]
