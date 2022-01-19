@@ -17,6 +17,10 @@ from ShipGeoConfig import ConfigRegistry
 from argparse import ArgumentParser
 import json
 import uproot4 as uproot
+import awkward1 as ak 
+import pandas as pd
+import numpy as np
+
 
 debug = 0  # 1 print weights and field
            # 2 make overlap check
@@ -457,41 +461,10 @@ if simEngine == "MuonBack" or simEngine == "UnrolledMuonBack":
  #
  if simEngine == "UnrolledMuonBack":
   MuonBackgen = ROOT.UnrolledMuonBackGenerator()
-  lTree = uproot.open(inputFile)
-  if any(['cbmsim' in lName for lName in lTree.keys()]):
-     lTree = lTree[treeName]
-  else:
-     print("Bad file {}".format(inputFile))
-     print(lTree.keys())
-     sys.exit(0)
-  dataBase = {'fPdgCode':uproot.AsJagged(uproot.AsDtype('>i4')),
-                 'fX':uproot.AsJagged(uproot.AsDtype('>f4')),
-                 'fY':uproot.AsJagged(uproot.AsDtype('>f4')),
-                 'fZ':uproot.AsJagged(uproot.AsDtype('>f4')),
-                 'fPx':uproot.AsJagged(uproot.AsDtype('>f4')),
-                 'fPy':uproot.AsJagged(uproot.AsDtype('>f4')),
-                 'fPz':uproot.AsJagged(uproot.AsDtype('>f4')),
-                 'fW':uproot.AsJagged(uproot.AsDtype('>f4')),
-                 'fStartX':uproot.AsJagged(uproot.AsDtype('>f4')),
-                 'fStartY':uproot.AsJagged(uproot.AsDtype('>f4')),
-                 'fStartZ':uproot.AsJagged(uproot.AsDtype('>f4')),
-                 }
-
-  eventData = lTree['MCTrack'].arrays({'{}.{}'.format('MCTrack',item):dataBase[item] for item in ['fPdgCode', 'fW']}, cut=None, library='ak', how=dict)
-  eventData['event'] =  ak.broadcast_arrays(ak.local_index(eventData['MCTrack.fW'], axis=0), ak.zeros_like(eventData['MCTrack.fW']), axis=0)[0]
-  eventData = pd.DataFrame({key:ak.flatten(eventData[key]) for key in ['MCTrack.fPdgCode', 'MCTrack.fW', 'event']})
-  eventData =  eventData[np.absolute(eventData['MCTrack.fPdgCode'])==13]
-  eventData = eventData.groupby(by='event',as_index=False).max()
-  event_N = []
-  event_W = []
-  while (any(eventData['MCTrack.fW']>0)):
-    lEvent = eventData.sample(n=1, weights=eventData['MCTrack.fW'], random_state=13)
-    event_N.append(lEvent['event'])
-    event_W.append(np.amin([lEvent['MCTrack.fW'], 7.6875]))
-    eventData.loc[lEvent.index, 'MCTrack.fW'] = np.amax([0, lEvent['MCTrack.fW'] - 7.6875])
-  json_generator_input = {'events':event_N, 'weights':event_W}
+  eventsList = pd.read_csv(os.path.basename(inputFile)[:-4]+"csv", compression='gzip')
+  json_generator_input = {'events':eventsList['event'].astype(int).to_list(), 'weights':eventsList['W'].to_list()}
   print("Unrolled sample has {} events.".format(len(event_N)))
-  MuonBackgen.Init(inputFile,options.firstEvent,options.phiRandom, json.dumps(json_generator_input))
+  MuonBackgen.Init(inputFile,options.firstEvent,json.dumps(json_generator_input), options.phiRandom )
  else:
   MuonBackgen = ROOT.MuonBackGenerator()
  # MuonBackgen.FollowAllParticles() # will follow all particles after hadron absorber, not only muons
