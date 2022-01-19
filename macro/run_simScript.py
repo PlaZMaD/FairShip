@@ -17,8 +17,8 @@ from ShipGeoConfig import ConfigRegistry
 from argparse import ArgumentParser
 import json
 import uproot4 as uproot
-import awkward1 as ak 
 import pandas as pd
+import awkward1 as ak
 import numpy as np
 
 
