@@ -126,11 +126,11 @@ Bool_t UnrolledMuonBackGenerator::ReadEvent(FairPrimaryGenerator* cpg)
   std::unordered_map<int, int> muList;
   std::unordered_map<int, std::vector<int>> moList;
   while (fn<fNevents) {
-    
-   if (fn>fNevents-1){ 
+
+    if (fn>fNevents-1){ 
      LOGF(info, "End of file reached %i", fNevents);
      return kFALSE;
-  } 
+  }
    fTree->GetEntry(eventList.at(fn));
    muList.clear(); 
    moList.clear(); 
@@ -183,7 +183,7 @@ Bool_t UnrolledMuonBackGenerator::ReadEvent(FairPrimaryGenerator* cpg)
      if (found) {break;}
    }
   }
-  
+
   if (fSameSeed) {
     Int_t theSeed = fn + fSameSeed * fNevents;
     LOGF(debug, "Seed: %d", theSeed);
@@ -235,7 +235,7 @@ Bool_t UnrolledMuonBackGenerator::ReadEvent(FairPrimaryGenerator* cpg)
           break;
         }
        }
-       cpg->AddTrack(track->GetPdgCode(),px,py,pz,vx,vy,vz,track->GetMotherId(),wanttracking,e,tof,weightsList.at(fn),(TMCProcess)track->GetProcID());
+       cpg->AddTrack(track->GetPdgCode(),px,py,pz,vx,vy,vz,track->GetMotherId(),wanttracking,e,tof,weightsList.at(fn-1),(TMCProcess)track->GetProcID());
      }
   }else{
     vx += dx/100.;
@@ -246,7 +246,7 @@ Bool_t UnrolledMuonBackGenerator::ReadEvent(FairPrimaryGenerator* cpg)
      py = pt*TMath::Sin(phi);
     }
     cpg->AddTrack(int(pythiaid),px,py,pz,vx*100.,vy*100.,vz*100.,-1.,false,e,pythiaid,parentid);
-    cpg->AddTrack(int(id),px,py,pz,vx*100.,vy*100.,vz*100.,-1.,true,e,tof,weightsList.at(fn));
+    cpg->AddTrack(int(id),px,py,pz,vx*100.,vy*100.,vz*100.,-1.,true,e,tof,weightsList.at(fn-1));
   }
   return kTRUE;
 }
