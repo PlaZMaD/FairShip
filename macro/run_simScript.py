@@ -461,7 +461,8 @@ if simEngine == "MuonBack" or simEngine == "UnrolledMuonBack":
  #
  if simEngine == "UnrolledMuonBack":
   MuonBackgen = ROOT.UnrolledMuonBackGenerator()
-  eventsList = pd.read_csv(os.path.basename(inputFile)[:-4]+"csv", compression='gzip', skiprows=options.firstEvent, nrows=options.nEvents)
+  lfirstEvent = 0 if options.firstEvent==0 else range(1, options.firstEvent+1)
+  eventsList = pd.read_csv(os.path.basename(inputFile)[:-4]+"csv", compression='gzip', header=0, skiprows=lfirstEvent, nrows=options.nEvents)
 
   json_generator_input = {'events':eventsList['event'].astype(int).to_list(), 'weights':eventsList['W'].to_list()}
   # print("Unrolled sample has {} events.".format(len(event_N)))
