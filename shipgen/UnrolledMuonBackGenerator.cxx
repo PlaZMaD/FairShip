@@ -126,6 +126,11 @@ Bool_t UnrolledMuonBackGenerator::ReadEvent(FairPrimaryGenerator* cpg)
   std::unordered_map<int, int> muList;
   std::unordered_map<int, std::vector<int>> moList;
   while (fn<fNevents) {
+    
+   if (fn>fNevents-1){ 
+     LOGF(info, "End of file reached %i", fNevents);
+     return kFALSE;
+  } 
    fTree->GetEntry(eventList.at(fn));
    muList.clear(); 
    moList.clear(); 
@@ -178,10 +183,7 @@ Bool_t UnrolledMuonBackGenerator::ReadEvent(FairPrimaryGenerator* cpg)
      if (found) {break;}
    }
   }
-  if (fn>fNevents-1){ 
-     LOGF(info, "End of file reached %i", fNevents);
-     return kFALSE;
-  } 
+  
   if (fSameSeed) {
     Int_t theSeed = fn + fSameSeed * fNevents;
     LOGF(debug, "Seed: %d", theSeed);

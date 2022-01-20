@@ -481,7 +481,7 @@ if simEngine == "MuonBack" or simEngine == "UnrolledMuonBack":
     testf.Close()
  if options.sameSeed: MuonBackgen.SetSameSeed(options.sameSeed)
  primGen.AddGenerator(MuonBackgen)
- options.nEvents = min(options.nEvents,MuonBackgen.GetNevents()) if simEngine == "MuonBack" else min(options.nEvents,len(eventsList))
+ options.nEvents = min(options.nEvents,MuonBackgen.GetNevents())
  MCTracksWithHitsOnly = True # otherwise, output file becomes too big
  print('Process ',options.nEvents,' from input file, with Phi random=',options.phiRandom, ' with MCTracksWithHitsOnly',MCTracksWithHitsOnly)
  if options.followMuon :  
