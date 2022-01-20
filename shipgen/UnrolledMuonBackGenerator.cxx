@@ -56,7 +56,7 @@ Bool_t UnrolledMuonBackGenerator::Init(const char* fileName, const int firstEven
   if (fInputFile->IsZombie()) {
      LOGF(fatal, "Error opening the Signal file:%s", fileName);
   }
-  fn = firstEvent;
+  fn = 0;
   fPhiRandomize = fl;
   fSameSeed = 0;
   fsmearBeam = 0; // default no beam smearing, use SetSmearBeam(sb) if different, sb [cm]

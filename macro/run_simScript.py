@@ -461,7 +461,8 @@ if simEngine == "MuonBack" or simEngine == "UnrolledMuonBack":
  #
  if simEngine == "UnrolledMuonBack":
   MuonBackgen = ROOT.UnrolledMuonBackGenerator()
-  eventsList = pd.read_csv(os.path.basename(inputFile)[:-4]+"csv", compression='gzip')
+  eventsList = pd.read_csv(os.path.basename(inputFile)[:-4]+"csv", compression='gzip', skiprows=options.firstEvent, nrows=options.nEvents)
+
   json_generator_input = {'events':eventsList['event'].astype(int).to_list(), 'weights':eventsList['W'].to_list()}
   # print("Unrolled sample has {} events.".format(len(event_N)))
   MuonBackgen.Init(inputFile,options.firstEvent,json.dumps(json_generator_input), options.phiRandom )
@@ -480,7 +481,7 @@ if simEngine == "MuonBack" or simEngine == "UnrolledMuonBack":
     testf.Close()
  if options.sameSeed: MuonBackgen.SetSameSeed(options.sameSeed)
  primGen.AddGenerator(MuonBackgen)
- options.nEvents = min(options.nEvents,MuonBackgen.GetNevents())
+ options.nEvents = min(options.nEvents,MuonBackgen.GetNevents()) if simEngine == "MuonBack" else min(options.nEvents,len(eventsList))
  MCTracksWithHitsOnly = True # otherwise, output file becomes too big
  print('Process ',options.nEvents,' from input file, with Phi random=',options.phiRandom, ' with MCTracksWithHitsOnly',MCTracksWithHitsOnly)
  if options.followMuon :  
