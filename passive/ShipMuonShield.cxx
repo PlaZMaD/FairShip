@@ -906,7 +906,7 @@ void ShipMuonShield::ConstructGeometry()
       +w2, +h2,
       -w2, +h2,
   };
-  if (!fStepGeo && (fDesign != 8||nm!=nMagnets - 1))
+  if (!fStepGeo && (fDesign != 8 || nM != nMagnets - 1))
   {
 
 
