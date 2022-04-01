@@ -952,18 +952,18 @@ void ShipMuonShield::ConstructGeometry()
     }
 
     //horizontal
-    double cover_hor_width = 2.*std::max(2.7*m, max_x + 0.5.*m);
+    double cover_hor_width = 2.*std::max(2.7*m, max_x + 0.5*m);
     TGeoVolume *cover_up_box = gGeoManager->MakeBox("up_cover", concrete, cover_hor_width/2.,  cover_thickness/2., cover_length/2.);
-    TGeoVolume *cover_down_box = gGeoManager->MakeBo("down_cover", concrete, cover_hor_width/2.,  cover_thickness/2., cover_length/2.);
-    tShield->AddNode(cover_up_box, 1, new TGeoTranslation(0., (max_y + cover_thickness/2.  + 0.5*m), zEndOfAbsorb + cover_length/2.+ 1.*cm);
-    tShield->AddNode(cover_down_box, 1, new TGeoTranslation(0., -(max_y + cover_thickness/2.  + 0.5*m), zEndOfAbsorb + cover_length/2.+ 1.*cm);
+    TGeoVolume *cover_down_box = gGeoManager->MakeBox("down_cover", concrete, cover_hor_width/2.,  cover_thickness/2., cover_length/2.);
+    tShield->AddNode(cover_up_box, 1, new TGeoTranslation(0., (max_y + cover_thickness/2.  + 0.5*m), zEndOfAbsorb + cover_length/2.+ 1.*cm));
+    tShield->AddNode(cover_down_box, 1, new TGeoTranslation(0., -(max_y + cover_thickness/2.  + 0.5*m), zEndOfAbsorb + cover_length/2.+ 1.*cm));
 
     //vertical
     double cover_vert_height = 2.* (max_y + cover_thickness + 0.5*m);
     TGeoVolume *cover_left_box = gGeoManager->MakeBox("left_cover", concrete, cover_thickness/2., cover_vert_height/2., cover_length/2.);
     TGeoVolume *cover_right_box = gGeoManager->MakeBox("right_cover", concrete, cover_thickness/2., cover_vert_height/2., cover_length/2.);
-    tShield->AddNode(cover_left_box, 1, new TGeoTranslation(-(cover_hor_width + cover_thickness/2.), 0., zEndOfAbsorb + cover_length/2.+ 1.*cm);
-    tShield->AddNode(cover_right_box, 1, new TGeoTranslation((cover_hor_width + cover_thickness/2.), 0., zEndOfAbsorb + cover_length/2.+ 1.*cm);
+    tShield->AddNode(cover_left_box, 1, new TGeoTranslation(-(cover_hor_width + cover_thickness/2.), 0., zEndOfAbsorb + cover_length/2.+ 1.*cm));
+    tShield->AddNode(cover_right_box, 1, new TGeoTranslation((cover_hor_width + cover_thickness/2.), 0., zEndOfAbsorb + cover_length/2.+ 1.*cm));
 
   }
       Double_t dX1 = dXIn[0];
