@@ -962,7 +962,7 @@ void ShipMuonShield::ConstructGeometry()
     double cover_vert_height = 2.* (max_y + cover_thickness + 0.5*m);
     TGeoVolume *cover_left_box = gGeoManager->MakeBox("left_cover", concrete, cover_thickness/2., cover_vert_height/2., cover_length/2.);
     TGeoVolume *cover_right_box = gGeoManager->MakeBox("right_cover", concrete, cover_thickness/2., cover_vert_height/2., cover_length/2.);
-    tShield->AddNode(cover_left_box, 1, new TGeoTranslation(-(cover_hor_width/2. + cover_thickness/2.), 0., cover_z_position);
+    tShield->AddNode(cover_left_box, 1, new TGeoTranslation(-(cover_hor_width/2. + cover_thickness/2.), 0., cover_z_position));
     tShield->AddNode(cover_right_box, 1, new TGeoTranslation((cover_hor_width/2. + cover_thickness/2.), 0., cover_z_position));
 
   }
