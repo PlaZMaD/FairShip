@@ -943,7 +943,7 @@ void ShipMuonShield::ConstructGeometry()
     double max_y = 0;
     double max_x = 0;
     double cover_thickness = 2. * m;
-    double cover_length = 2. * (dZ3 + dZ4 + dZ5 + dZ6 + dZ7) - 2.*cm;
+    double cover_length = 2. * (dZ3 + dZ4 + dZ5 + dZ6 + dZ7) - 10.*cm;
     double cover_z_position = zEndOfAbsorb + cover_length/2.+ 1.*cm + 2.*(dZ1 + dZ2);
     for (int i = 2; i < nMagnets-1; ++i)
     {
