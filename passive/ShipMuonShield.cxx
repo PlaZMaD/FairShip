@@ -906,7 +906,7 @@ void ShipMuonShield::ConstructGeometry()
       +w2, +h2,
       -w2, +h2,
   };
-  if (!fStepGeo)
+  if (!fStepGeo && fDesign != 8)
   {
 
 
@@ -939,7 +939,7 @@ void ShipMuonShield::ConstructGeometry()
   }
       }
 //Add shield cover 
-  if (fDesign==8){
+  if (fDesign == 8){
     double max_y = 0;
     double max_x = 0;
     double cover_thickness = 2. * m;
@@ -955,15 +955,15 @@ void ShipMuonShield::ConstructGeometry()
     double cover_hor_width = 2.*std::max(2.7*m, max_x + 0.5*m);
     TGeoVolume *cover_up_box = gGeoManager->MakeBox("up_cover", concrete, cover_hor_width/2.,  cover_thickness/2., cover_length/2.);
     TGeoVolume *cover_down_box = gGeoManager->MakeBox("down_cover", concrete, cover_hor_width/2.,  cover_thickness/2., cover_length/2.);
-    tShield->AddNode(cover_up_box, 1, new TGeoTranslation(0., (max_y + cover_thickness/2.  + 0.5*cm), cover_z_position));
-    tShield->AddNode(cover_down_box, 1, new TGeoTranslation(0., -(max_y + cover_thickness/2.  + 0.5*cm), cover_z_position));
+    tShield->AddNode(cover_up_box, 1, new TGeoTranslation(0., (max_y + cover_thickness/2. ), cover_z_position));
+    tShield->AddNode(cover_down_box, 1, new TGeoTranslation(0., -(max_y + cover_thickness/2.), cover_z_position));
 
     //vertical
-    double cover_vert_height = 2.* (max_y + cover_thickness + 0.5*m);
+    double cover_vert_height = 2.* (max_y + cover_thickness);
     TGeoVolume *cover_left_box = gGeoManager->MakeBox("left_cover", concrete, cover_thickness/2., cover_vert_height/2., cover_length/2.);
     TGeoVolume *cover_right_box = gGeoManager->MakeBox("right_cover", concrete, cover_thickness/2., cover_vert_height/2., cover_length/2.);
-    tShield->AddNode(cover_left_box, 1, new TGeoTranslation(-(cover_hor_width/2. + cover_thickness/2.), 0., cover_z_position));
-    tShield->AddNode(cover_right_box, 1, new TGeoTranslation((cover_hor_width/2. + cover_thickness/2.), 0., cover_z_position));
+    tShield->AddNode(cover_left_box, 1, new TGeoTranslation(-(cover_hor_width/2. + cover_thickness/2. + 1.*cm), 0., cover_z_position));
+    tShield->AddNode(cover_right_box, 1, new TGeoTranslation((cover_hor_width/2. + cover_thickness/2. + 1.*cm), 0., cover_z_position));
 
   }
       Double_t dX1 = dXIn[0];
