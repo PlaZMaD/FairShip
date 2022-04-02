@@ -906,7 +906,7 @@ void ShipMuonShield::ConstructGeometry()
       +w2, +h2,
       -w2, +h2,
   };
-  if (!fStepGeo && (fDesign != 8 || nM == (nMagnets - 1)))
+  if (!fStepGeo && (fDesign != 8 || nM == (nMagnets - 2))) //wtf?
   {
 
 
@@ -952,18 +952,23 @@ void ShipMuonShield::ConstructGeometry()
     }
 
     //horizontal
-    double cover_hor_width = 2.*std::max(2.7*m, max_x + 0.5*m);
+    double max_cover_down_thickness = 10. * m - fFloor - 10.*cm - max_y;
+    double cover_down_thickness = std::max(std::min(max_cover_down_thickness, cover_thickness), 0.);//(max_y + cover_thickness/2.)
+    double cover_down_position = -(max_y + cover_down_thickness/2. + 10.*cm);
+    double cover_hor_width = 2.*std::max(2.7*m, max_x + 0.5*m); 
+
     TGeoVolume *cover_up_box = gGeoManager->MakeBox("up_cover", concrete, cover_hor_width/2.,  cover_thickness/2., cover_length/2.);
-    TGeoVolume *cover_down_box = gGeoManager->MakeBox("down_cover", concrete, cover_hor_width/2.,  cover_thickness/2., cover_length/2.);
-    tShield->AddNode(cover_up_box, 1, new TGeoTranslation(0., (max_y + cover_thickness/2. ), cover_z_position));
-    tShield->AddNode(cover_down_box, 1, new TGeoTranslation(0., -(max_y + cover_thickness/2.), cover_z_position));
+    TGeoVolume *cover_down_box = gGeoManager->MakeBox("down_cover", concrete, cover_hor_width/2.,  cover_down_thickness/2., cover_length/2.);
+    tShield->AddNode(cover_up_box, 1, new TGeoTranslation(0., (max_y + cover_thickness/2. + 10.*cm), cover_z_position));
+    tShield->AddNode(cover_down_box, 1, new TGeoTranslation(0., cover_down_position, cover_z_position));
 
     //vertical
-    double cover_vert_height = 2.* (max_y + cover_thickness);
+    double cover_vert_height = 2.* max_y + cover_thickness +  cover_down_thickness + 2*10.*cm;
+    double  cover_vert_position = ((max_y + cover_thickness/2. + 10.*cm) + cover_down_position)/2.;
     TGeoVolume *cover_left_box = gGeoManager->MakeBox("left_cover", concrete, cover_thickness/2., cover_vert_height/2., cover_length/2.);
     TGeoVolume *cover_right_box = gGeoManager->MakeBox("right_cover", concrete, cover_thickness/2., cover_vert_height/2., cover_length/2.);
-    tShield->AddNode(cover_left_box, 1, new TGeoTranslation(-(cover_hor_width/2. + cover_thickness/2. + 1.*cm), 0., cover_z_position));
-    tShield->AddNode(cover_right_box, 1, new TGeoTranslation((cover_hor_width/2. + cover_thickness/2. + 1.*cm), 0., cover_z_position));
+    tShield->AddNode(cover_left_box, 1, new TGeoTranslation(-(cover_hor_width/2. + cover_thickness/2. + 1.*cm), cover_vert_position, cover_z_position));
+    tShield->AddNode(cover_right_box, 1, new TGeoTranslation((cover_hor_width/2. + cover_thickness/2. + 1.*cm), cover_vert_position, cover_z_position));
 
   }
       Double_t dX1 = dXIn[0];
