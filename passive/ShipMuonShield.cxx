@@ -900,7 +900,6 @@ void ShipMuonShield::ConstructGeometry()
     TGeoUniformMagField *fields_s_p[4] = {magFieldIron_s_p,RetField_s_p,ConRField_s_p,ConLField_s_p};
     Double_t protection_width = 8. * m;
     Double_t protection_height = 8. * m;
-    TGeoUniformMagField *zerofield[4] = {0.,0.,0.,0.};  
     CreateMagnet("Protection", iron, tShield, fields_s_p, fieldDirection[nM],
          protection_width/4., (protection_height/2.-protection_width/4.), protection_width/4., (protection_height/2.-protection_width/4.), 0.1*m,
          midGapIn[nM], midGapOut[nM], HmainSideMagIn[nM],
