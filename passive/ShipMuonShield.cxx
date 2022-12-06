@@ -891,6 +891,16 @@ void ShipMuonShield::ConstructGeometry()
 		     dXIn[nM], dYIn[nM], dXOut[nM], dYOut[nM], dZf[nM],
 		     midGapIn[nM], midGapOut[nM], HmainSideMagIn[nM],
 		     HmainSideMagOut[nM], gapIn[nM], gapOut[nM], Z[nM], nM==8, fStepGeo);
+//Add some kind of protection here
+  if(nM==8){
+    Double_t protection_width = 8. * m;
+    Double_t protection_height = 8. * m;
+    TGeoUniformMagField *zerofield[4] = {0.,0.,0.,0.};  
+    CreateMagnet("Protection", iron, tShield, zerofield, fieldDirection[nM],
+         protection_width/4., (protection_height/2.-protection_width/4.), protection_width/4., (protection_height/2.-protection_width/4.), 0.1*m,
+         midGapIn[nM], midGapOut[nM], HmainSideMagIn[nM],
+         HmainSideMagOut[nM], 1.*mm, 1.*mm, Z[nM]+dZf[nM]/2.+200.*mm, 0, 0);
+  }
 
 	if (nM==8 || !fSupport) continue;
 	Double_t dymax = std::max(dYIn[nM] + dXIn[nM], dYOut[nM] + dXOut[nM]);
