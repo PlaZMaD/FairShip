@@ -893,8 +893,8 @@ void ShipMuonShield::ConstructGeometry()
 		     HmainSideMagOut[nM], gapIn[nM], gapOut[nM], Z[nM], nM==8, fStepGeo);
 //Add some kind of protection here
   if(nM==8){
-    TGeoVolume *snd_protection = gGeoManager->MakeBox("SND_Protection", iron, 5.*m, 5.*m-5.*cm, 5.*cm);
-    tShield->AddNode(snd_protection, 1, new TGeoTranslation(0., 0., Z[nM]+dZf[nM]/2.+200.*mm));
+    TGeoVolume *snd_protection = gGeoManager->MakeBox("SND_Protection", iron, 8 * m - 5.*cm, 7.5 * m - 5.*cm, 5.*cm);
+    tShield->AddNode(snd_protection, 1, new TGeoTranslation(3.5 * m, 4.2 * m, Z[nM]+dZf[nM]/2.+200.*mm));
 
     // TGeoUniformMagField *magFieldIron_s_p = new TGeoUniformMagField(0., 0., 0.);
     // TGeoUniformMagField *RetField_s_p     = new TGeoUniformMagField(0., 0., 0.);
