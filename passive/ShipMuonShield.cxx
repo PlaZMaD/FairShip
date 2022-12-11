@@ -892,22 +892,22 @@ void ShipMuonShield::ConstructGeometry()
 		     midGapIn[nM], midGapOut[nM], HmainSideMagIn[nM],
 		     HmainSideMagOut[nM], gapIn[nM], gapOut[nM], Z[nM], nM==8, fStepGeo);
 //Add some kind of protection here
-  if(nM==8){
-    TGeoVolume *snd_protection = gGeoManager->MakeBox("SND_Protection", iron, 8 * m - 5.*cm, 7.5 * m - 5.*cm, 5.*cm);
-    tShield->AddNode(snd_protection, 1, new TGeoTranslation(3.5 * m, 4.2 * m, Z[nM]+dZf[nM]/2.+200.*mm));
+//   if(nM==8){
+//     TGeoVolume *snd_protection = gGeoManager->MakeBox("SND_Protection", iron, 8 * m - 5.*cm, 7.5 * m - 5.*cm, 5.*cm);
+//     tShield->AddNode(snd_protection, 1, new TGeoTranslation(3.5 * m, 4.2 * m, Z[nM]+dZf[nM]/2.+200.*mm));
 
-    // TGeoUniformMagField *magFieldIron_s_p = new TGeoUniformMagField(0., 0., 0.);
-    // TGeoUniformMagField *RetField_s_p     = new TGeoUniformMagField(0., 0., 0.);
-    // TGeoUniformMagField *ConRField_s_p    = new TGeoUniformMagField(0., 0., 0.);
-    // TGeoUniformMagField *ConLField_s_p    = new TGeoUniformMagField(0., 0., 0.);
-    // TGeoUniformMagField *fields_s_p[4] = {magFieldIron_s_p,RetField_s_p,ConRField_s_p,ConLField_s_p};
-    // Double_t protection_width = 8. * m;
-    // Double_t protection_height = 10. * m - 1. * cm;
-    // CreateMagnet("Protection", iron, tShield, fields_s_p, fieldDirection[nM],
-    //      protection_width/4., (protection_height/2.-protection_width/4.), protection_width/4., (protection_height/2.-protection_width/4.), 0.1*m,
-    //      midGapIn[nM], midGapOut[nM], HmainSideMagIn[nM],
-    //      HmainSideMagOut[nM], 1.*mm, 1.*mm, Z[nM]+dZf[nM]/2.+200.*mm, 0, 0);
-  }
+//     // TGeoUniformMagField *magFieldIron_s_p = new TGeoUniformMagField(0., 0., 0.);
+//     // TGeoUniformMagField *RetField_s_p     = new TGeoUniformMagField(0., 0., 0.);
+//     // TGeoUniformMagField *ConRField_s_p    = new TGeoUniformMagField(0., 0., 0.);
+//     // TGeoUniformMagField *ConLField_s_p    = new TGeoUniformMagField(0., 0., 0.);
+//     // TGeoUniformMagField *fields_s_p[4] = {magFieldIron_s_p,RetField_s_p,ConRField_s_p,ConLField_s_p};
+//     // Double_t protection_width = 8. * m;
+//     // Double_t protection_height = 10. * m - 1. * cm;
+//     // CreateMagnet("Protection", iron, tShield, fields_s_p, fieldDirection[nM],
+//     //      protection_width/4., (protection_height/2.-protection_width/4.), protection_width/4., (protection_height/2.-protection_width/4.), 0.1*m,
+//     //      midGapIn[nM], midGapOut[nM], HmainSideMagIn[nM],
+//     //      HmainSideMagOut[nM], 1.*mm, 1.*mm, Z[nM]+dZf[nM]/2.+200.*mm, 0, 0);
+//   }
 
 	if (nM==8 || !fSupport) continue;
 	Double_t dymax = std::max(dYIn[nM] + dXIn[nM], dYOut[nM] + dXOut[nM]);
