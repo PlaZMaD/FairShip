@@ -847,7 +847,7 @@ void ShipMuonShield::ConstructGeometry()
       }
 
       auto *compRock = new TGeoCompositeShape("compRock",
-                                              "rock - muon_shield_cavern:TCC8_shift - muon_shield_trench:TCC8_trench_shift"
+                                              "rock - muon_shield_cavern:TCC8_shift"
                                               "- experiment_cavern:ECN3_shift"
                                               "- ECN3_narrow_trench:ECN3_narrow_trench_shift"
                                               "- ECN3_wide_trench:ECN3_wide_trench_shift"
