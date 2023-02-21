@@ -753,15 +753,15 @@ void ShipMuonShield::ConstructGeometry()
       Double_t absorber_offset = zgap;
       Double_t absorber_half_length = (dZf[0] + dZf[1]) + zgap / 2.;
 
-      
+
       TGeoVolume *sc_shield =  gGeoManager->MakeBox("sc_shield", iron, 72. * cm, 46. * cm, 100.*cm);
-      auto *sc_shield_shift = new TGeoTranslation("sc_shield_shift", 0, 0, zEndOfAbsorb + 2 * absorber_half_length + 10.*cm + 100.*cm);//+ 2 * absorber_half_length + absorber_offset + 7 * cm);
+      auto *sc_shield_shift = new TGeoTranslation("sc_shield_shift", 0, 0, zEndOfAbsorb + 2 * absorber_half_length + 10.*cm + 100.*cm + 15. *cm);//+ 2 * absorber_half_length + absorber_offset + 7 * cm);
       std::cout<<"SC MAGNET CENTER " << sc_shield_shift<<std::endl;
       sc_shield_shift->RegisterYourself();
       tShield->AddNode(sc_shield, 1, sc_shield_shift);
 
 
-      
+
       Double_t z_transition = zEndOfAbsorb + 2 * absorber_half_length + absorber_offset + 14 * cm + TCC8_trench_length;
       auto *rock = new TGeoBBox("rock", 20 * m, 20 * m, TCC8_length / 2. + ECN3_length / 2. + 5 * m);
       auto *muon_shield_cavern = new TGeoBBox("muon_shield_cavern", 5 * m, 3.75 * m, TCC8_length / 2.);
