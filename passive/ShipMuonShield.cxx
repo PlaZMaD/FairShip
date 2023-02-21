@@ -144,7 +144,7 @@ void ShipMuonShield::CreateArb8(TString arbName, TGeoMedium *medium,
             z_translation));
       }
   } else if (fWithConstShieldField) {
-      magF->SetField(magField);
+      // magF->SetField(magField);
   }
   // tShield->AddNode(magF, 1, new TGeoTranslation(x_translation, y_translation,
 	// 					z_translation));
