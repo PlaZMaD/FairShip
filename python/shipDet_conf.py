@@ -451,6 +451,12 @@ def configure(run,ship_geo):
  timeDet.SetSizeY(2 * ship_geo.TimeDet.DY)
  detectorList.append(timeDet)
 
+ fluxDet = ROOT.fluxDet("fluxDet", ROOT.kTRUE)
+ # fluxDet.SetZposition(-6000.*u.cm)
+ # fluxDet.SetSizeX(5 *u.m)
+ # fluxDet.SetSizeY(5 * u.m)
+ detectorList.append(fluxDet)
+
 #-----   Magnetic field   -------------------------------------------
  if not hasattr(ship_geo.Bfield,"fieldMap"):
   if ship_geo.strawDesign == 4 or ship_geo.strawDesign == 10 : fMagField = ROOT.ShipBellField("wilfried", ship_geo.Bfield.max ,ship_geo.Bfield.z,2,ship_geo.Yheight/2.*u.m )  

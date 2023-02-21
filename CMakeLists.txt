@@ -262,6 +262,7 @@ add_subdirectory (pid)
 add_subdirectory (muonShieldOptimization)
 # add_subdirectory (online)  is not anymore compatible with FairRoot
 add_subdirectory (millepede)
+add_subdirectory (fluxDet)
 
 FIND_PATH(TEvePath NAMES TEveEventManager.h PATHS
   ${SIMPATH}/tools/root/include
