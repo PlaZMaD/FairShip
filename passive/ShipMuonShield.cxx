@@ -140,6 +140,8 @@ void ShipMuonShield::CreateArb8(TString arbName, TGeoMedium *medium,
   if (arbName.Contains("Absorb")) {
       if (fWithConstAbsorberField) {
           magF->SetField(magField);
+          tShield->AddNode(magF, 1, new TGeoTranslation(x_translation, y_translation,
+            z_translation));
       }
   } else if (fWithConstShieldField) {
       magF->SetField(magField);
@@ -197,7 +199,7 @@ void ShipMuonShield::CreateArb8(TString arbName, TGeoMedium *medium,
   }
 
   std::vector<TGeoVolume*> magF;
-  
+  if (!arbName.Contains("Absorb")) {return;}
   for (int i = 0; i < zParts; ++i)
   {
     magF.push_back(gGeoManager->MakeArb8(arbName + '_' + std::to_string(i), medium, dZp - 0.00001*m, finalCorners[i]));
@@ -723,6 +725,13 @@ void ShipMuonShield::ConstructGeometry()
     TGeoMedium *iron  =gGeoManager->GetMedium("iron");
     InitMedium("Concrete");
     TGeoMedium *concrete  =gGeoManager->GetMedium("Concrete");
+
+    TGeoVolume *sc_shield =  gGeoManager->MakeBox("sc_shield", iron, 72. * cm, 46. * cm, 100.*cm);
+    auto *sc_shield_shift = new TGeoTranslation("sc_shield_shift", 0, 0, zEndOfAbsorb - 10.*cm - 100.*cm);//+ 2 * absorber_half_length + absorber_offset + 7 * cm);
+    std::cout<<"SC MAGNET CENTER " << sc_shield_shift<<std::endl;
+    sc_shield_shift->RegisterYourself();
+    Shield->AddNode(sc_shield, 1, sc_shield_shift);
+
     
     if (fDesign >= 7 && fDesign <= 9) {
       Double_t ironField = fField*tesla;
