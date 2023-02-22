@@ -168,7 +168,7 @@ def addVMCFields(shipGeo, controlFile = '', verbose = False, withVirtualMC = Tru
       # if not shipGeo.muShield.WithConstField:
       # field_center, _ = ShieldUtils.find_shield_center(shipGeo)
       fieldMaker.defineFieldMap('muonShieldField', 'files/shield_field.root',
-                                 ROOT.TVector3(0.0, 0.0, -6000), ROOT.TVector3(0.0, 0.0, 0.0), True)
+                                 ROOT.TVector3(0.0, 0.0, -6127), ROOT.TVector3(0.0, 0.0, 0.0), True)
       fieldsList.append('muonShieldField')
     # Combine the fields to obtain the global field
       if len(fieldsList) > 1:
