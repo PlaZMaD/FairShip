@@ -1,6 +1,7 @@
 #ifndef FLUXDETPOINT_H
 #define FLUXDETPOINT_H 1
 
+
 #include "FairMCPoint.h"
 
 #include "TObject.h"
@@ -36,10 +37,13 @@ class fluxDetPoint : public FairMCPoint
     /** Output to screen **/
     virtual void Print() const;
     Int_t PdgCode() const {return fPdgCode;}
+    TVector3 LastPoint() const {return fLpos;}
+    TVector3 LastMom() const {return fLmom;}
 
   private:
     /** Copy constructor **/
     Int_t fPdgCode;
+    TVector3 fLpos,fLmom;
     fluxDetPoint(const fluxDetPoint& point);
     fluxDetPoint operator=(const fluxDetPoint& point);
 

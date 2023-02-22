@@ -1,4 +1,5 @@
 #include "fluxDet.h"
+#include "fluxDetPoint.h"
 #include "FairVolume.h"
 #include "FairGeoVolume.h"
 #include "FairGeoNode.h"
@@ -23,14 +24,16 @@
 #include "TMath.h" 
 #include "TParticle.h" 
 #include "TVector3.h"
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
 
 
 fluxDet::fluxDet(const char* name, const char* Title, Bool_t Active, Double_t X, Double_t Y,Double_t Z, Double_t dX, Double_t dY, Double_t dZ)
 	: FairDetector(name, Active, kfluxDet),
 	  fTrackID(-1),
       fVolumeID(-1),
-      fPos(),
-      fMom(),
+      fPos(TLorentzVector(X, Y, Z, 0.)),
+      fMom(TLorentzVector (0., 0., 0., 0.)),
       fzPos(Z),
       fxSize(dX),
       fySize(dY),
@@ -40,7 +43,7 @@ fluxDet::fluxDet(const char* name, const char* Title, Bool_t Active, Double_t X,
       fDetector(0),
       ffluxDetPointCollection(new TClonesArray("fluxDetPoint"))
 {
-	FairDetector::Initialize();
+	// FairDetector::Initialize();
 	// fPos = TLorentzVector (X, Y, Z, 0.);
 
 }
@@ -49,18 +52,18 @@ fluxDet::fluxDet()
 	: FairDetector("fluxDet", kTRUE, kfluxDet),
 	  fTrackID(-1),
       fVolumeID(-1),
-      fPos(TLorentzVector(0., 0., -6000, 0.)),
+      fPos(TLorentzVector(0., 0., -3351, 0.)),
       fMom(TLorentzVector (0., 0., 0., 0.)),
-      fzPos(-6000.),
-      fxSize(400.),
-      fySize(400.),
+      fzPos(-3350.),
+      fxSize(300.),
+      fySize(500.),
       fzSize(0.5),
       fxCenter(0.),
       fyCenter(0.),
       fDetector(0),
       ffluxDetPointCollection(new TClonesArray("fluxDetPoint"))
 {
-	FairDetector::Initialize();
+	// FairDetector::Initialize();
 	// fPos = TLorentzVector (X, Y, Z, 0.);
 
 }
@@ -69,20 +72,24 @@ fluxDet::fluxDet(const char* name,Bool_t Active)
 	: FairDetector(name, Active, kfluxDet),
 	  fTrackID(-1),
       fVolumeID(-1),
-      fPos(TLorentzVector(0., 0., -6000, 0.)),
+      fPos(TLorentzVector(0., 0., -3350, 0.)),
       fMom(TLorentzVector (0., 0., 0., 0.)),
-      fzPos(-6000.),
-      fxSize(400.),
-      fySize(400.),
+      fzPos(-3350.),
+      fxSize(300.),
+      fySize(500.),
       fzSize(0.5),
       fxCenter(0.),
       fyCenter(0.),
       fDetector(0),
       ffluxDetPointCollection(new TClonesArray("fluxDetPoint"))
 {
-	FairDetector::Initialize();
+	// FairDetector::Initialize();
 
 
+}
+void fluxDet::Initialize()
+{
+  FairDetector::Initialize();
 }
 
 fluxDet::~fluxDet()

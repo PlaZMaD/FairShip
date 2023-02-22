@@ -20,6 +20,7 @@ class fluxDetHit : public ShipHit
      *@param t_1, t_2      TDC on both sides
      *@param flag      True/False, in case of pile up
      **/
+//    fluxDetHit(TimeDetPoint* p, Double_t t0);
 
     /** Destructor **/
     virtual ~fluxDetHit();
@@ -28,9 +29,11 @@ class fluxDetHit : public ShipHit
     Double_t GetX();
     Double_t GetY();
     Double_t GetZ();
-    // Int_t GetPDG();
     TVector3 GetXYZ();
     TGeoNode* GetNode();
+    // std::vector<double> GetTime(Double_t x);
+    // std::vector<double> GetTime();
+    // std::vector<double> GetMeasurements();
     // std::vector<double> GetMeasurements();
     /** Modifier **/
     // void SetTDC(Float_t val1, Float_t val2){t_1=val1;t_2=val2;}

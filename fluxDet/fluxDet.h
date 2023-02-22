@@ -1,5 +1,5 @@
-// #include "FairModule.h"                 // for FairModule
-// #include "FairLogger.h"
+#ifndef FLUXDET_H
+#define FLUXDET_H
 
 #include "Rtypes.h"                     // for ShipMuonShield::Class, Bool_t, etc
 #include "FairDetector.h"
@@ -9,6 +9,7 @@
 class fluxDetPoint;
 class FairVolume;
 class TClonesArray;
+
 class fluxDet : public FairDetector
 {
  public:
@@ -16,7 +17,8 @@ class fluxDet : public FairDetector
  	fluxDet();
  	fluxDet(const char* name,Bool_t Active);
  	virtual ~fluxDet();
-
+   virtual void   Initialize();
+   
  	void ConstructGeometry();
  	virtual Bool_t ProcessHits( FairVolume* v=0);
  	virtual TClonesArray* GetCollection(Int_t iColl) const;
@@ -66,3 +68,4 @@ class fluxDet : public FairDetector
     ClassDef(fluxDet,3)
 
 };
+#endif
