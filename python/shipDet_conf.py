@@ -452,7 +452,7 @@ def configure(run,ship_geo):
  detectorList.append(timeDet)
 
  # fluxDet = ROOT.fluxDet("fluxDet", ROOT.kTRUE)
- fluxDet = ROOT.fluxDet("fluxDet", "fluxDet", ROOT.kTRUE, 0., 0., -6000.*u.cm, 200.*u.cm,  200.*u.cm, 1.*u.cm)
+ fluxDet = ROOT.fluxDet("fluxDet", "fluxDet", ROOT.kTRUE, 0., 0., -6000.*u.cm, 200.*u.cm,  140.*u.cm, 1.*u.cm)
  # fluxDet.SetZposition(-6000.*u.cm)
  # fluxDet.SetSizeX(5 *u.m)
  # fluxDet.SetSizeY(5 * u.m)
