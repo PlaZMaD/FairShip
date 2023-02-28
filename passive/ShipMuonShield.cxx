@@ -219,7 +219,7 @@ void ShipMuonShield::CreateMagnet(TString magnetName,TGeoMedium* medium,TGeoVolu
 				  Double_t middleGap,Double_t middleGap2,
 				  Double_t HmainSideMag, Double_t HmainSideMag2,
 				  Double_t gap,Double_t gap2, Double_t Z, Bool_t NotMagnet,
-          Bool_t stepGeo)
+          Bool_t stepGeo, Bool_t SC_key = false)
   {
     Double_t coil_gap,coil_gap2;
     Int_t color[4] = {45,31,30,38};
@@ -296,6 +296,116 @@ void ShipMuonShield::CreateMagnet(TString magnetName,TGeoMedium* medium,TGeoVolu
 	2 * dX2 + middleGap2 + gap2, dY2 + dX2 - anti_overlap,
 	2 * dX2 + middleGap2 + gap2, -(dY2 + dX2 - anti_overlap)
     };
+
+    // SC part
+    if(SC_key){
+      Double_t SC_coef = 1.;
+      Double_t SC_width = 50.;
+        cornersMainL = {
+	middleGap, -(dY + 3*dX - anti_overlap),
+	middleGap, dY + 3*dX - anti_overlap,
+	dX + middleGap, dY - anti_overlap,
+	dX + middleGap, -(dY - anti_overlap),
+	middleGap2, -(dY2 + 3*dX2 - anti_overlap),
+	middleGap2, dY2 + 3*dX2 - anti_overlap,
+	dX2 + middleGap2, dY2 - anti_overlap,
+	dX2 + middleGap2, -(dY2 - anti_overlap)
+    };
+
+    cornersTL = {middleGap + dX,
+                                          dY,
+                                          middleGap,
+                                          dY + 3*dX,
+                                          4 * dX + middleGap + coil_gap,
+                                          dY + 3*dX,
+                                          dX + middleGap + coil_gap,
+                                          dY,
+                                          middleGap2 + dX2,
+                                          dY2,
+                                          middleGap2,
+                                          dY2 + 3*dX2,
+                                          4 * dX2 + middleGap2 + coil_gap2,
+                                          dY2 + 3*dX2,
+                                          dX2 + middleGap2 + coil_gap2,
+                                          dY2};
+
+    cornersMainSideL = 
+      fDesign == 7 ?
+      std::array<Double_t, 16>{
+	dX + middleGap + gap, -HmainSideMag,
+	dX + middleGap + gap, HmainSideMag,
+	4 * dX + middleGap + gap, HmainSideMag,
+	4 * dX + middleGap + gap, -HmainSideMag,
+	dX2 + middleGap2 + gap2, -HmainSideMag2,
+	dX2 + middleGap2 + gap2, HmainSideMag2,
+	4 * dX2 + middleGap2 + gap2, HmainSideMag2,
+	4 * dX2 + middleGap2 + gap2, -HmainSideMag2
+      } :
+      std::array<Double_t, 16>{
+	dX + middleGap + gap, -(dY - anti_overlap),
+	dX + middleGap + gap, dY - anti_overlap,
+	4 * dX + middleGap + gap, dY + 3*dX - anti_overlap,
+	4 * dX + middleGap + gap, -(dY + 3*dX - anti_overlap),
+	dX2 + middleGap2 + gap2, -(dY2 - anti_overlap),
+	dX2 + middleGap2 + gap2, dY2 - anti_overlap,
+	4 * dX2 + middleGap2 + gap2, dY2 + 3*dX2 - anti_overlap,
+	4 * dX2 + middleGap2 + gap2, -(dY2 + 3*dX2 - anti_overlap)
+    };
+
+
+
+  //     /*
+  //     cornersMainSideL = std::array<Double_t, 16>{
+	// dX + middleGap + gap, -(dY - anti_overlap),
+	// dX + middleGap + gap, dY - anti_overlap,
+	// 2 * dX + middleGap + SC_coef + gap, dY + dX + SC_coef - anti_overlap,
+	// 2 * dX + middleGap + SC_coef + gap, -(dY + dX + SC_coef - anti_overlap),
+	// dX2 + middleGap2 + gap2, -(dY2 - anti_overlap),
+	// dX2 + middleGap2 + gap2, dY2 - anti_overlap,
+	// 2 * dX2 + middleGap2 + SC_coef + gap2, dY2 + dX2 - anti_overlap,
+	// 2 * dX2 + middleGap2 + SC_coef + gap2, -(dY2 + dX2 + SC_coef - anti_overlap)
+  //   };
+  //   */
+  //    Double_t width = dX;
+  //    Double_t width2 = dX2;
+  //    std::array<Double_t, 16> cornersLEFT = std::array<Double_t, 16>{
+	// 2 * dX + middleGap + SC_coef + gap, -(dY + dX - anti_overlap),
+	// 2 * dX + middleGap + SC_coef + gap, dY + dX - anti_overlap,
+	// 2 * dX + middleGap + SC_coef + gap + width, dY + dX - anti_overlap,
+	// 2 * dX + middleGap + SC_coef + gap + width, -(dY + dX - anti_overlap),
+	// 2 * dX2 + middleGap2 + SC_coef + gap2, -(dY2 + dX2 - anti_overlap),
+	// 2 * dX2 + middleGap2 + SC_coef + gap2, dY2 + dX2 - anti_overlap,
+	// 2 * dX2 + middleGap2 + SC_coef + gap2 + width2, dY2 + dX2 - anti_overlap,
+	// 2 * dX2 + middleGap2 + SC_coef + gap2 + width2, -(dY2 + dX2 - anti_overlap)
+  //   };
+  //   Double_t height = (dY + dX)/3;
+  //   Double_t height2 = (dY2 + dX2)/3;
+  //        std::array<Double_t, 16> cornersTOP = std::array<Double_t, 16>{
+	// -(2 * dX + middleGap + SC_coef + gap + width), (dY + dX + anti_overlap),
+  // (2 * dX + middleGap + SC_coef + gap + width), (dY + dX + anti_overlap),
+	// (2 * dX + middleGap + SC_coef + gap + width), (dY + dX + anti_overlap + height),
+  // -(2 * dX + middleGap + SC_coef + gap + width), (dY + dX + anti_overlap + height),
+  // -(2 * dX2 + middleGap2 + SC_coef + gap + width2), (dY2 + dX2 + anti_overlap),
+  // (2 * dX2 + middleGap2 + SC_coef + gap + width2), (dY2 + dX2 + anti_overlap),
+	// (2 * dX2 + middleGap2 + SC_coef + gap + width2), (dY2 + dX2 + anti_overlap + height2),
+  // -(2 * dX2 + middleGap2 + SC_coef + gap + width2), (dY2 + dX2 + anti_overlap + height2)
+  //   };
+  //   std::array<Double_t, 16> cornersRIGHT;
+  //     for (int i = 0; i < 16; ++i) {
+  //       cornersRIGHT[i] = -cornersLEFT[i];
+  //       //cornersBOT[i] = -cornersTOP[i];
+  //     }
+  //   TString strLEFT = "_LEFT";
+  //   TString strRIGHT = "_RIGHT";
+  //   TString strTOP = "_TOP";
+  //   //TString strBOT = "_BOT";
+  //   CreateArb8(magnetName + strLEFT, medium, dZ, cornersLEFT, color[0], fields[1], tShield,  0, 0, Z, stepGeo);
+  //   CreateArb8(magnetName + strRIGHT, medium, dZ, cornersRIGHT, color[0], fields[1], tShield,  0, 0, Z, stepGeo);
+  //   CreateArb8(magnetName + strTOP, medium, dZ, cornersTOP, color[0], fields[1], tShield,  0, 0, Z, stepGeo);
+  //   //CreateArb8(magnetName + strBOT, medium, dZ, cornersBOT, color[0], fields[1], tShield,  0, 0, Z, stepGeo);
+    }
+
+    // END of SC part
 
     std::array<Double_t, 16> cornersMainR, cornersCLBA,
        cornersMainSideR, cornersCLTA, cornersCRBA,
@@ -770,6 +880,7 @@ void ShipMuonShield::ConstructGeometry()
       auto *ECN3_narrow_trench_shift = new TGeoTranslation("ECN3_narrow_trench_shift", 0 * m, 0 * m, - 25 / 2.* m + ECN3_length / 2.);
       ECN3_narrow_trench_shift->RegisterYourself();
 
+        //float mField = 0.0 * tesla;
         float mField = 1.6 * tesla;
 	TGeoUniformMagField *fieldsAbsorber[4] = {
 	    new TGeoUniformMagField(0., mField, 0.),
@@ -847,7 +958,7 @@ void ShipMuonShield::ConstructGeometry()
       }
 
       auto *compRock = new TGeoCompositeShape("compRock",
-                                              "rock - muon_shield_cavern:TCC8_shift"
+					      "rock - muon_shield_cavern:TCC8_shift - muon_shield_trench:TCC8_trench_shift"
                                               "- experiment_cavern:ECN3_shift"
                                               "- ECN3_narrow_trench:ECN3_narrow_trench_shift"
                                               "- ECN3_wide_trench:ECN3_wide_trench_shift"
@@ -881,8 +992,20 @@ void ShipMuonShield::ConstructGeometry()
         }
       }
       for (Int_t nM = 2; nM <= (nMagnets - 1); nM++) {
+  // SC MAGNET
+  if (dZf[nM] < 1e-5) {
+        continue;
+      }
+  Double_t ironField_s_SC = fField * fieldScale[nM] * tesla;
+  Bool_t SC_key = false;
+  if(nM == 3){
+    Double_t SC_FIELD = 5.1;
+    ironField_s_SC = SC_FIELD * fieldScale[nM] * tesla;
+    SC_key = true;
+  }
+  // END
   Double_t ironField_s = fField * fieldScale[nM] * tesla;
-  TGeoUniformMagField *magFieldIron_s = new TGeoUniformMagField(0.,ironField_s,0.);
+  TGeoUniformMagField *magFieldIron_s = new TGeoUniformMagField(0.,ironField_s_SC,0.);
   TGeoUniformMagField *RetField_s     = new TGeoUniformMagField(0.,-ironField_s,0.);
   TGeoUniformMagField *ConRField_s    = new TGeoUniformMagField(-ironField_s,0.,0.);
   TGeoUniformMagField *ConLField_s    = new TGeoUniformMagField(ironField_s,0.,0.);
@@ -890,7 +1013,7 @@ void ShipMuonShield::ConstructGeometry()
 	CreateMagnet(magnetName[nM], iron, tShield, fields_s, fieldDirection[nM],
 		     dXIn[nM], dYIn[nM], dXOut[nM], dYOut[nM], dZf[nM],
 		     midGapIn[nM], midGapOut[nM], HmainSideMagIn[nM],
-		     HmainSideMagOut[nM], gapIn[nM], gapOut[nM], Z[nM], nM==8, fStepGeo);
+		     HmainSideMagOut[nM], gapIn[nM], gapOut[nM], Z[nM], nM==8, fStepGeo, SC_key);
 
 	if (nM==8 || !fSupport) continue;
 	Double_t dymax = std::max(dYIn[nM] + dXIn[nM], dYOut[nM] + dXOut[nM]);

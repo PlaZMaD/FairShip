@@ -87,7 +87,7 @@ class ShipMuonShield : public FairModule
 		    Double_t dX2, Double_t dY2, Double_t dZ, Double_t middleGap,
 		    Double_t middleGap2, Double_t HmainSideMag,
 		    Double_t HmainSideMag2, Double_t gap, Double_t gap2,
-		    Double_t Z, Bool_t NotMagnet, Bool_t stepGeo);
+		    Double_t Z, Bool_t NotMagnet, Bool_t stepGeo, Bool_t);
 
 
 };
