@@ -140,6 +140,8 @@ void ShipMuonShield::CreateArb8(TString arbName, TGeoMedium *medium,
   if (arbName.Contains("Absorb")) {
       if (fWithConstAbsorberField) {
           magF->SetField(magField);
+          tShield->AddNode(magF, 1, new TGeoTranslation(x_translation, y_translation,
+            z_translation));
       }
   } else if (fWithConstShieldField) {
       magF->SetField(magField);
@@ -197,7 +199,7 @@ void ShipMuonShield::CreateArb8(TString arbName, TGeoMedium *medium,
   }
 
   std::vector<TGeoVolume*> magF;
-  
+  if (!arbName.Contains("Absorb")) {return;}
   for (int i = 0; i < zParts; ++i)
   {
     magF.push_back(gGeoManager->MakeArb8(arbName + '_' + std::to_string(i), medium, dZp - 0.00001*m, finalCorners[i]));
