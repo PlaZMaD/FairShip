@@ -993,7 +993,7 @@ void ShipMuonShield::ConstructGeometry()
       }
       for (Int_t nM = 2; nM <= (nMagnets - 1); nM++) {
   // SC MAGNET
-  if (dZf[nM] < 1e-5) {
+  if (dZf[nM] < 1e-5 || nM == 4) {
         continue;
       }
   Double_t ironField_s_SC = fField * fieldScale[nM] * tesla;
