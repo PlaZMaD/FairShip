@@ -29,7 +29,8 @@ ShipMuonShield::ShipMuonShield() : FairModule("ShipMuonShield", "") {}
 ShipMuonShield::ShipMuonShield(TString geofile,
                                Double_t floor,
                                const Int_t withCoMagnet, const Bool_t StepGeo,
-                               const Bool_t WithConstAbsorberField, const Bool_t WithConstShieldField)
+                               const Bool_t WithConstAbsorberField, const Bool_t WithConstShieldField,
+                               const Bool_t SC_mag)
   : FairModule("MuonShield", "ShipMuonShield")
 {
   fWithConstAbsorberField = WithConstAbsorberField;
@@ -42,6 +43,7 @@ ShipMuonShield::ShipMuonShield(TString geofile,
   params.Read("params");
   Double_t LE = 7 * m;
   fDesign = 8;
+  fSC_mag = SC_mag;
   fField = 1.7;
   dZ0 = 1 * m;
   dZ1 = 0.4 * m;
@@ -860,6 +862,8 @@ void ShipMuonShield::ConstructGeometry()
       Double_t z_transition = zEndOfAbsorb + 2 * absorber_half_length + absorber_offset + 14 * cm + TCC8_trench_length;
       auto *rock = new TGeoBBox("rock", 20 * m, 20 * m, TCC8_length / 2. + ECN3_length / 2. + 5 * m);
       auto *muon_shield_cavern = new TGeoBBox("muon_shield_cavern", 5 * m, 3.75 * m, TCC8_length / 2.);
+      // changed width 1.2m -> 2.5m -- for 04032023_config
+      // changed width 2.5m -> 1.2m -- for 04032023_config_narrow
       auto *muon_shield_trench = new TGeoBBox("muon_shield_trench", 1.2 * m, 2.4 * m, TCC8_trench_length / 2.);
       auto *TCC8_shift = new TGeoTranslation("TCC8_shift", 2.3 * m, 2.05 * m, - TCC8_length / 2.);
       TCC8_shift->RegisterYourself();
@@ -993,12 +997,12 @@ void ShipMuonShield::ConstructGeometry()
       }
       for (Int_t nM = 2; nM <= (nMagnets - 1); nM++) {
   // SC MAGNET
-  if (dZf[nM] < 1e-5 || nM == 4) {
+  if (dZf[nM] < 1e-5 || nM == 4 && fSC_mag) {
         continue;
       }
   Double_t ironField_s_SC = fField * fieldScale[nM] * tesla;
   Bool_t SC_key = false;
-  if(nM == 3){
+  if(nM == 3 && fSC_mag){
     Double_t SC_FIELD = 5.1;
     ironField_s_SC = SC_FIELD * fieldScale[nM] * tesla;
     SC_key = true;

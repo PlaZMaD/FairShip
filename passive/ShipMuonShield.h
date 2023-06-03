@@ -26,7 +26,7 @@ class ShipMuonShield : public FairModule
                                const Bool_t WithConstAbsorberField=true, const Bool_t WithConstShieldField=true);
 
    ShipMuonShield(TString geofile, Double_t floor=500, const Int_t withCoMagnet=0, const Bool_t StepGeo=false,
-   const Bool_t WithConstAbsorberField=true, const Bool_t WithConstShieldField=true);
+   const Bool_t WithConstAbsorberField=true, const Bool_t WithConstShieldField=true, const Bool_t SC_mag=false);
    ShipMuonShield();
    virtual ~ShipMuonShield();
    void ConstructGeometry();
@@ -51,6 +51,7 @@ class ShipMuonShield : public FairModule
   Bool_t fStepGeo;
   Bool_t fWithConstAbsorberField;
   Bool_t fWithConstShieldField;
+  Bool_t fSC_mag;
 
   void CreateArb8(TString arbName, TGeoMedium *medium, Double_t dZ,
 		  std::array<Double_t, 16> corners, Int_t color,
