@@ -141,7 +141,8 @@ def configure(run,ship_geo):
                                        ship_geo.muShieldWithCobaltMagnet,
                                        ship_geo.muShieldStepGeo,
                                        ship_geo.hadronAbsorber.WithConstField,
-                                       ship_geo.muShield.WithConstField)
+                                       ship_geo.muShield.WithConstField,
+                                       ship_geo.muShield.FieldScale)
  detectorList.append(MuonShield)
 
  if not hasattr(ship_geo,"magnetDesign"):

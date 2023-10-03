@@ -63,7 +63,7 @@ ShipMuonShield::ShipMuonShield(TString geofile,
 }
 
 ShipMuonShield::ShipMuonShield(TVectorT<Double_t> in_params,
-Double_t floor, const Int_t withCoMagnet, const Bool_t StepGeo, const Bool_t WithConstAbsorberField, const Bool_t WithConstShieldField)
+Double_t floor, const Int_t withCoMagnet, const Bool_t StepGeo, const Bool_t WithConstAbsorberField, const Bool_t WithConstShieldField, const Double_t withFieldScale)
   : FairModule("MuonShield", "ShipMuonShield")
 {
   for(int i = 0; i < 56; i++){
@@ -90,6 +90,7 @@ Double_t floor, const Int_t withCoMagnet, const Bool_t StepGeo, const Bool_t Wit
 
   fFloor = floor;
   fSupport = false;
+  FieldScale = withFieldScale;
 
   Double_t Z = -25 * m - fMuonShieldLength / 2.;
 
@@ -953,7 +954,7 @@ void ShipMuonShield::ConstructGeometry()
       top->AddNode(Cavern, 1, new TGeoTranslation(0, 0, z_transition));
 
 
-      std::array<double, 9> fieldScale = {{1., 1., 1., 1., 1., 1., 1., 1., 1.}};
+      std::array<double, 9> fieldScale = {{FieldScale, FieldScale, FieldScale, FieldScale, FieldScale, FieldScale, FieldScale, FieldScale, FieldScale}};
       if (fWithCoMagnet > 0)
       {
         Double_t lengthSum = 0.;

@@ -60,10 +60,13 @@ if "SC_mag" not in globals():
     SC_mag = False
 if "scName" not in globals():
     scName = None
+if "FieldScale" not in globals():
+    FieldScale = 1.
 
 with ConfigRegistry.register_config("basic") as c:
     c.SC_mag = SC_mag
     c.scName = scName
+    c.FieldScale = FieldScale
     # global muShieldDesign, targetOpt, strawDesign, Yheight
     c.Yheight = Yheight*u.m
     # decision by the SP 
@@ -320,6 +323,7 @@ with ConfigRegistry.register_config("basic") as c:
     c.decayVolume.length     =   50*u.m
 
     c.muShield       =  AttrDict(z=0*u.cm)
+    c.muShield.FieldScale = c.FieldScale
     c.muShieldDesign = muShieldDesign
     c.muShield.Field = 1.7 # in units of Tesla expected by ShipMuonShield
     c.muShield.LE = 7 * u.m     # - 0.5 m air - Goliath: 4.5 m - 0.5 m air - nu-tau mu-det: 3 m - 0.5 m air. finally 10m asked by Giovanni
