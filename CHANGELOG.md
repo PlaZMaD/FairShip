@@ -14,13 +14,22 @@ it in future.
 
 ### Added
 
+* Add option for helium-filled decay volume
 * Add pre-commit config: This will be phased in to improve code quality and spot issues as early as possible. Status visible in README and CI enabled for new pull requests.
 * Add CHANGELOG.md
+* Add `.git-blame-ignore-revs` to allow automatic reformatting etc. without polluting git blame
+* Automatically built documentation using Doxygen
 
 ### Fixed
 
+* Remove trailing whitespace and fix line endings
+* Fix compilation warnings due to deprecations #469
+
 ### Changed
+
+* Update getGeoInformation command line interface
 
 ### Removed
 
-* Removed obsolete files related to old ways of installing or testing FairShip
+* Remove obsolete files related to old ways of installing or testing FairShip
+* Remove uses of future and past modules #473

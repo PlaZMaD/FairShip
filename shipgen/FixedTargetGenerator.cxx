@@ -20,14 +20,14 @@ const Double_t c_light = 2.99792458e+10; // speed of light in cm/sec (c_light   
 const Double_t mbarn = 1E-3*1E-24*TMath::Na(); // cm^2 * Avogadro
 
 // -----   Default constructor   -------------------------------------------
-FixedTargetGenerator::FixedTargetGenerator() 
+FixedTargetGenerator::FixedTargetGenerator()
 {
-  fUseRandom1 = kFALSE; 
+  fUseRandom1 = kFALSE;
   fUseRandom3 = kTRUE;
   fSeed = 0;
   fMom        = 400;  // proton
   fLogger = FairLogger::GetLogger();
-  targetName = ""; 
+  targetName = "";
   fcharmtarget = false;
   xOff=0; yOff=0;
   tauOnly = false;
@@ -70,24 +70,24 @@ Bool_t FixedTargetGenerator::InitForCharmOrBeauty(TString fInName, Int_t nev, Do
   nTree->SetBranchAddress("mpz",&n_mpz);
   nTree->SetBranchAddress("mE",&n_mE);
   if (nTree->GetBranch("k")){
-   fLogger->Info(MESSAGE_ORIGIN,"+++has branch+++");
+   LOG(INFO) << "+++has branch+++";
    nTree->SetBranchAddress("k",&ck);}
 // check if we deal with charm or beauty:
   nTree->GetEvent(0);
-  if (!setByHand and n_M>5){ 
+  if (!setByHand and n_M>5){
     chicc = chibb;
-    fLogger->Info(MESSAGE_ORIGIN,"automatic detection of beauty, configured for beauty");
-    fLogger->Info(MESSAGE_ORIGIN,"bb cross section / mbias %f",chicc);
+    LOG(INFO) << "automatic detection of beauty, configured for beauty";
+    LOG(INFO) << "bb cross section / mbias " << chicc;
   }else{
-    fLogger->Info(MESSAGE_ORIGIN,"cc cross section / mbias %f",chicc);
+    LOG(INFO) << "cc cross section / mbias " << chicc;
   }
 // convert pot to weight corresponding to one spill of 5e13 pot
  // get histogram with number of pot to normalise
  // pot are counted double, i.e. for each signal, i.e. pot/2.
   Int_t nrcpot=((TH1F*)fin->Get("2"))->GetBinContent(1)/2.; // number of primary interactions
   wspill = nrpotspill*chicc/nrcpot*nEvents/nev;
-  fLogger->Info(MESSAGE_ORIGIN,"Input file: %s   with %i entries, corresponding to nr-pot=%f",fInName.Data(),nEvents,nrcpot/chicc);
-  fLogger->Info(MESSAGE_ORIGIN,"weight %f corresponding to %f p.o.t. per spill for %i events to process",wspill,nrpotspill,nev);
+  LOG(INFO) << "Input file: " << fInName.Data() << " with " << nEvents << " entries, corresponding to nr-pot=" << (nrcpot/chicc);
+  LOG(INFO) << "weight " << wspill << " corresponding to " << nrpotspill << " p.o.t. per spill for " << nev << " events to process";
 
   pot=0.;
   //Determine fDs on this file for primaries
@@ -97,13 +97,13 @@ Bool_t FixedTargetGenerator::InitForCharmOrBeauty(TString fInName, Int_t nev, Do
   return kTRUE;
 }
 // -----   Default Init   -------------------------------------------
-Bool_t FixedTargetGenerator::Init() 
+Bool_t FixedTargetGenerator::Init()
 {
   fPythiaP =  new Pythia8::Pythia(); // pythia needed also for G4only, to copy 2mu BRs
   if (Option == "Primary" && !G4only){
    fPythiaN =  new Pythia8::Pythia();
   }else if (Option != "charm" && Option != "beauty" && !G4only) {
-   fLogger->Error(MESSAGE_ORIGIN,"Option not known %s, abort",Option.Data());
+   LOG(ERROR) << "Option not known "<< Option.Data() << ", abort";
   }
   if (fUseRandom1) fRandomEngine = new PyTr1Rng();
   if (fUseRandom3) fRandomEngine = new PyTr3Rng();
@@ -120,7 +120,7 @@ Bool_t FixedTargetGenerator::Init()
   Int_t pcount = 0;
   for(const auto& fPythia : plist) {
    if (pcount > 0 && (Option != "Primary" || G4only)){continue;}
-   pcount+=1; 
+   pcount+=1;
    fPythia->setRndmEnginePtr(fRandomEngine);
    fPythia->settings.mode("Random:seed",fSeed);
    fPythia->settings.mode("Next:numberCount",heartbeat);
@@ -171,19 +171,19 @@ Bool_t FixedTargetGenerator::Init()
     if (p->tau0()>1){
      string particle = std::to_string(n)+":mayDecay = false";
      fPythia->readString(particle);
-     fLogger->Info(MESSAGE_ORIGIN,"Made %s stable for Pythia, should decay in Geant4",p->name().c_str());
+     LOG(INFO) << "Made " << p->name().c_str() << " stable for Pythia, should decay in Geant4";
     }
-   } 
+   }
 // boost branching fraction of rare di-muon decays
-//                       eta  omega rho0  eta' phi   
+//                       eta  omega rho0  eta' phi
    if (fBoost != 1.){
-    fLogger->Info(MESSAGE_ORIGIN,"Rescale BRs of dimuon decays in Pythia: %f",fBoost);
-    for (unsigned int i=0; i<r.size(); ++i) {  
+    LOG(INFO) << "Rescale BRs of dimuon decays in Pythia: " << fBoost;
+    for (unsigned int i=0; i<r.size(); ++i) {
      Pythia8::ParticleDataEntry* V = fPythia->particleData.particleDataEntryPtr(r[i]);
      Pythia8::DecayChannel ch = V->channel(c[i]);
      if (TMath::Abs(ch.product(0))!=13 || TMath::Abs(ch.product(1))!=13){
-      fLogger->Info(MESSAGE_ORIGIN,"this is not the right decay channel: %i %i",r[i],c[i]);
-     }else{     
+      LOG(INFO) << "this is not the right decay channel: " << r[i] << " " << c[i];
+     }else{
      TString tmp="";
      tmp+=r[i];tmp+=":";tmp+= c[i];
      tmp+=":bRatio =";
@@ -222,22 +222,22 @@ Bool_t FixedTargetGenerator::Init()
   }
   if (targetName!=""){
    fMaterialInvestigator = new GenieGenerator();
-   if (!fcharmtarget){   
+   if (!fcharmtarget){
    TGeoNavigator* nav = gGeoManager->GetCurrentNavigator();
    nav->cd(targetName);
-   TGeoNode* target = nav->GetCurrentNode(); 
+   TGeoNode* target = nav->GetCurrentNode();
    TObjArray* nodes =  target->GetVolume()->GetNodes();
    TGeoNode* first = (TGeoNode*)nodes->At(0);
    Int_t ilast = nodes->GetSize()-5; // assumes that the last 5 nodes are for the shielding around the target.
    TGeoNode* last  = (TGeoNode*)nodes->At(ilast);
-   nav->cd(targetName+"/"+first->GetName()); 
+   nav->cd(targetName+"/"+first->GetName());
    TGeoBBox* sha = (TGeoBBox*)first->GetVolume()->GetShape();
    Double_t dz   = sha->GetDZ();
    Double_t origin[3] = {0,0,-dz};
    Double_t master[3] = {0,0,0};
    nav->LocalToMaster(origin,master);
    startZ =  master[2];
-   nav->cd(targetName+"/"+last->GetName()); 
+   nav->cd(targetName+"/"+last->GetName());
    sha = (TGeoBBox*)first->GetVolume()->GetShape();
    dz   = sha->GetDZ();
    origin[2] = +dz;
@@ -250,11 +250,11 @@ Bool_t FixedTargetGenerator::Init()
    end[1]=yOff;
    end[2]=endZ;
    }
-   else{  //charm geometry uses a different target 
+   else{  //charm geometry uses a different target
    TGeoVolume* top = gGeoManager->GetTopVolume();
    TGeoNode* target = top->FindNode(targetName);
    if (!target){
-       fLogger->Error(MESSAGE_ORIGIN,"target not found, %s, program will crash",targetName.Data());
+       LOG(ERROR) << "target not found, " << targetName.Data() << ", program will crash";
    }
    Double_t z_middle = target->GetMatrix()->GetTranslation()[2];
    TGeoBBox* sha = (TGeoBBox*)target->GetVolume()->GetShape();
@@ -296,18 +296,18 @@ Bool_t FixedTargetGenerator::ReadEvent(FairPrimaryGenerator* cpg)
    Double_t sigma;
    Int_t count=0;
    Double_t zinterStart = start[2];
-   if (Option == "charm" || Option == "beauty"){ 
+   if (Option == "charm" || Option == "beauty"){
 // simulate more downstream interaction points for interactions down in the cascade
     if (!(nTree->GetBranch("k"))){ck=1;}
    }
-   else {ck=1;} 
+   else {ck=1;}
    while (ck>0.5){
     while (prob2int<rndm) {
  //place x,y,z uniform along path
       zinter = gRandom->Uniform(zinterStart,end[2]);
       Double_t point[3]={xOff,yOff,zinter};
       bparam = fMaterialInvestigator->MeanMaterialBudget(start, point, mparam);
-      Double_t interLength = mparam[8]; 
+      Double_t interLength = mparam[8];
       TGeoNode *node = gGeoManager->FindNode(point[0],point[1],point[2]);
       TGeoMaterial *mat = 0;
       if (node && !gGeoManager->IsOutside()) {
@@ -319,12 +319,12 @@ Bool_t FixedTargetGenerator::ReadEvent(FairPrimaryGenerator* cpg)
       }else{
          prob2int=0.;
       }
-      rndm = gRandom->Uniform(0.,1.); 
+      rndm = gRandom->Uniform(0.,1.);
       count+=1;
     }
     zinterStart = zinter;
     ck-=1;
-  } 
+  }
   zinter = zinter*cm;
   }
   Pythia8::Pythia* fPythia;
@@ -343,14 +343,14 @@ Bool_t FixedTargetGenerator::ReadEvent(FairPrimaryGenerator* cpg)
    }
   }else{
     if (nEntry==nEvents){
-      fLogger->Info(MESSAGE_ORIGIN,"Rewind input file: %i",nEntry);
+      LOG(INFO) << "Rewind input file: " << nEntry;
       nEntry=0;}
     nTree->GetEvent(nEntry);
     nEntry+=1;
     // sanity check, count number of p.o.t. on input file.
     Double_t pt=TMath::Sqrt( (n_mpx*n_mpx)+(n_mpy*n_mpy));
     // every event appears twice, i.e.
-    if (pt<1.e-5 && n_mid==2212){ 
+    if (pt<1.e-5 && n_mid==2212){
      pot+=+0.5;
      ntotprim+=1;}
     Int_t idabs=int(TMath::Abs(n_id));
@@ -363,7 +363,7 @@ Bool_t FixedTargetGenerator::ReadEvent(FairPrimaryGenerator* cpg)
     cpg->AddTrack(int(n_mid),n_mpx,n_mpy,n_mpz, xOff/cm,yOff/cm,zinter/cm,-1,kFALSE,n_mE,0.,wspill,procID);
 // second charm hadron in the event
     nTree->GetEvent(nEntry);
-    if (nID1 * n_id > 0){fLogger->Info(MESSAGE_ORIGIN,"same sign charm: %i, %i, %i",nEntry,nID1,n_id);}
+    if (nID1 * n_id > 0){LOG(INFO) << "same sign charm: " << nEntry << ", " << nID1 << ", " << n_id;}
     nEntry+=1;
     fPythiaP->event.append(int(n_id),1,0,0,n_px,n_py,n_pz,n_E,n_M,0.,9.);
     fPythiaP->next();
@@ -372,12 +372,12 @@ Bool_t FixedTargetGenerator::ReadEvent(FairPrimaryGenerator* cpg)
   if (withEvtGen){
    fPythia->moreDecays();} // let the very short lived resonances decay via Pythia8
   if(Debug && !G4only){fPythia->event.list();}
-  TMCProcess procID; 
+  TMCProcess procID;
   for(Int_t ii=1; ii<fPythia->event.size(); ii++){
      Double_t  e = fPythia->event[ii].e();
      Double_t  m = fPythia->event[ii].m();
      Double_t pz = fPythia->event[ii].pz();
-     Int_t id = fPythia->event[ii].id(); 
+     Int_t id = fPythia->event[ii].id();
      Bool_t wanttracking=kTRUE;
      if (e-m<EMax || !fPythia->event[ii].isFinal() || pz<0) {wanttracking=kFALSE;}
      if (DrellYan || PhotonCollision || OnlyMuons){
@@ -403,7 +403,7 @@ Bool_t FixedTargetGenerator::ReadEvent(FairPrimaryGenerator* cpg)
      if(withNtuple){
           int idabs = TMath::Abs(id);
           if (idabs<10)  {continue;}
-          if (idabs<18 || idabs==22 || idabs==111 || idabs==221 || idabs==223 || idabs==331 
+          if (idabs<18 || idabs==22 || idabs==111 || idabs==221 || idabs==223 || idabs==331
                  || idabs==211 || idabs==113 || idabs==333  || idabs==321   || idabs==2212 ){
           Int_t moID = fPythia->event[im+1].id();
           fNtuple->Fill(0,id,px,py,pz,e,x/cm,y/cm,z/cm,moID);
@@ -413,4 +413,3 @@ Bool_t FixedTargetGenerator::ReadEvent(FairPrimaryGenerator* cpg)
   return kTRUE;
 }
 // -------------------------------------------------------------------------
-

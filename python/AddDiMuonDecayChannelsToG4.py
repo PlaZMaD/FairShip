@@ -1,4 +1,3 @@
-from __future__ import division
 import ROOT
 ROOT.gROOT.ProcessLine('#include "Geant4/G4ParticleTable.hh"')
 ROOT.gROOT.ProcessLine('#include "Geant4/G4DecayTable.hh"')
@@ -18,7 +17,7 @@ def Initialize(p8):
     dl = []
     for daughter in range(4):
       if daughter<mul:
-       pid = achannel.product(daughter) 
+       pid = achannel.product(daughter)
        dl.append(pt.FindParticle(pid).GetParticleName())
       else:  dl.append(ROOT.G4String(""))
     mode  = ROOT.G4PhaseSpaceDecayChannel(particleG4.GetParticleName(),bR,mul,dl[0],dl[1],dl[2],dl[3])

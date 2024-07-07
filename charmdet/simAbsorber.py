@@ -1,5 +1,4 @@
-#!/usr/bin/env python 
-from __future__ import print_function
+#!/usr/bin/env python
 import ROOT,os,sys,time,shipRoot_conf
 ROOT.gROOT.ProcessLine('#include "FairModule.h"')
 
@@ -10,13 +9,13 @@ PDG = ROOT.TDatabasePDG.Instance()
 mcEngine     = "TGeant4"
 
 setup = {}
-# 
+#
 setup['muflux'] = {'thickness': 240*u.cm/2., 'material':'iron'}
 s = 'muflux'
 thickness = setup[s]['thickness']
 material  = setup[s]['material']
 
-import rootUtils as ut 
+import rootUtils as ut
 h={}
 
 from argparse import ArgumentParser
@@ -42,16 +41,16 @@ def run():
  run.SetName(mcEngine)  # Transport engine
  run.SetOutputFile(outFile)  # Output file
  run.SetUserConfig("g4Config.C") # user configuration file default g4Config.C
- rtdb = run.GetRuntimeDb() 
+ rtdb = run.GetRuntimeDb()
 # -----Materials----------------------------------------------
- run.SetMaterials("media.geo")  
+ run.SetMaterials("media.geo")
 # -----Create geometry----------------------------------------------
  cave= ROOT.ShipCave("CAVE")
  cave.SetGeometryFileName("cave.geo")
  run.AddModule(cave)
 #
  target = ROOT.simpleTarget()
- target.SetEnergyCut(0.) 
+ target.SetEnergyCut(0.)
  target.SetParameters(material,thickness,0.)
  if storeOnlyMuons: target.SetFastMuon()
  run.AddModule(target)
@@ -88,9 +87,9 @@ def run():
  timer.Stop()
  rtime = timer.RealTime()
  ctime = timer.CpuTime()
- print(' ') 
- print("Macro finished succesfully.") 
- print("Output file is ",  outFile) 
+ print(' ')
+ print("Macro finished succesfully.")
+ print("Output file is ",  outFile)
  print("Real time ",rtime, " s, CPU time ",ctime,"s")
 
 storeOnlyMuons = True

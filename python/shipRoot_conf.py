@@ -1,4 +1,3 @@
-from __future__ import print_function
 import ROOT
 import atexit
 import sys
@@ -91,4 +90,3 @@ def configure(darkphoton=None):
       addDPtoROOT()
    else:
       addHNLtoROOT()
-

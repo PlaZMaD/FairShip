@@ -1,11 +1,7 @@
-from future import standard_library
-standard_library.install_aliases()
 import os
 import re
 import pickle
 from contextlib import contextmanager
-from future.utils import with_metaclass
-
 
 def expand_env(string):
     """
@@ -38,7 +34,7 @@ class _SingletonDict(type):
         del(cls._instances[cls][key])
 
 
-class ConfigRegistry(with_metaclass(_SingletonDict, dict)):
+class ConfigRegistry(dict, metaclass=_SingletonDict):
     """
     Singleton registry of all Configurations
     """
@@ -92,7 +88,7 @@ class ConfigRegistry(with_metaclass(_SingletonDict, dict)):
 
 
 class AttrDict(dict):
-    """ 
+    """
     dict class that can address its keys as fields, e.g.
     d['key'] = 1
     assert d.key == 1

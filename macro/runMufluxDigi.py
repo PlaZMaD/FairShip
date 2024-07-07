@@ -1,19 +1,17 @@
 #!/usr/bin/env python
 
-from __future__ import print_function
-from __future__ import division
 firstEvent = 0
 dy         = None
 
 import resource
 def mem_monitor():
- # Getting virtual memory size 
+ # Getting virtual memory size
     pid = os.getpid()
     with open(os.path.join("/proc", str(pid), "status")) as f:
         lines = f.readlines()
     _vmsize = [l for l in lines if l.startswith("VmSize")][0]
     vmsize = int(_vmsize.split()[1])
-    #Getting physical memory size  
+    #Getting physical memory size
     pmsize = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
     print("memory: virtuell = %5.2F MB  physical = %5.2F MB"%(vmsize/1.0E3,pmsize/1.0E3))
 
@@ -34,7 +32,7 @@ parser.add_argument("-d", "--Debug", dest="debug", help="debug", default=False)
 
 options = parser.parse_args()
 
-outFile = options.inputFile.replace('.root','_dig.root') 
+outFile = options.inputFile.replace('.root','_dig.root')
 # outfile should be in local directory
 tmp = outFile.split('/')
 outFile = tmp[len(tmp)-1]
@@ -46,7 +44,7 @@ from rootpyPickler import Unpickler
 #load Shipgeo dictionary
 upkl    = Unpickler(fgeo)
 ShipGeo = upkl.load('ShipGeo')
- 
+
 # -----Create geometry----------------------------------------------
 import charmDet_conf
 run = ROOT.FairRunSim()

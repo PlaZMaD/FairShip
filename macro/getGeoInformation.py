@@ -1,11 +1,9 @@
-#!/usr/bin/env python 
+#!/usr/bin/env python
 #prints z-coordinators of SHiP detector volumes
 #WARNING: printing the entire geometry takes a lot of time
 #24-02-2015 comments to EvH
 
-from __future__ import print_function, division
-from builtins import range
-import operator, sys
+import operator
 from argparse import ArgumentParser
 from array import array
 import os,ROOT
@@ -22,7 +20,7 @@ def local2Global(n):
      x = ROOT.gGeoManager.GetVerboseLevel()
      ROOT.gGeoManager.SetVerboseLevel(0)
      Info['weight']=Info['node'].GetVolume().Weight() # kg
-     Info['cubicmeter']=Info['node'].GetVolume().Capacity()/1000000. # 
+     Info['cubicmeter']=Info['node'].GetVolume().Capacity()/1000000. #
      ROOT.gGeoManager.SetVerboseLevel(x)
     o = [tmp.GetOrigin()[0],tmp.GetOrigin()[1],tmp.GetOrigin()[2]]
     Info['locorign'] = o
@@ -92,11 +90,11 @@ def print_info(path, node, level, currentlevel, print_sub_det_info=False):
 
 
 parser = ArgumentParser()
-parser.add_argument("-g", "--geometry", dest="geometry", help="input geometry file",
+parser.add_argument("-g", "--geometry", help="Input geometry file",
                     required=True)
-parser.add_argument("-l", "--level", dest="level", help="max subnode level", default=0)
-parser.add_argument("-v", "--volume", dest="volume", help="name of volume to expand", default="")
-parser.add_argument("-X", "--moreInfo", dest="moreInfo", help="print weight and capacity", default=False)
+parser.add_argument("-l", "--level", help="Max subnode level", default=0)
+parser.add_argument("-v", "--volume", help="Name of node to expand", default="")
+parser.add_argument("-X", "--moreInfo", help="Print weight and capacity", action="store_true")
 
 options = parser.parse_args()
 fname = options.geometry
